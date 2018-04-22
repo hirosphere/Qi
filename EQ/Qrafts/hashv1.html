@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Hash 1</title>
+<script src="prime.js"></script>
+</head>
+<body>
+<header>
+<h1>Hash 1</h1>
+
+</header>
+<article id="Content"></article>
+<script>
+
+function main()
+{
+	var self = this;
+	new AppPane( q.id( "Content") );
+}
+
+function AppPane( com )
+{
+	var e = q.div( com );
+	q.e( "p", e, { "Text": "#おおもじこく・小文字郡" } )
+}
+
+document.body.onload = main;
+
+</script>
+</body>
+</html>

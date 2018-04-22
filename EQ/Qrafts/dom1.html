@@ -1,0 +1,146 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Domくらべ 1</title>
+</head>
+<body>
+<header>
+<h1>Domくらべ 1</h1>
+
+</header>
+<article id="Content">
+		<button id="nama1">Nama 1</button>
+		<button id="nama2">Nama 2</button>
+		<button id="frag">Frag</button>
+</article>
+<script>
+
+function main()
+{
+	var self = this;
+	var com = q.id( "Content");
+	q.id( "nama1" ).onclick = function() { test( false, false, com ); };
+	q.id( "nama2" ).onclick = function() { test( false, true, com ); };
+	q.id( "frag" ).onclick = function() { test( true, undefined, com ); };
+	//var e = q.div( { "Class": "List", "Text": "Hello 強震 !!" }, com );
+
+
+
+	//com.Build();
+}
+
+function test( isfr, after, com )
+{
+	console.log( isfr );
+	var ul = document.createElement( "ul" );
+	if( ! after ) com.appendChild( ul );
+	test_( isfr, ul, 0 );
+	if( after ) com.appendChild( ul );
+}
+
+function test_( isfr, com, depth )
+{
+	if( depth >= 2 )  return;
+
+	var e = document.createElement( "li" );
+	e.innerHTML = "Item";
+
+	if( isfr )
+	{
+		;
+	}
+	else
+	{
+		;
+	}
+
+	for( var i = 0; i < 10; i ++ )
+	{
+		test_( isfr, e, depth + 1 );
+	}
+}
+
+var q = new function()
+{
+	this.id = function( id ) { return document.getElementById( id ); };
+	
+	this.div = function( args, com ) { return this.e( "div", args, com ); };
+	this.button = function( args, com ) { return this.e( "button", args, com ); };
+
+	this.e = function( type, args, com )
+	{
+		var e = document.createElement( type );
+		if( args )
+		{
+			if( args.Text !== undefined )  this.text( e, args.Text );
+		}
+		com && com.Add( e );
+		return e;
+	};
+
+	HTMLElement.prototype.Add = function( node )
+	{
+		this._partnodes = this._partnodes || new DocumentFragment();
+		this._partnodes.appendChild( node );
+	};
+
+	HTMLElement.prototype.Build = function()
+	{
+		if( this._partnodes == null )  return;
+		
+		for( var i = this._partnodes.firstSibling; i !== null; i = i.nextSibling )
+		{
+			//i.Build();
+			console.log( typeof i );
+		}
+
+		this.appendChild( this._partnodes );
+	}
+
+	//
+
+	this.text = function( e, text )
+	{
+		e.innerHTML = this.ht_plain( text );
+	};
+
+	this.ht_plain = function( text )
+	{
+		return ( "" + text ).replace( /<|>|&|  | |\t|\r\n|\r|\n/g, hp_rep );
+	};
+	
+	var ht_rep_table =
+	{
+		"<": "&lt;",
+		">": "&gt;",
+		"&": "&amp;", 
+		"  ": " &nbsp;",
+		" ": "&nbsp;", 
+		"\t": "&nbsp&nbsp&nbsp&nbsp;", 
+		"\r\n": "<br/>\r\n",
+		"\r": "<br/>\r\n",
+		"\n": "<br/>\r\n" 
+	};
+	
+	function hp_rep( ch )  {  return ht_rep_table[ ch ];  }
+};
+
+function class_def( base, decor )
+{
+	var ctor = function()
+	{
+		if( this.Initiate ) this.Initiate.apply( this, arguments );
+	};
+	var proto = ctor.prototype;
+	var baseproto = base && base.prototype;
+	if( baseproto ) for( var fn in baseproto )  proto[ fn ] = baseproto[ fn ];
+	decor.call( proto, baseproto );
+	return ctor;
+}
+
+document.body.onload = main;
+
+</script>
+</body>
+</html>

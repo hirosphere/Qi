@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>File1</title>
+<script src="prime.js"></script>
+<script src="EQ.js"></script>
+<link rel="stylesheet" type="text/css" href="qrafts.css"/>
+</head>
+<body>
+<header>
+<h1>File1</h1>
+
+</header>
+<article id="Content"></article>
+<script>
+
+function main()
+{
+	new AppPane( q.id( "Content" ) );
+}
+
+function AppPane( com )
+{
+	let self = this;
+	let e = q.div( com );
+	{
+		q.p( e, { "text": "file load" } );
+		this.output = q.textarea( e, { "style": { "width": "800px", "height": "150px" } } );
+		let wu = new EQ.WaveUnit();
+		wu.LoadDataText( "../SampleWaves/20180409063800.in/SMN0051804090638/SMN0051804090638.EW" );
+	}
+}
+
+
+var EQFS = new function()
+{
+	;
+};
+
+document.body.onload = main;
+
+</script>
+</body>
+</html>
