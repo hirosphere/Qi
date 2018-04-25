@@ -27,6 +27,7 @@ var q = new function()
 	};
 	this.check = function( com, args ) { return this.input( com, "checkbox", args ); };
 	this.range = function( com, args ) { return this.input( com, "range", args ); };
+	this.fr = function() { return document.createDocumentFragment(); };
 
 	this.e = function( type, com, args  )
 	{
@@ -34,6 +35,7 @@ var q = new function()
 		if( args )
 		{
 			if( args.text !== undefined )  this.text( e, args.text );
+			if( args.class !== undefined )  e.className = args.class;
 			if( args.attrs != null )  for( var fn in args.attrs )  e[ fn ] = args.attrs[ fn ];
 			if( args.style != null )  for( var fn in args.style )  e.style[ fn ] = args.style[ fn ];
 		}
@@ -67,12 +69,15 @@ var q = new function()
 	};
 	
 	function hp_rep( ch )  {  return ht_rep_table[ ch ];  }
-};
 
-function SyncLoad( path )
-{
-	let req = new XMLHttpRequest();
-	req.open( "get", path, false );
-	req.send( null );
-	return "" + req.responseText;
-}
+	//  http  //
+
+	this.get = function( path )
+	{
+		console.log( path );
+		let req = new XMLHttpRequest();
+		req.open( "get", path, false );
+		req.send( null );
+		return "" + req.responseText;
+	};
+};

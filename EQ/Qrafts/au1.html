@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>au1</title>
 <script src="prime.js"></script>
-<script src="EQ.js"></script>
+<script src="EQWave.js"></script>
 <link rel="stylesheet" type="text/css" href="qrafts.css"/>
 </head>
 <body>
@@ -149,7 +149,7 @@ let file = "../SampleWaves/20180409063800.in/SMN0031804090638/SMN0031804090638.E
 
 			this.makewave2 = function( context )
 			{
-				let wu = new EQ.WaveUnit();
+				let wu = new EQWave.WaveUnit();
 				wu.LoadDataText( file );
 				if( ! wu.Completed )  return this.makewave1( 100, context );
 

@@ -1,17 +1,17 @@
 
 
-body
-{
-	padding-left: 70px;
+body {
+	padding-left: 10px;
 }
 
-textarea
-{
+h1 { font-size: 20px; margin: 3px; }
+
+
+textarea {
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 
-button
-{
+button {
 	padding: 2em;
 }

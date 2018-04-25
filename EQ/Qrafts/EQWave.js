@@ -1,6 +1,6 @@
-let EQ = {};
+let EQWave = {};
 
-EQ.WaveUnit = class_def
+EQWave.WaveUnit = class_def
 (
 	null,
 	function()
@@ -11,12 +11,12 @@ EQ.WaveUnit = class_def
 
 		this.LoadDataText = function( filepath )
 		{
-			this.SetDataText( SyncLoad( filepath ) );
+			this.SetDataText( q.get( filepath ) );
 		};
 
 		this.SetDataText = function( datatext )
 		{
-			//console.log( datatext );
+			this.Completed = false;
 
 			let m1 = datatext.match( /(.*\n){17}/ );
 			if( ! m1 ) return;
@@ -36,7 +36,7 @@ EQ.WaveUnit = class_def
 			
 			let sf_match = info[ "ScaleFactor" ].match( /(\d+)\(gal\)\/(\d+)/ );
 			let sr_match = info[ "SamplingFreq(Hz)" ].match( /(\d+)Hz/ );
-console.log( sf_match, sr_match );
+
 			if( sf_match == null || sr_match == null )  return;
 
 			let scalefactor = sf_match[ 1 ] / sf_match[ 2 ];

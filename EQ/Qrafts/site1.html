@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Site1</title>
+<script src="prime.js"></script>
+<script src="EQFS.js"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBhQjsoTBqzC7xqEpe84bjKW5vTgZnzwl8&callback=initMap"></script>
+<link rel="stylesheet" type="text/css" href="qrafts.css"/>
+<style>
+
+.App
+{
+	width: 1051px;
+	height: 550px;
+}
+
+.SiteList
+{
+	display: inline-block;
+	width: 300px;
+	height: 100%;
+	overflow: auto;
+	font-size: 14px;
+}
+
+.SiteList .Item
+{
+	height: 42px;
+	line-height: 42px;
+	border-bottom: 1px dotted #999988;
+	white-space: nowrap;
+	overflow-x: hidden; 
+}
+
+.Map
+{
+	display: inline-block;
+	width: 750px;
+	height: 100%;
+	margin-left: 1px;
+	background: #e8ecfc;
+}
+
+</style>
+</head>
+<body>
+<header>
+
+</header>
+<article id="Content"></article>
+<script>
+let gmapkey = "AIzaSyBhQjsoTBqzC7xqEpe84bjKW5vTgZnzwl8";
+
+function main()
+{
+	new AppPane( q.id( "Content" ) );
+}
+
+function initMap(){}
+
+function AppPane( com )
+{
+	let self = this;
+	let e = q.div( com, { "class": "App" } );
+	{
+		new ListPane( e, EQFS.SiteList );
+		this.map = new MapPane( e );
+	}
+
+	this.initmap = function()
+	{
+		;
+	};
+}
+
+function ListPane( com, list )
+{
+	let e = q.div( com, { "class": "SiteList" } );
+	let fr = q.fr();
+	q.p( e, { "text": "count: " + list.count } );
+	for( var id in list )
+	{
+		new ListItem( e, list[ id ] );
+	}
+	e.appendChild( fr );
+}
+
+function ListItem( com, site )
+{
+	var e = q.div( com, { "class": "Item",
+		"text": [ site.code, site.name, site.namer ].join( " - " )
+	});
+}
+
+function MapPane( com )
+{
+	let e = q.div( com, { "class": "Map" } );
+	let gmap = new google.maps.Map( e, { "center": { "lat": 138, "lng": 36}, "zoom": 8 } );
+}
+
+let Hash = new function()
+{
+	this.Set = function( value )
+	{
+		location.h = value;
+	};
+};
+
+document.body.onload = main;
+
+</script>
+</body>
+</html>
