@@ -130,7 +130,7 @@ function MapPane( com )
 	let center = { "lat": 36, "lng": 138};
 
 	let e = q.div( com, { "class": "Map" } );
-	this.gmap = new google.maps.Map( e, { "center": center, "zoom": 8 } );
+	this.gmap = new google.maps.Map( e, { "center": center, "zoom": 7 } );
 
 	let cmark = new google.maps.Marker( { "position": center, "map": this.gmap } );
 
