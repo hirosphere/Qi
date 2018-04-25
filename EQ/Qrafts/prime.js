@@ -54,6 +54,24 @@ var q = new function()
 	{
 		return ( "" + text ).replace( /<|>|&|  | |\t|\r\n|\r|\n/g, hp_rep );
 	};
+
+	this.sc = this.setc = this.setclass = function( e, name, value )
+	{
+		value ? this.ac( e, name ) : this.rc( e, name );
+	};
+
+	this.ac = this.addc = this.addclass = function( e, name )
+	{
+		if( e.className.search( name ) < 0 )  e.className += " " + name; 
+	};
+
+	this.rc = this.rmvc = this.removeclass = function( e, name )
+	{
+		let regex = new RegExp( "(^| )" + name + "( |$)" );
+		e.className = e.className.replace( regex, rmvcfn );
+	}
+
+	function rmvcfn( all, a, b ) { return b; }
 	
 	var ht_rep_table =
 	{

@@ -18,6 +18,7 @@
 .SiteList
 {
 	display: inline-block;
+	cursor: default;
 	width: 300px;
 	height: 100%;
 	overflow: auto;
@@ -32,6 +33,13 @@
 	white-space: nowrap;
 	overflow-x: hidden; 
 }
+
+.SiteList .Item.Selected
+{
+	background: #333333;
+	color: #f6f5f0;
+}
+
 
 .Map
 {
@@ -62,41 +70,80 @@ function initMap(){}
 function AppPane( com )
 {
 	let self = this;
+	let mappane;
+
 	let e = q.div( com, { "class": "App" } );
 	{
-		new ListPane( e, EQFS.SiteList );
-		this.map = new MapPane( e );
+		new ListPane( e, EQFS.SiteList, onselchange );
+		mappane = new MapPane( e );
 	}
 
-	this.initmap = function()
+	function onselchange( site )
 	{
-		;
+		mappane.SetCenter( site.lat, site.long );
 	};
 }
 
-function ListPane( com, list )
+function ListPane( com, list, onselchange )
 {
+	var curitem;
+
 	let e = q.div( com, { "class": "SiteList" } );
 	let fr = q.fr();
 	q.p( e, { "text": "count: " + list.count } );
 	for( var id in list )
 	{
-		new ListItem( e, list[ id ] );
+		new ListItem( e, list[ id ], this );
 	}
 	e.appendChild( fr );
+
+	this.onitemselect = function( item, value )
+	{
+		onselchange( value );
+		if( curitem ) curitem.setselected( false );
+		curitem = item;
+		if( curitem ) curitem.setselected( true );
+	}
 }
 
-function ListItem( com, site )
+
+function ListItem( com, value, pane )
 {
+	let self = this;
 	var e = q.div( com, { "class": "Item",
-		"text": [ site.code, site.name, site.namer ].join( " - " )
+		"text": [ value.code, value.name, value.namer ].join( " - " )
 	});
+
+	e.onclick = function()
+	{
+		pane.onitemselect( self, value );
+	};
+
+	this.setselected = function( value )
+	{
+		q.setc( e, "Selected", value );
+	};
 }
 
 function MapPane( com )
 {
+	let center = { "lat": 36, "lng": 138};
+
 	let e = q.div( com, { "class": "Map" } );
-	let gmap = new google.maps.Map( e, { "center": { "lat": 36, "lng": 138}, "zoom": 8 } );
+	this.gmap = new google.maps.Map( e, { "center": center, "zoom": 8 } );
+
+	let cmark = new google.maps.Marker( { "position": center, "map": this.gmap } );
+
+	this.SetCenter = function( lat, lng )
+	{
+		center = { "lat": lat, "lng": lng };
+		this.gmap.panTo( new google.maps.LatLng( lat, lng ) );
+		setTimeout
+		(
+			function() { cmark.setPosition( new google.maps.LatLng( lat, lng ) ); },
+			200
+		)
+	};
 }
 
 let Hash = new function()
