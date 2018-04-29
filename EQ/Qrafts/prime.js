@@ -19,6 +19,8 @@ var q = new function()
 	this.p = function( com, args ) { return this.e( "p", com, args ); };
 	this.textarea = function( com, args ) { return this.e( "textarea", com, args ); };
 	this.button = function( com, args ) { return this.e( "button", com, args ); };
+	this.select = function( com, args ) { return this.e( "select", com, args ); };
+	this.option = function( com, args ) { return this.e( "option", com, args ); };
 	this.input = function( com, inputtype, args )
 	{
 		let e = this.e( "input", com, args );

@@ -1,0 +1,136 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>List 1</title>
+<script src="Prime.js"></script>
+<script src="EQFS.js"></script>
+<link rel="stylesheet" type="text/css" href="Qrafts.css"/>
+<style>
+
+select
+{
+	padding: 1ex;
+	font-size: 16px;
+}
+
+.app
+{
+	width: 1051px;
+	height: 550px;
+}
+
+.filelist
+{
+	display: inline-block;
+	cursor: default;
+	width: 300px;
+	height: 100%;
+	overflow: auto;
+	font-size: 14px;
+}
+
+.filelist .item
+{
+	height: 42px;
+	line-height: 42px;
+	border-bottom: 1px dotted #999988;
+	white-space: nowrap;
+	overflow-x: hidden; 
+}
+
+.filelist .item.selected
+{
+	background: #333333;
+	color: #f6f5f0;
+}
+
+.Map
+{
+	display: inline-block;
+	width: 750px;
+	height: 100%;
+	margin-left: 1px;
+	background: #e8ecfc;
+}
+
+</style>
+</head>
+<body>
+<header>
+
+</header>
+<article id="Content"></article>
+<script>
+function main()
+{
+	new AppPane( q.id( "Content" ) );
+}
+
+function AppPane( com )
+{
+	let self = this;
+
+	let e = q.div( com, { "class": "app" } );
+	{
+		new ListPane( e, onselchange );
+	}
+
+	function onselchange( site )
+	{
+		//mappane.SetCenter( site.lat, site.long );
+	};
+}
+
+function ListPane( com, onselchange )
+{
+	var curitem;
+
+	let e = q.div( com, { "class": "filelist" } );
+	q.p( e, { "text": "EQFS.Root : " + EQFS.Root } );
+
+	new FolderSelPane( e, EQFS.Root );
+
+	this.onitemselect = function( item, value )
+	{
+		onselchange( value );
+		if( curitem ) curitem.setselected( false );
+		curitem = item;
+		if( curitem ) curitem.setselected( true );
+	}
+}
+
+function FolderSelPane( com, node )
+{
+	let e = q.select( com );
+	let parts = node.GetPartNodes();
+	for( var part of parts )
+	{
+		q.option( e, { "text": part.Path } );
+	}
+}
+
+
+function ListItem( com, value, pane )
+{
+	let self = this;
+	var e = q.div( com, { "class": "item",
+		"text": value
+	});
+
+	e.onclick = function()
+	{
+		pane.onitemselect( self, value );
+	};
+
+	this.setselected = function( value )
+	{
+		q.setc( e, "Selected", value );
+	};
+}
+
+document.body.onload = main;
+
+</script>
+</body>
+</html>

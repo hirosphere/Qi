@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <title>Site1</title>
-<script src="prime.js"></script>
+<script src="Prime.js"></script>
 <script src="EQFS.js"></script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBhQjsoTBqzC7xqEpe84bjKW5vTgZnzwl8&callback=initMap"></script>
-<link rel="stylesheet" type="text/css" href="qrafts.css"/>
+<link rel="stylesheet" type="text/css" href="Qrafts.css"/>
 <style>
 
 .App
@@ -130,7 +130,9 @@ function MapPane( com )
 	let center = { "lat": 36, "lng": 138};
 
 	let e = q.div( com, { "class": "Map" } );
-	this.gmap = new google.maps.Map( e, { "center": center, "zoom": 7 } );
+	this.gmap = new google.maps.Map
+	( e, { "center": center, "zoom": 7, "scaleControl": true }
+	);
 
 	let cmark = new google.maps.Marker( { "position": center, "map": this.gmap } );
 
@@ -141,7 +143,7 @@ function MapPane( com )
 		setTimeout
 		(
 			function() { cmark.setPosition( new google.maps.LatLng( lat, lng ) ); },
-			200
+			280
 		)
 	};
 }

@@ -11,6 +11,10 @@ textarea {
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+a
+{
+	line-height: 2em;
+}
 
 button {
 	padding: 2em;
