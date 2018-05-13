@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="../Qrafts/Files/Prime.js"></script>
+<script src="./Apps/App.js"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBhQjsoTBqzC7xqEpe84bjKW5vTgZnzwl8&callback=initGMap"></script>
+<style>
+
+html { font-size: 14px; font-family: "meirio"; color: #333; }
+
+html,body
+{
+	margin: 0; padding: 0;
+	width: 100%; height: 100%;
+	position: relative; overflow: hidden;
+}
+
+.list {  }
+
+.list .content
+{
+	overflow-x: hidden;
+	overflow-y: auto;
+	padding: 2px;
+}
+
+.list .item
+{
+	border-bottom: 1px dotted #999;
+	line-height: 3.0em;
+	padding: 0 5px;
+	white-space: nowrap;
+}
+
+.list .item.selected
+{
+	background: #222; color: #eee;
+}
+
+</style>
+</head>
+<body onload="Main.Init()"></body>
+</html>

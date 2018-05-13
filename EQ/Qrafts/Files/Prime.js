@@ -16,7 +16,19 @@ var q = new function()
 	this.id = function( id ) { return document.getElementById( id ); };
 	
 	this.div = function( com, args ) { return this.e( "div", com, args ); };
+
+	this.h1 = function( com, args ) { return this.e( "h1", com, args ); };
+	this.h2 = function( com, args ) { return this.e( "h2", com, args ); };
+	this.h3 = function( com, args ) { return this.e( "h3", com, args ); };
+	this.h4 = function( com, args ) { return this.e( "h4", com, args ); };
+
 	this.p = function( com, args ) { return this.e( "p", com, args ); };
+	this.span = function( com, args ) { return this.e( "span", com, args ); };
+
+	this.table = function( com, args ) { return this.e( "table", com, args ); };
+	this.tr = function( com, args ) { return this.e( "tr", com, args ); };
+	this.td = function( com, args ) { return this.e( "td", com, args ); };
+
 	this.textarea = function( com, args ) { return this.e( "textarea", com, args ); };
 	this.button = function( com, args ) { return this.e( "button", com, args ); };
 	this.select = function( com, args ) { return this.e( "select", com, args ); };
@@ -46,6 +58,11 @@ var q = new function()
 	};
 
 	//
+
+	this.clr = this.clear = function( e )
+	{
+		while( e.childNodes.length > 0 )  e.removeChild( e.lastChild );
+	};
 
 	this.text = function( e, text )
 	{
@@ -92,12 +109,40 @@ var q = new function()
 
 	//  http  //
 
-	this.get = function( path )
+	this.get = function( path, onload )
 	{
-		console.log( path );
 		let req = new XMLHttpRequest();
-		req.open( "get", path, false );
+		req.open( "get", path, true );
+		req.onload = function( ev )
+		{
+			onload( req.responseText );
+		};
+		console.log( path );
 		req.send( null );
 		return "" + req.responseText;
+	};
+
+	this.getb = function( path, onload )
+	{
+		let req = new XMLHttpRequest();
+		req.open( "get", path, true );
+		req.responseType = "arraybuffer";
+		req.onload = function( ev )
+		{
+			onload( req.response );
+		};
+		console.log( path );
+		req.send( null );
+	};
+
+	//  //
+
+
+	//  //
+
+	this.frac = function( v, sc )
+	{
+		let s = Math.pow ( 10, sc );
+		return Math.round( v * s ) / s;
 	};
 };

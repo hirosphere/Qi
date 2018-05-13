@@ -70,12 +70,18 @@ EQWave.WaveUnit = class_def
 
 			//console.log( wave.join( "\n" ) );
 
-			//  各価をフィールドに格納。  //
+			//  各値をフィールドに格納。  //
 
 			this.MaxAcc = maxacc;
 			this.SampleRate = smprate;
 			this.Wave = wave;
 			this.Completed = true;
 		};
+
+		this.SetBinaryData = function( data )	// ( ArrayBuffer )
+		{
+			;
+		};
 	}
 );
+

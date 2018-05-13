@@ -3,11 +3,12 @@
 <head>
 <meta charset="utf-8">
 <title>Site1</title>
-<script src="Prime.js"></script>
-<script src="EQFS.js"></script>
+<script src="Files/Prime.js"></script>
+<script src="Files/EQFS.js"></script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBhQjsoTBqzC7xqEpe84bjKW5vTgZnzwl8&callback=initMap"></script>
-<link rel="stylesheet" type="text/css" href="Qrafts.css"/>
 <style>
+
+html { font-size: 13px; }
 
 .App
 {
@@ -41,15 +42,21 @@
 }
 
 
-.Map
+.Content
 {
 	display: inline-block;
 	width: 750px;
 	height: 100%;
+	vertical-align: top;
 	margin-left: 1px;
 	background: #e8ecfc;
 }
 
+.Map
+{
+	width: 100%;
+	height: 80%;
+}
 </style>
 </head>
 <body>
@@ -62,7 +69,10 @@ let gmapkey = "AIzaSyBhQjsoTBqzC7xqEpe84bjKW5vTgZnzwl8";
 
 function main()
 {
-	new AppPane( q.id( "Content" ) );
+	EQFS.Init
+	(
+		function() { new AppPane( q.id( "Content" ) ); }
+	);
 }
 
 function initMap(){}
@@ -80,7 +90,8 @@ function AppPane( com )
 
 	function onselchange( site )
 	{
-		mappane.SetCenter( site.lat, site.long );
+		// mappane.SetCenter( site.lat, site.long );
+		mappane.SetSite( site );
 	};
 }
 
@@ -90,7 +101,7 @@ function ListPane( com, list, onselchange )
 
 	let e = q.div( com, { "class": "SiteList" } );
 	let fr = q.fr();
-	q.p( e, { "text": "count: " + list.count } );
+	//q.p( e, { "text": "count: " + list.count } );
 	for( var id in list )
 	{
 		new ListItem( e, list[ id ], this );
@@ -127,24 +138,53 @@ function ListItem( com, value, pane )
 
 function MapPane( com )
 {
-	let center = { "lat": 36, "lng": 138};
+	let center = { "lat": 36, "lng": 138 };
 
-	let e = q.div( com, { "class": "Map" } );
+	let e = q.div( com, { "class": "Content" } );
+	let mapdiv = q.div( e, { "class": "Map" } );
 	this.gmap = new google.maps.Map
-	( e, { "center": center, "zoom": 7, "scaleControl": true }
+	(
+		mapdiv, { "center": center, "zoom": 7, "scaleControl": true }
 	);
+
+	let info = new InfoPane( e );
 
 	let cmark = new google.maps.Marker( { "position": center, "map": this.gmap } );
 
-	this.SetCenter = function( lat, lng )
+	this.SetSite = function( site )
 	{
-		center = { "lat": lat, "lng": lng };
-		this.gmap.panTo( new google.maps.LatLng( lat, lng ) );
+		center = { "lat": site.lat, "lng": site.long };
+		this.gmap.panTo( new google.maps.LatLng( site.lat, site.long ) );
+		info.SetSite( site );
 		setTimeout
 		(
-			function() { cmark.setPosition( new google.maps.LatLng( lat, lng ) ); },
-			280
+			function() { cmark.setPosition( new google.maps.LatLng( site.lat, site.long ) ); },
+			210
 		)
+	};
+}
+
+function InfoPane( com )
+{
+	let e = q.table( com, { style: { width: "600px" } } );
+	let r1 = new row( e, "北緯" );
+	let r2 = new row( e, "東経" );
+	let r3 = new row( e, "標高" );
+	let r4 = new row( e, "地中センサ深さ" );
+
+	function row( table, title )
+	{
+		this.tr = q.tr( table );
+		this.hd = q.td( this.tr, { "class": "rowhead", text: title } );
+		this.col = q.td( this.tr );
+	}
+
+	this.SetSite = function( site )
+	{
+		q.text( r1.col, site.lat );
+		q.text( r2.col, site.long );
+		q.text( r3.col, site.elev );
+		q.text( r4.col, site.dep );
 	};
 }
 

@@ -3,37 +3,58 @@
 <head>
 <meta charset="utf-8">
 <title>List 1</title>
-<script src="Prime.js"></script>
-<script src="EQFS.js"></script>
-<link rel="stylesheet" type="text/css" href="Qrafts.css"/>
+<script src="Files/Prime.js"></script>
+<script src="Files/EQFS.js"></script>
 <style>
+
+html { font-size: 13px; }
+
+h1 { margin: 6px 6px; padding: 0; font-size: 29px; }
+p { margin: 0; padding: 1ex; }
 
 select
 {
-	padding: 1ex;
-	font-size: 16px;
+	padding: 1.1ex;
+	font-size: 18px;
+	color: #343430;
 }
 
 .app
 {
-	width: 1051px;
+	width: 1050px;
 	height: 550px;
+}
+
+.side
+{
+	display: inline-block;
+	overflow: auto;
+	width: 240px;
+	height: 100%;
+}
+
+.content
+{
+	display: inline-block;
+	padding: 0px;
+	margin-left: 1px;
+	width: 809px;
+	height: 100%;
+	overflow: auto;
 }
 
 .filelist
 {
-	display: inline-block;
 	cursor: default;
-	width: 300px;
-	height: 100%;
 	overflow: auto;
 	font-size: 14px;
+	color: #101008;
 }
 
 .filelist .item
 {
-	height: 42px;
-	line-height: 42px;
+	height: 37px;
+	line-height: 37px;
 	border-bottom: 1px dotted #999988;
 	white-space: nowrap;
 	overflow-x: hidden; 
@@ -45,13 +66,11 @@ select
 	color: #f6f5f0;
 }
 
-.Map
+td { background: #f0f0ff; }
+
+.info-field
 {
-	display: inline-block;
-	width: 750px;
-	height: 100%;
-	margin-left: 1px;
-	background: #e8ecfc;
+	background: #ddddfa;
 }
 
 </style>
@@ -64,21 +83,91 @@ select
 <script>
 function main()
 {
-	new AppPane( q.id( "Content" ) );
+	EQFS.Init
+	(
+		function()
+		{
+			console.log( typeof EQFS );
+			new AppPane( q.id( "Content" ) );
+		}
+	)
 }
 
 function AppPane( com )
 {
 	let self = this;
+	let info;
 
 	let e = q.div( com, { "class": "app" } );
 	{
-		new ListPane( e, onselchange );
+		let side = q.div( e, { "class": "side" } );
+		{
+			let ysel = new ItemSelPane
+			(
+				side, "年", EQFS.Root,
+				function( node ) { foldersel.SetNode( node ); }
+			);
+
+			let foldersel = new ItemSelPane
+			(
+				side, "フォルダ", null,
+				function( node ) { filesel.SetNode( node ); }
+			);
+
+			let filesel = new ListPane
+			(
+				side, function( node ) { info.SetNode( node ); }
+			);
+
+		}
+		let c = q.div( e, { "class": "content" });
+		info = new InfoPane( c );
 	}
 
-	function onselchange( site )
+	function onselchange( node )
 	{
 		//mappane.SetCenter( site.lat, site.long );
+		q.text( info, node && node.Name )
+	};
+}
+
+function InfoPane( com )
+{
+	let e = q.div( com, { "class": "info" } );
+	let hdr = q.h1( e );
+	let p1 = q.p( e );
+	let table = q.table( e, { style: { width: "800px" } } );
+	let wave_ta = q.textarea( e, { style:{ width: "800px", height: "400px" } } );
+
+	this.SetNode = function( node )
+	{
+		let site = node && node.Site;
+		let hdstr = site && [ site.code, site.name, site.namer ].join( "  " );
+		let text = site && [ node.Com.Caption, site.lat, site.long, site.elev, site.dep ].join( ", " )
+			+ "\n" + node.Path; 
+		q.text( hdr, hdstr );
+		q.text( p1, text );
+		
+		let self = this;
+		node && node.LoadKwin
+		(
+			function( bin )
+			{
+				let dec = new decoder( bin );
+
+				q.clr( table );
+				for( var cols of dec.monitor )
+				{
+					let tr = q.tr( table );
+					q.td( tr, { "text": cols[ 0 ], "class": "info-field" } );
+					q.td( tr, { "text": cols[ 1 ] } );
+					q.td( tr, { "text": cols[ 2 ] } );
+					q.td( tr, { "text": cols[ 3 ] } );
+				}
+
+				wave_ta.value = dec.channels[ 0 ].join( "\t" );
+			}
+		);
 	};
 }
 
@@ -87,47 +176,85 @@ function ListPane( com, onselchange )
 	var curitem;
 
 	let e = q.div( com, { "class": "filelist" } );
-	q.p( e, { "text": "EQFS.Root : " + EQFS.Root } );
 
-	new FolderSelPane( e, EQFS.Root );
-
-	this.onitemselect = function( item, value )
+	this.SetNode = function( node )
 	{
-		onselchange( value );
-		if( curitem ) curitem.setselected( false );
+		q.clr( e );
+		if( node == null )  return;
+
+		node.GetPartNodes( onload );
+
+		function onload( parts )
+		{
+			for( var part of parts )  new ListItem( e, part, onitemclick );
+		}
+	};
+
+	function onitemclick( item, node )
+	{
+		if( item == curitem )  return;
+
+		curitem && curitem.setselected( false );
 		curitem = item;
-		if( curitem ) curitem.setselected( true );
+		curitem && curitem.setselected( true );
+		onselchange( node );
 	}
+
 }
 
-function FolderSelPane( com, node )
-{
-	let e = q.select( com );
-	let parts = node.GetPartNodes();
-	for( var part of parts )
-	{
-		q.option( e, { "text": part.Path } );
-	}
-}
-
-
-function ListItem( com, value, pane )
+function ListItem( com, node, onitemclick )
 {
 	let self = this;
-	var e = q.div( com, { "class": "item",
-		"text": value
-	});
+	let site = node && node.Site;
+	let caption = site && [ site.code, site.name, site.namer ].join( " - " );
+	var e = q.div
+	(
+		com, { "class": "item", "text": caption }
+	);
 
 	e.onclick = function()
 	{
-		pane.onitemselect( self, value );
+		onitemclick( self, node );
 	};
 
 	this.setselected = function( value )
 	{
-		q.setc( e, "Selected", value );
+		q.setc( e, "selected", value );
 	};
 }
+
+function ItemSelPane( com, caption, node, onselect )
+{
+	let e = q.select( com );
+	q.option( e, { "text": caption } );
+
+	e.onchange = function()
+	{
+		let item = this.childNodes[ this.selectedIndex ];
+		if( item ) onselect( item.fsnode || null );
+	};
+
+	this.SetNode = function( node )
+	{
+		while( e.childNodes.length > 1 ) { e.removeChild( e.lastChild ); };
+
+		if( node == null )  return;
+		node.GetPartNodes
+		(
+			function( parts )
+			{
+				for( var part of parts )
+				{
+					let opt = q.option( e, { "text": part.Caption } );
+					opt.fsnode = part;
+				}
+			}
+		)
+	};
+
+	this.SetNode( node );
+}
+
 
 document.body.onload = main;
 
