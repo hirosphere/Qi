@@ -7,6 +7,7 @@ let Main = new function()
 		let apppane = new AppPane( root );
 		root.UpdateLayout();
 
+
 		EQFS.Init( eqfscomplete );
 
 		function eqfscomplete()
@@ -56,7 +57,7 @@ let AppPane = class_def
 
 		this.OnEQFSComplete = function()
 		{
-			this.CurrentIndex.SetCurrent( this.Index );
+			this.CurrentIndex.Set( this.Index );
 		};
 
 		this.UpdatePageTitle = function()
@@ -75,8 +76,7 @@ let SidePane = class_def
 		{
 			this.e = q.div( null, { "class": "side", text_: "side" } );
 
-			new Pane( this, { Width: -1, Height: 50, edef: { type: "div", text: "side top" } } );
-			new Pane( this, { Width: -1, Height: 50, Rel: 10 } );
+			new CollListPane( this, { Width: -1, Height: 50, Rel: 10, Selection: args.App.CurrentIndex } );
 			new Pane( this, { Width: -1, Height: 50, edef: { type: "div", text: "side bottom" } } );
 
 			this.Layout = new Layout.Vert();

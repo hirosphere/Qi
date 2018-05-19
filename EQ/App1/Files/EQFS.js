@@ -7,12 +7,12 @@ let EQFS = new function()
 		//oncomplete();
 		MakeSiteList( onload );
 
-		function onload()
+		let self = this;
+		function onload( list )
 		{
-			;
+			self.SiteList = list;
+			oncomplete();
 		}
-
-		oncomplete();
 	};
 
 	this.GetIndex = function( path, onload )
@@ -21,27 +21,37 @@ let EQFS = new function()
 
 		function _onload( csv )
 		{
-			
 			let list = [];
 			let lines = csv.split( /\r?\n/ );
+			lines.pop();
 			for( var line of lines )
 			{
 				let cols = line.split( "\t" );
-				let item = { Type: cols[ 0 ], Name: cols[ 1 ], Size: cols[ 2 ] };
-				list.push( item );
+				list.push( { Type: cols[ 0 ], Name: cols[ 1 ], Size: cols[ 2 ] } );
 			}
 			onload( list );
 		}
 	};
 
+	let sitefs = [ "Code", "Name", "Namer", "Lat", "Lng", "Elev", "Depth", "Pref", "Prefr", "Latj", "Lngj", "Meter" ];
+
 	function MakeSiteList( onload )
 	{
-		//q.get( rootpath + "sitepub_all_utf8.csv", onload );
-		//q.get( rootpath + "/Waves/Index.txt", onload );
+		q.get( rootpath + "sitepub_all_utf8.csv", _onload );
 
-		function onload( csv )
+		function _onload( csv )
 		{
-			console.log( csv );
+			let list = {};
+			let lines = csv.split( /\r?\n/ );
+			lines.pop();
+			for( var line of lines )
+			{
+				let cols = line.split( "," );
+				let item = {};
+				for( var i = 0; i < sitefs.length; i ++ )  item[ sitefs[ i ] ] = cols[ i ]; 
+				list[ item.Code ] = item;
+			}
+			onload( list );
 		}
 	}
 

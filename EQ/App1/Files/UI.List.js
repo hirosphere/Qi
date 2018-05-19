@@ -1,5 +1,5 @@
 
-let ListPane = class_def
+let CollListPane = class_def
 (
 	Pane,
 	function()
@@ -9,7 +9,7 @@ let ListPane = class_def
 			this.Node = null;
 
 			this.e = q.div( null, { "class": args && args.Class || "list" } );
-			q.p( this.e, { text: "list" } );
+			q.p( this.e, { text: "Coll List" } );
 
 			this.Selection = args.Selection;
 			let self = this;
@@ -18,9 +18,14 @@ let ListPane = class_def
 				Select: function( node )
 				{
 					self.Update();
+				},
+
+				Unselect: function( node )
+				{
+					;
 				}
 			};
-			this.Selection &&  this.Selection.AddView( view );
+			this.Selection.AddView( view );
 
 			this.Update();
 		};

@@ -10,6 +10,9 @@ let FolderIndex = class_def
 		this.Initiate = function( com, compath, name )
 		{
 			base.Initiate.call( this, com );
+			
+			this.PartMaked = 0;
+			this.getpartnodescallbacks = [];
 			this.Path = compath + name + ( name.length ? "/" : "" );
 			this.Name = name;
 		};
@@ -26,11 +29,16 @@ let FolderIndex = class_def
 
 		this.GetPartNodes = function( callback )
 		{
-			if( this.PartNodes.length > 0 )
+			if( this.PartMaked == 2 )
 			{
 				callback( this.PartNodes );
 				return;
 			}
+
+			this.getpartnodescallbacks.push( callback );
+			if( this.PartMaked == 1 )  return;
+			
+			this.PartMaked = 1;
 
 			EQFS.GetIndex( this.Path, onload );
 
@@ -42,7 +50,9 @@ let FolderIndex = class_def
 					if( item.Type == "Dir" )  new self.PartIndex( self, self.Path, item.Name );
 					if( item.Type == "File" )  new WaveIndex( self, self.Path, item.Name );
 				}
-				callback( self.PartNodes );
+				self.PartMaked = 2;
+				for( var callback of self.getpartnodescallbacks ) callback( self.PartNodes );
+				self.getpartnodescallbacks.length = 0;
 			}
 		};
 	}
@@ -65,9 +75,11 @@ let WaveIndex = class_def
 		this.GetCaption = function()
 		{
 			var mt;
-			if( mt = this.Name.match( /^([A-Z]{3,4})(\d{2,3})/ ) )
+			if( mt = this.Name.match( /^([A-Z]{3}\d{3}|[A-Z]{4}\d{2})/ ) )
 			{
-				return `${mt[1]}${mt[2]}`;
+				let code = mt[ 1 ];
+				let site = EQFS.SiteList[ code ];
+				return site ? `${ site.Code } ${ site.Name }` : this.Name;
 			}
 			return this.Name;
 		};

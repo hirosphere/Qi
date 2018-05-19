@@ -28,7 +28,7 @@ let PageSwitchPane = class_def
 			let index = this.Cur.GetCurrent();
 			if( index == null )  return;
 
-			// console.log( index.GetCaption() );
+			// console.log( "Switch.Update", index.GetCaption() );
 
 
 			let type = index.Type;
@@ -65,7 +65,6 @@ Content.ListPane = class_def
 
 		this.SetIndex = function( index )
 		{
-			console.log( "SetIndex", index.GetCaption() )
 			q.clr( this.body );
 			if( index == null )  return;
 
