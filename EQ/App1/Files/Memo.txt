@@ -1,0 +1,6 @@
+
+PathSel					PageSel
+root								ItemList	[ 2011, 2012, 2013 ... ]
+root/2016							ItemList	[ 2016/04/16-00:38:00, ... ]
+root/2016/20160416..				ItemList	[ KMM0131604160038.kwin, ... ]
+root/2016/20160416../KMM0131604..	Content		

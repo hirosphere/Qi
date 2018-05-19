@@ -2,14 +2,17 @@
 <html>
 <head>
 <meta charset="utf-8">
-<script src="../Files/Prime.js"></script>
-<script src="../Files/EQFS.js"></script>
-<script src="../Files/Pane.js"></script>
-<script src="./AppMain.js"></script>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBhQjsoTBqzC7xqEpe84bjKW5vTgZnzwl8&callback=initGMap"></script>
+<script src="../Libs/Prime.js"></script>
+<script src="./Files/Model.js"></script>
+<script src="./Files/EQFS.js"></script>
+<script src="./Files/Pane.js"></script>
+<script src="./Files/UI.List.js"></script>
+<script src="./Files/UI.Content.js"></script>
+<script src="./Files/Index.js"></script>
+<script src="./Apps/ListApp.js"></script>
 <style>
 
-html { font-size: 14px; font-family: "meirio"; color: #333; }
+html, input, textarea { font-size: 14px; font-family: sans-serif; color: #333; }
 
 html,body
 {
@@ -18,7 +21,17 @@ html,body
 	position: relative; overflow: hidden;
 }
 
-.list {  }
+button { font-size: 16px; }
+select { text-align: center; font-size: 23px; }
+option { text-align: center; font-size: 18px; }
+select option[selected] { background: #666; }
+
+.app { background: #fff; border: 0px solid #222; }
+.path { padding: 0 13px; line-height: 42px; font-size: 16px; border-bottom: 1px solid #bbb; }
+.side { background: #fff; border: 0px solid #666; }
+.content { background: #fff; border: 0px solid #666; }
+
+.list {}
 
 .list .content
 {
@@ -39,6 +52,11 @@ html,body
 {
 	background: #222; color: #eee;
 }
+
+.PATH_ITEM { padding: 0 1em; }
+
+.CONTENT_LIST { border: 5px solid #f41; word-wrap: break-word; }
+.CONTENT_LIST_ITEM { display: inline-block; padding: 0 2em; line-height: 70px;  }
 
 </style>
 </head>
