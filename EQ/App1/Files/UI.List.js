@@ -6,8 +6,47 @@ let ListPane = class_def
 	{
 		this.Build = function( args )
 		{
+			this.Node = null;
+
 			this.e = q.div( null, { "class": args && args.Class || "list" } );
 			q.p( this.e, { text: "list" } );
+
+			this.Selection = args.Selection;
+			let self = this;
+			let view =
+			{
+				Select: function( node )
+				{
+					self.Update();
+				}
+			};
+			this.Selection &&  this.Selection.AddView( view );
+
+			this.Update();
+		};
+
+		this.Update = function()
+		{
+			let node = this.Selection.GetCurrent();
+			if( node && node.Com == this.Node )
+			{
+
+			}
+			else
+			{
+				this.SetNode( node );
+			}
+		};
+
+		this.SetNode = function( node )
+		{
+			this.Node = node;
+			node && node.GetPartNodes( callback );
+
+			function callback( parts )
+			{
+				;
+			}
 		};
 	}
 );
@@ -19,26 +58,27 @@ let PathSelectPane = class_def
 	{
 		this.Build = function( args )
 		{
-			this.Selection = null;
+			args = args || {};
+
 			this.e = q.div( null, { "class": args && args.Class } );
 			this.content = q.span( this.e );
-			args && args.Selection && this.SetSelection( args.Selection );
+
+			this.Selection = args.Selection;
+			let self = this;
+			let view =
+			{
+				Select: function( node )
+				{
+					self.Update();
+				}
+			};
+			this.Selection &&  this.Selection.AddView( view );
+
 			this.Update();
 		};
 
 		this.SetSelection = function( selection )
 		{
-			this.Selection = selection;
-			let self = this;
-			let view = this.selview =
-			{
-				Select: function( node )
-				{
-					// console.log( "path sel", node.GetCaption() );
-					self.Update();
-				}
-			};
-			selection.AddView( view );
 			console.log( "PathSelectPane" );
 		};
 
@@ -46,8 +86,6 @@ let PathSelectPane = class_def
 		{
 			let sel = this.Selection;
 			let node = sel && sel.GetCurrent();
-			console.log( "PathPane.Update", node && node.GetCaption() );
-			//q.text( this.e, `${ node && node.GetCaption()}` );
 
 			if( node == null )  return;
 
@@ -59,7 +97,6 @@ let PathSelectPane = class_def
 			let self = this;
 			function onclick( node )
 			{
-				console.log( node.toString(), self.App && self.App.toString() );
 				sel.SetCurrent( node );
 			}
 		};
