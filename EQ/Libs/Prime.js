@@ -8,7 +8,7 @@ function class_def( base, decor )
 	proto.Initiate = function(){};
 	var baseproto = base && base.prototype;
 	if( baseproto ) for( var fn in baseproto )  proto[ fn ] = baseproto[ fn ];
-	decor.call( proto, baseproto );
+	decor.call( proto, baseproto, base, ctor );
 	return ctor;
 }
 

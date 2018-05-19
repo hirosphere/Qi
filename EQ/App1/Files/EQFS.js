@@ -1,6 +1,6 @@
 let EQFS = new function()
 {
-	let rootpath = "/d/github/eq/";
+	let rootpath = location.host == "localhost" ? "/D/GitHub/EQ/" : "/EQ/";
 
 	this.Init = function( oncomplete )
 	{

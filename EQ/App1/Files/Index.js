@@ -2,22 +2,21 @@
 let FolderIndex = class_def
 (
 	Node,
-	function( base )
+	function( base, bc, ctor )
 	{
 		this.Type = "Folder";
+		this.PartIndex = ctor;
 
-		this.Initiate = function( com, caption, compath, name )
+		this.Initiate = function( com, compath, name )
 		{
 			base.Initiate.call( this, com );
-			this.Caption = caption;
 			this.Path = compath + name + ( name.length ? "/" : "" );
 			this.Name = name;
-			console.log( this.Path, caption );
 		};
 
 		this.GetCaption = function()
 		{
-			return this.Caption;
+			return this.Name;
 		};
 
 		this.GetPartNodes = function( callback )
@@ -35,10 +34,25 @@ let FolderIndex = class_def
 			{
 				for( var item of list )
 				{
-					if( item.Type == "Dir" )  new FolderIndex( self, item.Name, self.Path, item.Name );
+					if( item.Type == "Dir" )  new self.PartIndex( self, self.Path, item.Name );
 				}
 				callback( self.PartNodes );
 			}
+		};
+	}
+);
+
+let YearIndex = class_def
+(
+	FolderIndex,
+	function( base )
+	{
+		this.Type = "Index";
+		this.PartIndex = FolderIndex;
+
+		this.GetCaption = function()
+		{
+			return this.Name;
 		};
 	}
 );
@@ -49,11 +63,10 @@ let RootIndex = class_def
 	function( base )
 	{
 		this.Type = "Index";
+		this.PartIndex = YearIndex;
 
-		this.Initiate = function()
-		{
-			base.Initiate.call( this, null, "EQ", "", "" );
-		};
+		this.Initiate = function() { base.Initiate.call( this, null, "", "" ) };
+		this.GetCaption = function() { return "EQ " + this.Name };
 	}
 );
 
