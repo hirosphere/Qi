@@ -46,7 +46,7 @@ let AppPane = class_def
 					vert, { Width: -1, Height: 50, Rel: 10, Layout: new Layout.Horiz() }
 				);
 				{
-					this.side = new SidePane( horiz, { Width: 168, Rel: 0.2, Height: -1, App: this } );
+					this.side = new SidePane( horiz, { Width: 202, Rel: 0.2, Height: -1, App: this } );
 					this.content = new PageSwitchPane( horiz, { Width: 250, Rel: 10, Height: -1, App: this } );
 				}
 			}
@@ -77,7 +77,7 @@ let SidePane = class_def
 			this.e = q.div( null, { "class": "side", text_: "side" } );
 
 			new CollListPane( this, { Width: -1, Height: 50, Rel: 10, Selection: args.App.CurrentIndex } );
-			new Pane( this, { Width: -1, Height: 50, edef: { type: "div", text: "side bottom" } } );
+			//new Pane( this, { Width: -1, Height: 50, edef: { type: "div", text: "side bottom" } } );
 
 			this.Layout = new Layout.Vert();
 		};

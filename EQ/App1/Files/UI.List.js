@@ -6,10 +6,18 @@ let CollListPane = class_def
 	{
 		this.Build = function( args )
 		{
-			this.Node = null;
+			this.CssClass = args && args.CssClass || "COLL_LIST";
+			this.ComNode = null;
 
-			this.e = q.div( null, { "class": args && args.Class || "list" } );
-			q.p( this.e, { text: "Coll List" } );
+			this.e = q.div( null, { "class": this.CssClass } );
+
+			this.i = new DivPane( this, { Width: -1, Height: 40, Rel: 0, Text: "" } );
+			this.Content = new DivPane
+			(
+				this, { Width: -1, Height: 40, Rel: 10, Class: this.CssClass + "_CONTENT" }
+			);
+
+			this.Layout = new Layout.Vert();
 
 			this.Selection = args.Selection;
 			let self = this;
@@ -17,6 +25,7 @@ let CollListPane = class_def
 			{
 				Select: function( node )
 				{
+					// console.log( "CollList.view.Select", node.GetCaption() );					
 					self.Update();
 				},
 
@@ -33,25 +42,39 @@ let CollListPane = class_def
 		this.Update = function()
 		{
 			let node = this.Selection.GetCurrent();
-			if( node && node.Com == this.Node )
+			if( node && this.ComNode && ( node.Com == this.ComNode ) )
 			{
+				//  coll change  //
 
+				q.text( this.i.e, "coll change " + node.GetCaption() );
 			}
 			else
 			{
-				this.SetNode( node );
+				//  com change  //
+				this.SetComNode( node && node.Com || null );
 			}
 		};
 
-		this.SetNode = function( node )
+		this.SetComNode = function( node )
 		{
-			this.Node = node;
+			this.ComNode = node;
+			q.text( this.i.e, "com change " + ( node && node.GetCaption() ) );
+			q.clr( this.Content.e );
+
+			let self = this;
+			let pref = this.CssClass;
 			node && node.GetPartNodes( callback );
 
 			function callback( parts )
 			{
-				;
+				for( var part of parts )  new ListItem( pref, self.Content.e, part, self.Selection );
 			}
+		};
+
+		let ListItem = function( pref, com, node, selection )
+		{
+			let e = q.div( com, { "class": pref + "_ITEM", text: node.GetCaption() } );
+			e.onclick = function() { selection.SetCurrent( node ); };
 		};
 	}
 );
