@@ -132,6 +132,7 @@ let PathSelectPane = class_def
 		let PathItem = function( com, node, pref, onclick )
 		{
 			let e = q.span( com, { "class": pref + "_ITEM", text: node.GetCaption() } );
+			let t = q.span( com, { "class": pref + "_TERM", text: ">" } );
 			e.onclick = function() { onclick( node ); };
 		};
 	}

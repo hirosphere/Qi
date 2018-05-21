@@ -32,6 +32,7 @@ let PageSwitchPane = class_def
 
 
 			let type = index.Type;
+			console.log( type );
 			if( this.CurContent )  this.CurContent.Enable = false;
 			this.CurContent = this.Contents[ type ] || this.Contents[ type ] || this.CreateContent( index );
 			this.CurContent.SetIndex( index );
@@ -89,5 +90,23 @@ Content.ListPane = class_def
 			e.onclick = function(){ onclick( index ); };
 		}
 	}
-)
+);
+
+Content.EQPane = class_def
+(
+	Content.ListPane,
+	function()
+	{
+		;
+	}
+);
+
+Content.WavePane = class_def
+(
+	Pane,
+	function()
+	{
+		;
+	}
+);
 

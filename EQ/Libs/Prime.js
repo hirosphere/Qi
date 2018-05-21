@@ -120,7 +120,7 @@ var q = new function()
 		{
 			onload( req.responseText );
 		};
-		console.log( path );
+		// console.log( path );
 		req.send( null );
 		return "" + req.responseText;
 	};
