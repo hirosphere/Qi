@@ -4,7 +4,7 @@ let FolderIndex = class_def
 	Node,
 	function( base, bc, ctor )
 	{
-		this.Type = "Folder";
+		this.Type = "Dir";
 		this.PartIndex = ctor;
 
 		this.Initiate = function( com, compath, name )
@@ -22,7 +22,7 @@ let FolderIndex = class_def
 			var mt;
 			if( mt = this.Name.match( /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})00/ ) )
 			{
-				return `${mt[1]}/${mt[2]}/${mt[3]} ${mt[4]}:${mt[5]}`;
+				return `${mt[1]}/${mt[2]}/${mt[3]}  ${mt[4]}時${mt[5]}分`;
 			}
 			return this.Name;
 		};
@@ -63,13 +63,15 @@ let WaveIndex = class_def
 	FolderIndex,
 	function( base )
 	{
-		this.Type = "Wave";
-
 		this.Initiate = function( com, compath, name )
 		{
 			base.Initiate.call( this, com, compath, name );
 			this.Path = compath + name;
 			this.Name = name;
+
+			var iswave = name.match( /\.kwin$/ );
+
+			if( iswave ) this.Type = "Wave";
 		};
 
 		this.GetCaption = function()
@@ -83,11 +85,6 @@ let WaveIndex = class_def
 			}
 			return this.Name;
 		};
-
-		this.GetPartNodes = function( callback )
-		{
-			callback( [] );
-		}
 	}
 );
 
@@ -96,8 +93,6 @@ let RootIndex = class_def
 	FolderIndex,
 	function( base )
 	{
-		this.Type = "Folder";
-
 		this.Initiate = function() { base.Initiate.call( this, null, "", "" ) };
 		this.GetCaption = function() { return "EQ " };
 	}

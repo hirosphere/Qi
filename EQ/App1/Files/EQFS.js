@@ -1,6 +1,7 @@
 let EQFS = new function()
 {
 	let rootpath = location.host == "localhost" ? "/D/GitHub/EQ/" : "/EQ/";
+	let wavespath = rootpath + "Waves/";
 
 	this.Init = function( oncomplete )
 	{
@@ -32,6 +33,11 @@ let EQFS = new function()
 			onload( list );
 		}
 	};
+
+	this.GetBinaryFile = function( path, onload )
+	{
+		q.getb( wavespath + path, onload );
+	}
 
 	let sitefs = [ "Code", "Name", "Namer", "Lat", "Lng", "Elev", "Depth", "Pref", "Prefr", "Latj", "Lngj", "Meter" ];
 

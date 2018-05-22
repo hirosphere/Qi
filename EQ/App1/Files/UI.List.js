@@ -1,84 +1,4 @@
 
-let CollListPane = class_def
-(
-	Pane,
-	function()
-	{
-		this.Build = function( args )
-		{
-			this.CssClass = args && args.CssClass || "COLL_LIST";
-			this.ComNode = null;
-
-			this.e = q.div( null, { "class": this.CssClass } );
-
-			this.i = new DivPane( this, { Width: -1, Height: 40, Rel: 0, Text: "" } );
-			this.Content = new DivPane
-			(
-				this, { Width: -1, Height: 40, Rel: 10, Class: this.CssClass + "_CONTENT" }
-			);
-
-			this.Layout = new Layout.Vert();
-
-			this.Selection = args.Selection;
-			let self = this;
-			let view =
-			{
-				Select: function( node )
-				{
-					// console.log( "CollList.view.Select", node.GetCaption() );					
-					self.Update();
-				},
-
-				Unselect: function( node )
-				{
-					;
-				}
-			};
-			this.Selection.AddView( view );
-
-			this.Update();
-		};
-
-		this.Update = function()
-		{
-			let node = this.Selection.GetCurrent();
-			if( node && this.ComNode && ( node.Com == this.ComNode ) )
-			{
-				//  coll change  //
-
-				q.text( this.i.e, "coll change " + node.GetCaption() );
-			}
-			else
-			{
-				//  com change  //
-				this.SetComNode( node && node.Com || null );
-			}
-		};
-
-		this.SetComNode = function( node )
-		{
-			this.ComNode = node;
-			q.text( this.i.e, "com change " + ( node && node.GetCaption() ) );
-			q.clr( this.Content.e );
-
-			let self = this;
-			let pref = this.CssClass;
-			node && node.GetPartNodes( callback );
-
-			function callback( parts )
-			{
-				for( var part of parts )  new ListItem( pref, self.Content.e, part, self.Selection );
-			}
-		};
-
-		let ListItem = function( pref, com, node, selection )
-		{
-			let e = q.div( com, { "class": pref + "_ITEM", text: node.GetCaption() } );
-			e.onclick = function() { selection.SetCurrent( node ); };
-		};
-	}
-);
-
 let PathSelectPane = class_def
 (
 	Pane,
@@ -134,6 +54,91 @@ let PathSelectPane = class_def
 			let e = q.span( com, { "class": pref + "_ITEM", text: node.GetCaption() } );
 			let t = q.span( com, { "class": pref + "_TERM", text: ">" } );
 			e.onclick = function() { onclick( node ); };
+		};
+	}
+);
+
+let CollListPane = class_def
+(
+	Pane,
+	function()
+	{
+		this.Build = function( args )
+		{
+			this.CssClass = args && args.CssClass || "COLL_LIST";
+			this.ComNode = null;
+			this.items = {};
+
+			this.e = q.div( null, { "class": this.CssClass } );
+
+			this.Content = new DivPane
+			(
+				this, { Width: -1, Height: 40, Rel: 10, Class: this.CssClass + "_CONTENT" }
+			);
+			this.i = new DivPane( this, { Width: -1, Height: 40, Rel: 0, Text: "" } );
+
+			this.Layout = new Layout.Vert();
+
+			this.Selection = args.Selection;
+			let self = this;
+			let view =
+			{
+				Select: function( node )
+				{
+					if( node && ( node.Com == self.ComNode ) )  self.SetItemState( node, true );
+					else  self.UpdateContent();
+				},
+
+				Unselect: function( node )
+				{
+					self.SetItemState( node, false );
+				}
+			};
+			this.Selection.AddView( view );
+
+			this.UpdateContent();
+		};
+
+		this.UpdateContent = function()
+		{
+			let node = this.Selection.GetCurrent();
+			let com = this.ComNode = node && node.Com;
+
+			//q.text( this.i.e, "com change? " + ( com && com.GetCaption() ) );
+			q.text( this.i.e, "com change ! " + ( node && node.GetCaption() || " ??" ) );
+			q.clr( this.Content.e );
+
+			this.items = {};
+			let self = this;
+			let pref = this.CssClass;
+			com && com.GetPartNodes( callback );
+
+			function callback( parts )
+			{
+				for( var part of parts )
+					self.items[ part.rtid ] =
+					  new ListItem( pref, self.Content.e, part, self.Selection );
+				
+				self.SetItemState( self.Selection.GetCurrent(), true, true );
+			}
+		};
+
+		this.SetItemState = function( node, selected, scroll )
+		{
+			let item = node && this.items[ node.rtid ];
+			item && item.SetState( selected );
+			if( item && scroll )
+			{
+				this.Content.e.scrollTop = item.e.offsetTop - 50;
+			}
+		};
+
+		let ListItem = function( pref, com, node, selection )
+		{
+			let e = this.e = q.div( com, { "class": pref + "_ITEM", text: node.GetCaption() } );
+			e.onclick = function() { selection.SetCurrent( node ); };
+
+			this.SetState = function( selected ) { q.setc( e, "SELECTED", selected ); };
 		};
 	}
 );

@@ -134,7 +134,7 @@ var q = new function()
 		{
 			onload( req.response );
 		};
-		console.log( path );
+		//console.log( path );
 		req.send( null );
 	};
 

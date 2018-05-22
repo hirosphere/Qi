@@ -5,9 +5,12 @@
 <script src="../Libs/Prime.js"></script>
 <script src="./Files/Model.js"></script>
 <script src="./Files/EQFS.js"></script>
+<script src="./Files/BinReader.js"></script>
+<script src="./Files/EQWave.js"></script>
 <script src="./Files/Pane.js"></script>
 <script src="./Files/UI.List.js"></script>
 <script src="./Files/UI.Content.js"></script>
+<script src="./Files/UI.Content.Wave.js"></script>
 <script src="./Files/Index.js"></script>
 <script src="./Apps/ListApp.js"></script>
 <style>
@@ -53,14 +56,23 @@ select option[selected] { background: #666; }
 	background: #222; color: #eee;
 }
 
-.PATH_ITEM { padding: 0 1em; }
-.PATH_TERM { color: #888; }
+.PATH_ITEM { padding: 0 0.74em; vertical-align: middle; }
+.PATH_TERM { color: #aa9; font-size: 80%; vertical-align: middle;  }
 
-.COLL_LIST_CONTENT { overflow: auto; padding: 1px; }
-.COLL_LIST_ITEM { height: 3em; line-height: 3em; border-bottom: 1px dotted #776; }
+.COLL_LIST_CONTENT { overflow: auto; padding: 1px; padding-bottom: 60%; }
+.COLL_LIST_ITEM
+{
+	height: 3em; line-height: 3em;
+	padding-left: 0.78ex;
+	border-bottom: 1px dotted #776;
+}
+
+.COLL_LIST_ITEM.SELECTED { background: #111; color: #eee; }
 
 .CONTENT_LIST { border: 1px solid #fa1; word-wrap: break-word; overflow: auto; }
 .CONTENT_LIST_ITEM { display: inline-block; padding: 0 2em; line-height: 70px;  }
+
+.WAVE_FILE_INFO { font-family: "OCRB"; }
 
 </style>
 </head>

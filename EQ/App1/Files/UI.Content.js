@@ -26,33 +26,56 @@ let PageSwitchPane = class_def
 		this.Update = function()
 		{
 			let index = this.Cur.GetCurrent();
-			if( index == null )  return;
 
-			// console.log( "Switch.Update", index.GetCaption() );
-
-
-			let type = index.Type;
-			console.log( type );
 			if( this.CurContent )  this.CurContent.Enable = false;
-			this.CurContent = this.Contents[ type ] || this.Contents[ type ] || this.CreateContent( index );
+			this.CurContent = this.MakeContent( index );
 			this.CurContent.SetIndex( index );
 			this.CurContent.Enable = true;
 
 			this.UpdateLayout();
 		};
 
-		this.CreateContent = function( index )
+		this.MakeContent = function( index )
 		{
-			return new Content.ListPane( this, { Width: 50, Rel: 10, Height: -1, App: this.App } );
+			let pageid = index && index.Type || "null";
+			var content = this.Contents[ pageid ];
+			if( content ) return content;
+
+			console.log( pageid );
+			switch( pageid )
+			{
+				case "Dir":
+					content = new Content.EnterList( this, { Width: 50, Rel: 10, Height: -1, App: this.App } );
+					break;
+
+				case "Wave":
+					content = new Content.Wave( this, { Width: 50, Rel: 10, Height: -1, App: this.App } );
+					break;
+				
+				default:
+					content = new Content.Base( this, { Width: 50, Rel: 10, Height: -1 } );
+					break;
+			}
+
+			return this.Contents[ pageid ] = content;
 		};
 	}
 );
 
 let Content = {};
 
-Content.ListPane = class_def
+Content.Base = class_def
 (
 	Pane,
+	function()
+	{
+		this.SetIndex = function( index ) {};
+	}
+);
+
+Content.EnterList = class_def
+(
+	Content.Base,
 	function()
 	{
 		this.Build = function( args )
@@ -68,20 +91,10 @@ Content.ListPane = class_def
 		{
 			q.clr( this.body );
 			if( index == null )  return;
-
 			let self = this;
 			index.GetPartNodes( callback );
-
-			function callback( nodes )
-			{
-				for( var part of nodes )  new ListItem( self.body, part, onclick );
-			}
-
-			function onclick( index )
-			{
-				// console.log( index.GetCaption() );
-				self.App.CurrentIndex.Set( index );
-			}
+			function callback( nodes ) { for( var part of nodes ) new ListItem( self.body, part, onclick );  }
+			function onclick( index )  { self.App.CurrentIndex.Set( index ); }
 		};
 
 		function ListItem( com, index, onclick )

@@ -22,13 +22,13 @@ let Model = class_def
 		{
 			if( view == null )  return;
 
-			view._rtid = view._rtid || RTId.next();
-			this._views[ view._rtid ] = view;
+			view.rtid = view.rtid || RTId.next();
+			this._views[ view.rtid ] = view;
 		};
 
 		this.RemoveView = function( view )
 		{
-			if( view && view._rtid )  delete this._views[ view._rtid ];
+			if( view && view.rtid )  delete this._views[ view.rtid ];
 		};
 
 		this.Notify = function( message, args )
@@ -60,7 +60,7 @@ let Node = class_def
 		this.Initiate = function( com )
 		{
 			this.Com = com || null;
-			this._rtid = RTId.next();
+			this.rtid = RTId.next();
 			this.PartNodes = [];
 			if( com )  com.PartNodes.push( this );
 		};
@@ -77,7 +77,7 @@ let Node = class_def
 			callback && callback( this.PartNodes );
 		};
 
-		this.GetCaption = function() { return "Node " + this._rtid; };
+		this.GetCaption = function() { return "Node " + this.rtid; };
 
 		this.toString = function() { return this.GetCaption(); };
 	}

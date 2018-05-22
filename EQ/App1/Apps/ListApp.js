@@ -27,6 +27,7 @@ let AppPane = class_def
 		{
 			base.Initiate.apply( this, arguments );
 		}
+		
 		this.Build = function()
 		{
 			this.Index = new RootIndex();
@@ -46,8 +47,8 @@ let AppPane = class_def
 					vert, { Width: -1, Height: 50, Rel: 10, Layout: new Layout.Horiz() }
 				);
 				{
-					this.side = new SidePane( horiz, { Width: 202, Rel: 0.2, Height: -1, App: this } );
-					this.content = new PageSwitchPane( horiz, { Width: 250, Rel: 10, Height: -1, App: this } );
+					var side = new SidePane( horiz, { Width: 202, Rel: 0.2, Height: -1, App: this } );
+					var content = new PageSwitchPane( horiz, { Width: 250, Rel: 10, Height: -1, App: this } );
 				}
 			}
 
