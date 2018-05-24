@@ -11,7 +11,7 @@ let PageSwitchPane = class_def
 			this.CurContent = null;
 
 			this.Layout = new Layout.Horiz();
-			this.e = q.div( null, { "class": "content" } );
+			this.e = q.div( null, { "class": args.CssClass } );
 
 			let self = this;
 			let view =

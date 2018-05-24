@@ -18,10 +18,13 @@ let EQFS = new function()
 
 	this.GetIndex = function( path, onload )
 	{
-		q.get( rootpath + "Waves/" + path + "Index.txt", _onload );
+		let realpath = wavespath + path + "Index.txt?DC=" + new Date().getTime();
+		q.get( realpath, _onload );
 
 		function _onload( csv )
 		{
+			// console.log( realpath );
+			// console.log( csv );
 			let list = [];
 			let lines = csv.split( /\r?\n/ );
 			lines.pop();

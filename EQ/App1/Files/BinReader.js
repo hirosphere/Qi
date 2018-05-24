@@ -24,9 +24,19 @@ let BinReader = class_def
 			return value;
 		};
 
+		let bcdtbl = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "+", "-", "0", "" ];
+
 		this.Bcd = function( bytelen, div, caption )
 		{
-			var value = "bcd";
+			var bcd = "";
+
+			for( var i = 0; i < bytelen; i ++ )
+			{
+				let byte = this.view.getUint8( this.pos + i );
+				bcd += bcdtbl[ byte >> 4 ] + bcdtbl[ byte & 15 ];
+			}
+			
+			let value = bcd.replace( /^([+-])?0+/, "$1" ) / div;
 			this.usem &&  this.postmonitor( `bcd( ${ bytelen } )`, bytelen, caption, value );
 			this.pos += bytelen;
 			return value;
@@ -42,7 +52,7 @@ let BinReader = class_def
 
 		this.Skip = function( len, caption )
 		{
-			this.usem && this.postmonitor( "skip", len, caption, `uint8[ ${ len } ]` );
+			this.usem && this.postmonitor( "skip", len, caption, `( ${ len } )` );
 			this.pos += len;
 		};
 

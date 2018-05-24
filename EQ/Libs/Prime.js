@@ -27,6 +27,7 @@ var q = new function()
 	this.span = function( com, args ) { return this.e( "span", com, args ); };
 
 	this.table = function( com, args ) { return this.e( "table", com, args ); };
+	this.tbody = function( com, args ) { return this.e( "tbody", com, args ); };
 	this.tr = function( com, args ) { return this.e( "tr", com, args ); };
 	this.td = function( com, args ) { return this.e( "td", com, args ); };
 

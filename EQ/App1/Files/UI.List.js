@@ -104,20 +104,18 @@ let CollListPane = class_def
 			let node = this.Selection.GetCurrent();
 			let com = this.ComNode = node && node.Com;
 
-			//q.text( this.i.e, "com change? " + ( com && com.GetCaption() ) );
-			q.text( this.i.e, "com change ! " + ( node && node.GetCaption() || " ??" ) );
+			//q.text( this.i.e, "com change " + ( node && node.GetCaption() || " ??" ) );
 			q.clr( this.Content.e );
 
 			this.items = {};
 			let self = this;
-			let pref = this.CssClass;
 			com && com.GetPartNodes( callback );
 
 			function callback( parts )
 			{
 				for( var part of parts )
 					self.items[ part.rtid ] =
-					  new ListItem( pref, self.Content.e, part, self.Selection );
+					  new ListItem( self.CssClass, self.Content.e, part, self.Selection );
 				
 				self.SetItemState( self.Selection.GetCurrent(), true, true );
 			}

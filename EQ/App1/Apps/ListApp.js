@@ -48,7 +48,8 @@ let AppPane = class_def
 				);
 				{
 					var side = new SidePane( horiz, { Width: 202, Rel: 0.2, Height: -1, App: this } );
-					var content = new PageSwitchPane( horiz, { Width: 250, Rel: 10, Height: -1, App: this } );
+					var content = new PageSwitchPane
+					( horiz, { Width: 250, Rel: 10, Height: -1, App: this, CssClass: "CONTENT_SWITCH" } );
 				}
 			}
 
