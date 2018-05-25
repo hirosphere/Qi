@@ -26,11 +26,10 @@ Content.Wave = class_def
 			q.text( this.path, this.Index && this.Index.Path );
 
 			let self = this;
-			this.Index && EQWave.Get( this.Index.Path, callback );
+			this.Index && EQWave.Get( this.Index.Path, true, callback );
 
 			function callback( wave )
 			{
-				//q.text( self.qr, wave.Monitor );
 				make_info_table( self.fileinfo, wave );
 			}
 		};

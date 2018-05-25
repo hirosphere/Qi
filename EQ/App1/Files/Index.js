@@ -20,9 +20,13 @@ let FolderIndex = class_def
 		this.GetCaption = function()
 		{
 			var mt;
-			if( mt = this.Name.match( /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})00/ ) )
+			if( mt = this.Name.match( /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})00$/ ) )
 			{
-				return `${mt[1]}/${mt[2]}/${mt[3]}  ${mt[4]}時${mt[5]}分`;
+				return `${mt[1]}/${mt[2]}/${mt[3]}  ${mt[4]}:${mt[5]}`;
+			}
+			if( mt = this.Name.match( /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})\.i/ ) )
+			{
+				return `${mt[1]}/${mt[2]}/${mt[3]}  ${mt[4]}:${mt[5]}:${mt[6]} (i)`;
 			}
 			return this.Name;
 		};
@@ -48,7 +52,11 @@ let FolderIndex = class_def
 				for( var item of list )
 				{
 					if( item.Type == "Dir" )  new self.PartIndex( self, self.Path, item.Name );
-					if( item.Type == "File" )  new WaveIndex( self, self.Path, item.Name );
+					if( item.Type == "File" )
+					{
+						new WaveIndex( self, self.Path, item.Name, true );
+						item.IsKiK && new WaveIndex( self, self.Path, item.Name, false ); 
+					}
 				}
 				self.PartMaked = 2;
 				for( var callback of self.getpartnodescallbacks ) callback( self.PartNodes );
@@ -63,11 +71,12 @@ let WaveIndex = class_def
 	FolderIndex,
 	function( base )
 	{
-		this.Initiate = function( com, compath, name )
+		this.Initiate = function( com, compath, name, issurf )
 		{
 			base.Initiate.call( this, com, compath, name );
 			this.Path = compath + name;
 			this.Name = name;
+			this.IsSurf = issurf;
 
 			var iswave = name.match( /\.kwin$/ );
 
@@ -81,7 +90,8 @@ let WaveIndex = class_def
 			{
 				let code = mt[ 1 ];
 				let site = EQFS.SiteList[ code ];
-				return site ? `${ site.Code } ${ site.Name }` : this.Name;
+				let surf = ( this.IsSurf ? "" : " (地中)" );
+				return site ? `${ site.Code } ${ site.Name }${ surf }` : this.Name;
 			}
 			return this.Name;
 		};

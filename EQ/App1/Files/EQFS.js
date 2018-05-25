@@ -16,12 +16,12 @@ let EQFS = new function()
 		}
 	};
 
-	this.GetIndex = function( path, onload )
+	this.GetIndex = function( path, callback )
 	{
 		let realpath = wavespath + path + "Index.txt?DC=" + new Date().getTime();
-		q.get( realpath, _onload );
+		q.get( realpath, onload );
 
-		function _onload( csv )
+		function onload( csv )
 		{
 			// console.log( realpath );
 			// console.log( csv );
@@ -31,9 +31,21 @@ let EQFS = new function()
 			for( var line of lines )
 			{
 				let cols = line.split( "\t" );
-				list.push( { Type: cols[ 0 ], Name: cols[ 1 ], Size: cols[ 2 ] } );
+				let type = cols[ 0 ];
+				let name = cols[ 1 ];
+				let size = cols[ 2 ];
+
+				if( type == "Dir" )
+				{
+					list.push( { Type: type, Name: name, Size: size } );
+				}
+				else if( type == "File" )
+				{
+					let isKik = name.match( /^[A-Z]{3}H/ ) != null;
+					list.push( { Type: type, Name: name, Size: size, IsKiK: isKik } );
+				}
 			}
-			onload( list );
+			callback( list );
 		}
 	};
 
