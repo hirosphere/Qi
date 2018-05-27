@@ -2,7 +2,7 @@
 let EQGraph = new function()
 {
 
-	this.DrawWave = function( context, width, height, samples )
+	this.DrawWave = function( context, width, height, channel, color )
 	{
 		let vcenter = height / 2;
 		context.strokeStyle = "#fff";
@@ -14,18 +14,19 @@ let EQGraph = new function()
 		context.closePath();
 		context.stroke();
 
-		context.strokeStyle = "#fff";
+		context.strokeStyle = color;
 		context.lineWidth = 1;
 		context.beginPath();
 		context.moveTo( 0, vcenter );
 
-		for( var i = 0; i < samples.length; i ++ )
+		let scale = vcenter / 100;
+		for( var i = 0, len = channel.SampleCount; i < len; i ++ )
 		{
-			let x = i / samples.length * width;
-			let y = vcenter - samples[ i ] * 1;
+			let x = i / len * width;
+			let y = vcenter - channel.GetSample( i ) * scale;
 			context.lineTo( x, y );
 		}
-		context.closePath();
+		//context.closePath();
 		context.stroke();
 	};
 };
@@ -83,11 +84,13 @@ EQGraph.CanvasPane = class_def
 
 		this.Draw = function( context, width, height )
 		{
-			context.fillStyle = "#3030d0";
-			context.fillRect( 10, 10, width - 20, height - 20 );
+			context.fillStyle = "#2828b0";
+			context.fillRect( 0, 0, width - 0, height - 0 );
 			context.font = "48px serif";
 			//this.Wave && context.strokeText( this.Wave.Channels.length, 30, 60 );
-			this.Wave && EQGraph.DrawWave( context, width, height, this.Wave.Channels[ 0 ].Samples );
+			this.Wave && EQGraph.DrawWave( context, width, height, this.Wave.UD, "#40d0d0" );
+			this.Wave && EQGraph.DrawWave( context, width, height, this.Wave.EW, "#70d060" );
+			this.Wave && EQGraph.DrawWave( context, width, height, this.Wave.NS, "#ffffff" );
 		};
 	}
 );

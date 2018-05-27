@@ -33,7 +33,7 @@ Content.Wave = class_def
 			q.text( this.path, this.Index && this.Index.Path );
 
 			let self = this;
-			this.Index && EQWave.Get( this.Index.Path, true, callback );
+			this.Index && EQWave.Get( this.Index.Path, this.Index.IsSurf, callback );
 
 			function callback( wave )
 			{

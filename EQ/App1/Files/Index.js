@@ -83,7 +83,7 @@ let FolderIndex = class_def
 
 let WaveIndex = class_def
 (
-	FolderIndex,
+	Index,
 	function( base )
 	{
 		this.Initiate = function( com, compath, name, issurf )

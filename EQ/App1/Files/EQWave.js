@@ -11,7 +11,11 @@ let EQWave = class_def
 		ctor.Get = function( filepath, surf, callback )
 		{
 			var wset = Wavesets[ filepath ];
-			if( wset )  callback( wset[ surf ? 0 : 1 ] );
+			if( wset )
+			{
+				callback( wset[ surf ? 0 : 1 ] );
+				return;
+			}
 
 			EQFS.GetBinaryFile( filepath, on_bin_load );
 
@@ -33,7 +37,14 @@ let EQWave = class_def
 
 		this.Initiate = function( dec, surf )
 		{
+			this.IsKiK = dec.IsKiK;
 			this.Channels = dec.Channels;
+			this.SamplingRate = dec.SamplingRate;
+
+			let upper = dec.IsKiK && surf;
+			this.NS = dec.Channels[ upper ? 3 : 0 ]; 
+			this.EW = dec.Channels[ upper ? 4 : 1 ]; 
+			this.UD = dec.Channels[ upper ? 5 : 2 ]; 
 
 			this.Monitor = dec.monitor;
 			this.ChannelMonitor = dec.Channels[ 0 ].Monitor;
@@ -87,7 +98,7 @@ let EQDec = new function()
 
 		    //  各チャンネル成分に関する情報  //
 
-		let channel_array = new Bin_Channel( [], ch_count, 0, samplecount, rd );
+		let channel_list = new Bin_Channel( [], ch_count, 0, samplecount, rd );
 		
 		// let wave_1 = bin_Wave_Info( rd, isKik, "1" );
 		// let wave_2 = ( isKik ? bin_Wave_Info( rd, isKik, "2" ) : null );
@@ -111,7 +122,7 @@ let EQDec = new function()
 
 		// 秒ブロック... ( 波形データ本体 ) //
 
-		channel_array.ReadSecBlock();
+		channel_list.ReadSecBlock();
 		
 		//  //
 		
@@ -119,7 +130,7 @@ let EQDec = new function()
 		{
 			IsKiK: isKik,
 			SamplingRate: samplingrate,
-			Channels: channel_array.Channels,
+			Channels: channel_list.Channels,
 			monitor: rd.monitor
 		};
 
@@ -138,7 +149,7 @@ let EQDec = new function()
 				this.index = index;
 				this.rd = rd;
 
-				this.work = { pos: 0, acc: 0, pmax: 0, pmin: 0, lmax: 0, lmin: 0 };
+				this.work = { pos: 0, acc: 0, max: 0 };
 
 				let p = this.indexp = `ch ${ index + 1 }  `;
 		
@@ -158,14 +169,17 @@ let EQDec = new function()
 				channels[ index ] = this;
 				this.Channels = channels;
 
-				if( index == 0 ) this.log( "Ch", "Scale", "num, denom, gain", "offset" );
-				this.log( `Channel ${ index }`, scale, [ num, denom, gain ].join( ", " ), offset );
+				//if( index == 0 ) this.log( "Ch", "Scale", "num, denom, gain", "offset" );
+				//this.log( `Channel ${ index }`, scale, [ num, denom, gain ].join( ", " ), offset );
 				
+				this.Header =
+				{
+					Scale: scale, Denom: denom, Nom: num, Gain: gain, Offset: offset
+				};
+
+				this.SampleCount = samplecount;
+				this.Offset = 0;
 				this.Scale = scale;
-				this.SFDenom = denom;
-				this.SFNom = num;
-				this.Gain = gain;
-				this.Offset = offset = 0;
 
 				if( ( index + 1 ) < ch_count )
 				{
@@ -175,6 +189,11 @@ let EQDec = new function()
 
 			this.log = function( a, b, c, d, e ) { this.Monitor.push( [ a, b, c, d, e ] ); };
 					
+			this.GetSample = function( index )
+			{
+				return this.Samples[ index ] - this.Offset;
+			};
+
 			this.ReadSecBlock = function()
 			{
 				var bctr = 0;
@@ -191,16 +210,17 @@ let EQDec = new function()
 					bctr ++;
 				}
 
-				this.Total();
-
+				this.Complete();
 			};
 
-			this.Total = function()
+			this.Complete = function()
 			{
-				this.log( `Total ${ this.index }` );
-				this.Next && this.Next.Total();
-			};
-			
+				this.Offset = this.work.acc / this.SampleCount;
+				this.MaxAcc = this.work.max;
+
+				this.Next && this.Next.Complete();
+			}
+
 			this.ReadChannelSec = function( view, pos, blockn )
 			{
 				if( pos >= view.byteLength )  return;
@@ -208,9 +228,10 @@ let EQDec = new function()
 				let sizect = view.getUint16( pos + 4 );
 				let size = sizect >> 12;
 				let count = ( sizect & 0xfff ) - 1;
-				let sample = ( view.getInt32( pos + 6 ) - this.Offset ) * this.Scale;
+				let sample = view.getInt32( pos + 6 );
 
-				this.log( `first sample ${ blockn }`, sample, view.getInt32( pos + 6 ), this.Offset );
+				this.AddSample( sample );
+				//this.AddSample( 0 );
 
 				this.rd.pos = pos;
 				this.rd.Skip( 4,  this.indexp + "---" );
@@ -300,7 +321,9 @@ let EQDec = new function()
 
 			this.AddSample = function( value )
 			{
-				this.Samples[ this.work.pos ++ ] = this.Scale * ( value + this.Offset );
+				let sample = this.Samples[ this.work.pos ++ ] = this.Scale * ( value );
+				this.work.acc += sample;
+				this.work.max = Math.max( this.work.max, Math.abs( sample ) );
 			};
 		}
 	);
