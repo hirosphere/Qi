@@ -6,11 +6,13 @@ Content.Wave = class_def
 	{
 		this.Build = function()
 		{
+			this.AudioPlayer = new EQAudio.Player();
+
 			this.e = q.div( null, { "class": "CONTENT_WAVE" } );
 
+			this.CanvasPane = new EQGraph.CanvasPane( this, { Width: -1, Height: 60, Rel: 30 } );
 			let div1 = new DivPane( this, { Width: -1, Height: 60, Rel: 0 } );
-			this.CanvasPane = new EQGraph.CanvasPane( this, { Width: -1, Height: 60, Rel: 10 } );
-			let div3 = new DivPane( this, { Width: -1, Height: 60, Rel: 10, Class: "WAVE_FILE_INFO" } );
+			let div3 = new DivPane( this, { Width: -1, Height: 60, Rel: 0, Class: "WAVE_FILE_INFO" } );
 
 			this.Layout = new Layout.Vert();
 
@@ -39,6 +41,7 @@ Content.Wave = class_def
 			{
 				//make_info_table( self.fileinfo, wave.Monitor );
 				//make_info_table( self.fileinfo, wave.ChannelMonitor );
+				self.AudioPlayer.SetWave( wave );
 				self.CanvasPane.SetWave( wave );
 			}
 		};

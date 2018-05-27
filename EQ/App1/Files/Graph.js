@@ -19,7 +19,7 @@ let EQGraph = new function()
 		context.beginPath();
 		context.moveTo( 0, vcenter );
 
-		let scale = vcenter / 100;
+		let scale = vcenter / channel.MaxAcc;
 		for( var i = 0, len = channel.SampleCount; i < len; i ++ )
 		{
 			let x = i / len * width;
@@ -84,12 +84,13 @@ EQGraph.CanvasPane = class_def
 
 		this.Draw = function( context, width, height )
 		{
-			context.fillStyle = "#2828b0";
+			// context.fillStyle = "#2828b0";
+			context.fillStyle = "#000000";
 			context.fillRect( 0, 0, width - 0, height - 0 );
 			context.font = "48px serif";
 			//this.Wave && context.strokeText( this.Wave.Channels.length, 30, 60 );
 			this.Wave && EQGraph.DrawWave( context, width, height, this.Wave.UD, "#40d0d0" );
-			this.Wave && EQGraph.DrawWave( context, width, height, this.Wave.EW, "#70d060" );
+			this.Wave && EQGraph.DrawWave( context, width, height, this.Wave.EW, "#80d870" );
 			this.Wave && EQGraph.DrawWave( context, width, height, this.Wave.NS, "#ffffff" );
 		};
 	}
