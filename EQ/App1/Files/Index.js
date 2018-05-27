@@ -1,8 +1,17 @@
 
-let FolderIndex = class_def
+let Index = class_def
 (
 	Node,
-	function( base, bc, ctor )
+	function( base, ctor )
+	{
+		;
+	}
+)
+
+let FolderIndex = class_def
+(
+	Index,
+	function( base, ctor )
 	{
 		this.Type = "Dir";
 		this.PartIndex = ctor;
@@ -24,9 +33,15 @@ let FolderIndex = class_def
 			{
 				return `${mt[1]}/${mt[2]}/${mt[3]}  ${mt[4]}:${mt[5]}`;
 			}
-			if( mt = this.Name.match( /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})\.i/ ) )
+
+			if( mt = this.Name.match( /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(.+)?/ ) )
 			{
-				return `${mt[1]}/${mt[2]}/${mt[3]}  ${mt[4]}:${mt[5]}:${mt[6]} (i)`;
+				return `${mt[1]}/${mt[2]}/${mt[3]}  ${mt[4]}:${mt[5]}:${mt[6]} ${mt[7]}`;
+			}
+
+			if( mt = this.Name.match( /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(.+)?/ ) )
+			{
+				return `${mt[1]}/${mt[2]}/${mt[3]}  ${mt[4]}:${mt[5]} ${mt[6]}`;
 			}
 			return this.Name;
 		};

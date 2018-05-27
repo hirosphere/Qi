@@ -1,0 +1,4 @@
+
+let Custom = new function()
+{
+};

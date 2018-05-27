@@ -7,10 +7,17 @@ Content.Wave = class_def
 		this.Build = function()
 		{
 			this.e = q.div( null, { "class": "CONTENT_WAVE" } );
-			this.title = q.h2( this.e, { "class": "CONTENT_WAVE_TITLE" } );
-			this.path = q.div( this.e );
 
-			let table = q.table( this.e, { "class": "WAVE_FILE_INFO" } );
+			let div1 = new DivPane( this, { Width: -1, Height: 60, Rel: 0 } );
+			this.CanvasPane = new EQGraph.CanvasPane( this, { Width: -1, Height: 60, Rel: 10 } );
+			let div3 = new DivPane( this, { Width: -1, Height: 60, Rel: 10, Class: "WAVE_FILE_INFO" } );
+
+			this.Layout = new Layout.Vert();
+
+			this.title = q.div( div1.e, { "class": "CONTENT_WAVE_TITLE" } );
+			this.path = q.div( div1.e );
+
+			let table = q.table( div3.e );
 			this.fileinfo = q.tbody( table );
 		};
 
@@ -30,21 +37,41 @@ Content.Wave = class_def
 
 			function callback( wave )
 			{
-				make_info_table( self.fileinfo, wave );
+				//make_info_table( self.fileinfo, wave.Monitor );
+				//make_info_table( self.fileinfo, wave.ChannelMonitor );
+				self.CanvasPane.SetWave( wave );
 			}
 		};
 
-		function make_info_table( tbody, wave )
+		function make_info_table( tbody, rows )
 		{
 			q.clr( tbody );
-			for( var row of wave.Monitor )
+			for( var row of rows )
 			{
 				let tr = q.tr( tbody );
 				q.td( tr, { text: row[ 0 ], "class": "hdr" } );
+				q.td( tr, { text: row[ 4 ] } );
 				q.td( tr, { text: row[ 1 ] } );
 				q.td( tr, { text: row[ 2 ] } );
 				q.td( tr, { text: row[ 3 ] } );
 			}
 		};
+	}
+);
+
+Content.Wave.FileInfoPane = class_def
+(
+	Pane,
+	function()
+	{
+		this.Build = function( args )
+		{
+			this.e = q.div( null, { "class": "CONTENT_WAVE" } );
+			this.title = q.h2( this.e, { "class": "CONTENT_WAVE_TITLE" } );
+			this.path = q.div( this.e );
+
+			let table = q.table( this.e, { "class": "WAVE_FILE_INFO" } );
+			this.fileinfo = q.tbody( table );
+		}
 	}
 );

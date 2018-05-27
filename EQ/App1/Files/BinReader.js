@@ -11,14 +11,16 @@ let BinReader = class_def
 			this.pos = 0;
 		};
 
+		this.IsEnd = function() { return this.pos >= this.view.byteLength; };
+
 		let dv = DataView.prototype;
 		this.Uint8 = function( caption ) {  return this.Get( 1, "uint8", caption, dv.getUint8 );  };
 		this.Uint16 = function( caption ) {  return this.Get( 2, "uint16", caption, dv.getUint16 );  };
 		this.Uint32 = function( caption ) {  return this.Get( 4, "uint32", caption, dv.getUint32 );  };
 		
-		this.Int8 = function( caption ) {  return this.Get( 1, "uint8", caption, dv.getInt8 );  };
-		this.Int16 = function( caption ) {  return this.Get( 2, "uint16", caption, dv.getInt16 );  };
-		this.Int32 = function( caption ) {  return this.Get( 4, "uint32", caption, dv.getInt32 );  };
+		this.Int8 = function( caption ) {  return this.Get( 1, "int8", caption, dv.getInt8 );  };
+		this.Int16 = function( caption ) {  return this.Get( 2, "int16", caption, dv.getInt16 );  };
+		this.Int32 = function( caption ) {  return this.Get( 4, "int32", caption, dv.getInt32 );  };
 
 		this.Get = function( size, type, caption, getter )
 		{
@@ -70,7 +72,7 @@ let BinReader = class_def
 
 		this.postmonitor = function( type, length, caption, value )
 		{
-			this.monitor.push( [ caption, type, value, this.gethex( length ) ] );
+			this.monitor.push( [ caption, type, value, this.gethex( length ), this.pos ] );
 		};
 
 		let htbl = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F" ];
