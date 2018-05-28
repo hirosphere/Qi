@@ -35,6 +35,7 @@ let EQAudio = new function()
 				let rate = 25;
 
 				this.cosc && this.cosc.disconnect();
+				this.bosc && this.bosc.disconnect();
 
 				this.cosc = this.Context.createOscillator();
 				this.bosc = this.Context.createBufferSource();
@@ -42,6 +43,7 @@ let EQAudio = new function()
 				this.cosc.frequency.value = 880;
 				this.bosc.playbackRate.value = rate / wave.SamplingRate;
 				this.bosc.buffer = this.CreateWaveBuffer( wave.NS );
+				this.bosc.loop = true;
 
 				// this.cosc.connect( this.amp );
 				this.bosc.connect( this.amp );
@@ -50,7 +52,7 @@ let EQAudio = new function()
 				this.bosc.start();
 
 				this.amp.gain.value = 0.2;
-				this.amp.gain.setTargetAtTime( 0, this.Context.currentTime, 0.1 );
+				//this.amp.gain.setTargetAtTime( 0, this.Context.currentTime, 0.1 );
 			};
 
 			this.CreateWaveBuffer = function( channel )
