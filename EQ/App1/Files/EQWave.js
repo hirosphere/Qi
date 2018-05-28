@@ -42,12 +42,19 @@ let EQWave = class_def
 			this.SamplingRate = dec.SamplingRate;
 
 			let upper = dec.IsKiK && surf;
-			this.NS = dec.Channels[ upper ? 3 : 0 ]; 
-			this.EW = dec.Channels[ upper ? 4 : 1 ]; 
-			this.UD = dec.Channels[ upper ? 5 : 2 ]; 
+			this.NS = dec.Channels[ upper ? 3 : 0 ];
+			this.EW = dec.Channels[ upper ? 4 : 1 ];
+			this.UD = dec.Channels[ upper ? 5 : 2 ];
+
+			this.MaxAcc = Math.max( this.NS.MaxAcc, Math.max( this.EW.MaxAcc, this.UD.MaxAcc ) );
 
 			this.Monitor = dec.monitor;
 			this.ChannelMonitor = dec.Channels[ 0 ].Monitor;
+		};
+
+		this.GetInfo = function()
+		{
+			return `MaxAcc: ${ this.MaxAcc }\n  NS ${ this.NS.GetInfo() }\n  EW ${ this.EW.GetInfo() }\n  UD ${ this.UD.GetInfo() }`;
 		};
 	}
 );
@@ -149,7 +156,7 @@ let EQDec = new function()
 				this.index = index;
 				this.rd = rd;
 
-				this.work = { pos: 0, acc: 0, max: 0 };
+				this.work = { pos: 0, acc: 0, max: 0, min: 0 };
 
 				let p = this.indexp = `ch ${ index + 1 }  `;
 		
@@ -188,10 +195,16 @@ let EQDec = new function()
 			};
 
 			this.log = function( a, b, c, d, e ) { this.Monitor.push( [ a, b, c, d, e ] ); };
+
+			this.GetInfo = function()
+			{
+				let o = this.Offset;
+				return `MaxAcc: ${ this.MaxAcc } Offset: ${ o } max: ${ this.work.max - o } min: ${ this.work.min - o }`;
+			}
 					
 			this.GetSample = function( index )
 			{
-				return this.Samples[ index ] - this.Offset;
+				return this.Samples[ index ];
 			};
 
 			this.ReadSecBlock = function()
@@ -215,8 +228,15 @@ let EQDec = new function()
 
 			this.Complete = function()
 			{
-				this.Offset = this.work.acc / this.SampleCount;
-				this.MaxAcc = this.work.max;
+				let offset = this.Offset = this.work.acc / this.SampleCount;
+				this.MaxAcc = Math.max
+				(
+					this.work.max - offset,
+					Math.abs( this.work.min - offset )
+				);
+
+				let smpls = this.Samples;
+				for( var i = 0; i < smpls.length; i ++ )  smpls[ i ] -= offset;
 
 				this.Next && this.Next.Complete();
 			}
@@ -321,9 +341,10 @@ let EQDec = new function()
 
 			this.AddSample = function( value )
 			{
-				let sample = this.Samples[ this.work.pos ++ ] = this.Scale * ( value );
-				this.work.acc += sample;
-				this.work.max = Math.max( this.work.max, Math.abs( sample ) );
+				let sample = this.Samples[ this.work.pos ++ ] = this.Scale * value ;
+				this.work.acc += sample ;
+				this.work.max = Math.max( this.work.max, sample ) ;
+				this.work.min = Math.min( this.work.min, sample ) ;
 			};
 		}
 	);

@@ -32,13 +32,33 @@ let EQAudio = new function()
 
 			this.SetWave = function( wave )
 			{
-				this.cosc && this.cosc.disconnect( this.amp );
+				let rate = 25;
+
+				this.cosc && this.cosc.disconnect();
+
 				this.cosc = this.Context.createOscillator();
+				this.bosc = this.Context.createBufferSource();
+
 				this.cosc.frequency.value = 880;
-				this.cosc.connect( this.amp );
+				this.bosc.playbackRate.value = rate / wave.SamplingRate;
+				this.bosc.buffer = this.CreateWaveBuffer( wave.NS );
+
+				// this.cosc.connect( this.amp );
+				this.bosc.connect( this.amp );
+
 				this.cosc.start();
+				this.bosc.start();
+
 				this.amp.gain.value = 0.2;
-				this.amp.gain.setTargetAtTime( 0, this.Context.currentTime, 0.1 );			}
+				this.amp.gain.setTargetAtTime( 0, this.Context.currentTime, 0.1 );
+			};
+
+			this.CreateWaveBuffer = function( channel )
+			{
+				let buffer = this.Context.createBuffer( 1, channel.Samples.length, this.Context.sampleRate );
+				buffer.getChannelData( 0 ).set( channel.Samples );
+				return buffer;
+			};
 		}
 	);
 };

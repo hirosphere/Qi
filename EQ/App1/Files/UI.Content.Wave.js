@@ -31,8 +31,7 @@ Content.Wave = class_def
 
 		this.Update = function()
 		{
-			q.text( this.title, this.Index && this.Index.GetCaption() );
-			q.text( this.path, this.Index && this.Index.Path );
+			q.text( this.title, this.Index && `${ this.Index.GetCaption() } ${ this.Index.Path }` );
 
 			let self = this;
 			this.Index && EQWave.Get( this.Index.Path, this.Index.IsSurf, callback );
@@ -41,6 +40,7 @@ Content.Wave = class_def
 			{
 				//make_info_table( self.fileinfo, wave.Monitor );
 				//make_info_table( self.fileinfo, wave.ChannelMonitor );
+				q.text( self.path, wave && wave.GetInfo() );
 				self.AudioPlayer.SetWave( wave );
 				self.CanvasPane.SetWave( wave );
 			}
