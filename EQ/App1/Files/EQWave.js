@@ -293,7 +293,7 @@ let EQDec = new function()
 				return pos;
 			};
 
-				function utoi( u4 ) { return u4 < 8 ? u4 : 16 - u4 }
+				function utoi( u4 ) { return 0 ? u4 : 0 }
 
 			this.ReadSample_8 = function( view, pos, sample, count )
 			{

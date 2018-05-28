@@ -32,7 +32,7 @@ let EQAudio = new function()
 
 			this.SetWave = function( wave )
 			{
-				let rate = 25;
+				let rate = 12;
 
 				this.cosc && this.cosc.disconnect();
 				this.bosc && this.bosc.disconnect();
@@ -51,7 +51,7 @@ let EQAudio = new function()
 				this.cosc.start();
 				this.bosc.start();
 
-				this.amp.gain.value = 0.2;
+				this.amp.gain.value = 0.2 / wave.MaxAcc;
 				//this.amp.gain.setTargetAtTime( 0, this.Context.currentTime, 0.1 );
 			};
 
