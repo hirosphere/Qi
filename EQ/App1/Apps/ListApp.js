@@ -50,21 +50,46 @@ let AppPane = class_def
 					var side = new SidePane( horiz, { Width: 202, Rel: 0.2, Height: -1, App: this } );
 					var content = new PageSwitchPane
 					( horiz, { Width: 250, Rel: 10, Height: -1, App: this, CssClass: "CONTENT_SWITCH" } );
-				}
+				};
 			}
 
 			this.Layout = new Layout.Horiz();
+
+			let self = this;
+			this.CurrentIndex.AddView( { Select: function( node ) {  self.UpdatePageTitle();  } } );
 			this.UpdatePageTitle();
 		};
 
 		this.OnEQFSComplete = function()
 		{
 			this.CurrentIndex.Set( this.Index );
+			this.SetHash( location.hash.substr( 1 ) );
 		};
 
 		this.UpdatePageTitle = function()
 		{
-			document.title = "ListApp";
+			let cur = this.CurrentIndex.Get();
+			document.title = ( cur && cur.GetCaption() + " - " ) + "ListApp";
+			location.hash = "#" + this.GetHash();
+		};
+
+		this.SetHash = function( hash )
+		{
+			let values = {};
+			for( var line of hash.split( "&" ) )
+			{
+				let keyvalue = line.split( "=" );
+				;console.log( "SetHash", line )
+			}
+		};
+
+		this.GetHash = function()
+		{
+			let v =
+			{
+				Path: this.CurrentIndex.Get()
+			};
+			return Hash.Encode( v );
 		};
 	}
 );

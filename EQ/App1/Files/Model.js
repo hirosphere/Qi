@@ -43,6 +43,31 @@ let Model = class_def
 	}
 );
 
+Model.Value = class_def
+(
+	Model,
+	function( base , ctor )
+	{
+		this.Initiate = function( initialvalue )
+		{
+			base.Initiate.call( this );
+			this.Value = initialvalue;
+		};
+
+		this.GetValue = this.Get = function()
+		{
+			return this.Value;
+		};
+
+		this.SetValue = this.Set = function( value )
+		{
+			if( value === this.Value )  return;
+			this.Value = value;
+			this.Notify( "Change" );
+		};
+	}
+);
+
 let Tree = class_def
 (
 	Model,

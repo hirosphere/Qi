@@ -4,9 +4,9 @@ let Index = class_def
 	Node,
 	function( base, ctor )
 	{
-		;
+		this.GetNodeByPath;
 	}
-)
+);
 
 let FolderIndex = class_def
 (

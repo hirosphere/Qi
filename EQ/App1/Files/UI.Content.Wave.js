@@ -11,7 +11,7 @@ Content.Wave = class_def
 			this.e = q.div( null, { "class": "CONTENT_WAVE" } );
 
 			this.CanvasPane = new EQGraph.CanvasPane( this, { Width: -1, Height: 60, Rel: 30 } );
-			new Content.Wave.AudioPane( this, { Width: -1, Height: 60 } );
+			new AudioPane( this, { Width: -1, Height: 60, Player: this.AudioPlayer } );
 			let div1 = new DivPane( this, { Width: -1, Height: 160, Rel: 0 } );
 			let div3 = new DivPane( this, { Width: -1, Height: 160, Rel: 0, Class: "WAVE_FILE_INFO" } );
 
@@ -79,22 +79,3 @@ Content.Wave.FileInfoPane = class_def
 		}
 	}
 );
-
-Content.Wave.AudioPane = class_def
-(
-	Pane,
-	function()
-	{
-		this.Build = function( args )
-		{
-			this.e = q.div( null, {} );
-
-			new Pane( this, { Width: 60, Height: -1, edef: { type: "button", text: "button" } } );
-			new Pane( this, { Width: 120, Height: -1, edef: { type: "input" } } );
-			new Pane( this, { Width: 120, Height: -1, edef: { type: "input" } } );
-
-
-			this.Layout = new Layout.Horiz();
-		};
-	}
-)
