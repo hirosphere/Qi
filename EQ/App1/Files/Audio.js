@@ -27,14 +27,37 @@ let EQAudio = new function()
 		{
 			this.Initiate = function( context )
 			{
-				self = this;
 				this.Playing = new Model.Value( true );
+				this.Volume = new Model.Value( 100 );
+				this.Rate = new Model.Value( 30 );
+
 				this.Context = context;
-
+				
 				this.amp = context.createGain();
-				this.amp.connect( context.destination );
+				this.VGain = context.createGain();
+				this.amp.connect( this.VGain );
+				this.VGain.connect( context.destination );
 
-				this.Playing.AddView( { Change: function() { self.Update(); } } );
+				self = this;
+				this.Playing.AddView( { Change: function() { self.UpdateWave(); } } );
+				this.Volume.AddView( this );
+				this.Rate.AddView( this );
+				this.Update();
+			};
+
+			this.Change =
+			this.Update = function()
+			{
+				let gain = this.Volume.GetValue() / 100;
+				this.VGain.gain.setTargetAtTime( gain, this.Context.currentTime, 0.01 );
+
+				if( this.Wave && this.bosc )
+				{
+					this.bosc.playbackRate.value =
+						this.Rate.GetValue() *
+						this.Wave.SamplingRate /
+						this.Context.sampleRate || 1;
+				}
 			};
 
 			this.SetWave = function( wave )
@@ -46,10 +69,10 @@ let EQAudio = new function()
 				buffer.getChannelData( 1 ).set( wave.UD.Samples );
 				buffer.getChannelData( 2 ).set( wave.EW.Samples );
 
-				this.Update();
+				this.UpdateWave();
 			};
 
-			this.Update = function()
+			this.UpdateWave = function()
 			{
 				this.Playing.GetValue() ? this.Start() : this.Stop();
 			};
@@ -71,17 +94,18 @@ let EQAudio = new function()
 				this.cosc.frequency.value = 880;
 
 				this.bosc = this.Context.createBufferSource();
-				this.bosc.playbackRate.value = rate * wave.SamplingRate / this.Context.sampleRate;
 				this.bosc.loop = true;
 				this.bosc.buffer = this.WaveBuffer;
 				
 				// this.cosc.connect( this.amp );
 				this.bosc.connect( this.amp );
 
+				this.Update();
+
 				this.cosc.start();
 				this.bosc.start();
 
-				this.amp.gain.value = 1.2 / this.Wave.MaxAcc;
+				this.amp.gain.value = 1.0 / this.Wave.MaxAcc;
 				//this.amp.gain.setTargetAtTime( 1.2 / this.Wave.MaxAcc, this.Context.currentTime, 0.1 );
 			};
 		}

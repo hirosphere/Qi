@@ -7,6 +7,18 @@ let Measure = class_def
 	}
 );
 
+let Label = class_def
+(
+	Pane,
+	function()
+	{
+		this.Build = function( args )
+		{
+			this.e = q.e( "label", null, { text: args && args.Text } );
+		};
+	}
+);
+
 let Slider = class_def
 (
 	Pane,
@@ -16,6 +28,35 @@ let Slider = class_def
 		{
 			this.e = q.input( null );
 			this.e.type = "range";
+		};
+	}
+);
+
+let Input = class_def
+(
+	Pane,
+	function()
+	{
+		this.Build = function( args )
+		{
+			this.Value = args.Value;
+
+			this.e = q.input( null );
+			
+			let self = this;
+			this.e.onkeydown = function( ev )
+			{
+				if( ev.key == "Enter" )  {  self.Value.Set( this.value );  }
+			};
+
+			this.Value && this.Value.AddView( this );
+			this.Update();
+		};
+
+		this.Change =
+		this.Update = function()
+		{
+			this.e.value = this.Value && this.Value.Get() || "" ;
 		};
 	}
 );
