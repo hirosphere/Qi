@@ -82,18 +82,26 @@ EQGraph.CanvasPane = class_def
 			this.UpdateLayout();
 		};
 
+		let stylesets =
+		{
+			S1: { Back: "#000000", NS: "#ffffff", EW: "#80d870", UD: "#40d0d0" },
+			M1: { Back: "#3030A0", NS: "#ffffff", EW: "#c0ffff", UD: "#c0d8FF" },
+		};
+
 		this.Draw = function( context, width, height )
 		{
 			// context.fillStyle = "#2828b0";
-			context.fillStyle = "#000000";
+			let ss = stylesets.M1;
+			context.fillStyle = ss.Back;
+
 			context.fillRect( 0, 0, width - 0, height - 0 );
-			
+
 			if( this.Wave == null )  return;
 
 			let maxacc = this.Wave.MaxAcc;
-			this.Wave && EQGraph.DrawWave( context, width, height, this.Wave.UD, maxacc, "#40d0d0" );
-			this.Wave && EQGraph.DrawWave( context, width, height, this.Wave.EW, maxacc, "#80d870" );
-			this.Wave && EQGraph.DrawWave( context, width, height, this.Wave.NS, maxacc, "#ffffff" );
+			this.Wave && EQGraph.DrawWave( context, width, height, this.Wave.UD, maxacc, ss.UD );
+			this.Wave && EQGraph.DrawWave( context, width, height, this.Wave.EW, maxacc, ss.EW );
+			this.Wave && EQGraph.DrawWave( context, width, height, this.Wave.NS, maxacc, ss.NS );
 		};
 	}
 );

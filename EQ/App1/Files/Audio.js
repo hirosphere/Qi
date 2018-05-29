@@ -32,7 +32,7 @@ let EQAudio = new function()
 
 			this.SetWave = function( wave )
 			{
-				let rate = 12;
+				let rate = 40;
 
 				this.cosc && this.cosc.disconnect();
 				this.bosc && this.bosc.disconnect();
@@ -41,8 +41,8 @@ let EQAudio = new function()
 				this.bosc = this.Context.createBufferSource();
 
 				this.cosc.frequency.value = 880;
-				this.bosc.playbackRate.value = rate / wave.SamplingRate;
-				this.bosc.buffer = this.CreateWaveBuffer( wave.NS );
+				this.bosc.playbackRate.value = rate * wave.SamplingRate / this.Context.sampleRate;
+				this.bosc.buffer = this.CreateWaveBuffer( wave );
 				this.bosc.loop = true;
 
 				// this.cosc.connect( this.amp );
@@ -51,14 +51,16 @@ let EQAudio = new function()
 				this.cosc.start();
 				this.bosc.start();
 
-				this.amp.gain.value = 0.2 / wave.MaxAcc;
+				this.amp.gain.value = 1.2 / wave.MaxAcc;
 				//this.amp.gain.setTargetAtTime( 0, this.Context.currentTime, 0.1 );
 			};
 
-			this.CreateWaveBuffer = function( channel )
+			this.CreateWaveBuffer = function( wave )
 			{
-				let buffer = this.Context.createBuffer( 1, channel.Samples.length, this.Context.sampleRate );
-				buffer.getChannelData( 0 ).set( channel.Samples );
+				let buffer = this.Context.createBuffer( 3, wave.NS.Samples.length, this.Context.sampleRate );
+				buffer.getChannelData( 0 ).set( wave.NS.Samples );
+				buffer.getChannelData( 1 ).set( wave.UD.Samples );
+				buffer.getChannelData( 2 ).set( wave.EW.Samples );
 				return buffer;
 			};
 		}
