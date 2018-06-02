@@ -6,7 +6,7 @@ Content.Wave = class_def
 	{
 		this.Build = function()
 		{
-			this.AudioPlayer = new EQAudio.Player();
+			this.AudioPlayer = EQAudio.CreatePlayer();
 
 			this.e = q.div( null, { "class": "CONTENT_WAVE" } );
 
@@ -42,7 +42,7 @@ Content.Wave = class_def
 				//make_info_table( self.fileinfo, wave.Monitor );
 				//make_info_table( self.fileinfo, wave.ChannelMonitor );
 				//q.text( self.path, wave && wave.GetInfo() );
-				self.AudioPlayer.SetWave( wave );
+				self.AudioPlayer.Wave.Set( wave );
 				self.CanvasPane.SetWave( wave );
 			}
 		};

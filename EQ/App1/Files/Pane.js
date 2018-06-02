@@ -77,8 +77,8 @@ let DivPane = class_def
 		this.Type = "DivPane";
 		this.Build = function( args )
 		{
-			this.e = q.div( null, { "class": args.Class || "",  text: args.Text || "" } );
-		}
+			this.e = q.div( null, { "class": args.Class || "" } );
+		};
 	}
 );
 
@@ -131,9 +131,11 @@ let Layout = new function()
 		null,
 		function()
 		{
+			this.Sep = 0;
+
 			this.Action = function( pane )
 			{
-				var x_fix_total = 0;
+				var x_fix_total = this.get_total_sep( pane );
 				var x_rel_total = 0;
 				for( var part of pane.PartNodes )
 				{
@@ -165,6 +167,12 @@ let Layout = new function()
 					this.set_area( part, x_pos, y_pos, x_span, y_span );
 					x_pos += x_span;
 				}
+			};
+
+			this.get_total_sep = function( pane )
+			{
+				let len = pane.PartNodes.length;
+				return len > 1 ? this.Sep * len : 0;
 			};
 		}
 	);

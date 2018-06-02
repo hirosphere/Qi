@@ -7,26 +7,52 @@ let AudioPane = class_def
 		this.Build = function( args )
 		{
 			let self = this;
-			let player = args.Player;
-			let synth = player.Synth;
+			let model = args.Player;
 
 			this.e = q.div( null, {} );
 
-			new StateButton( this, { Width: 80, Height: -1, Value: synth.Playing, Labels: { "false": "停止中", "true": "再生中" } } );
+			this.BuildHoriz1( this, { Width: -1, Height: 80 }, model );
+			this.BuildHoriz2( this, { Width: -1, Height: 80 }, model );
+			this.BuildHoriz3( this, { Width: -1, Height: 80 }, model );
+
+			this.Layout = new Layout.Vert( { Sep: 2 } );
+		};
+
+		this.BuildHoriz1 = function( com, args, model )
+		{
+			let horiz = new DivPane( com, args );
+			horiz.e.style.zIndex = 1;
 			
-			new Label( this, { Width: 60, Height: -1, Text: "音量" } );
-			new Input( this, { Width: 80, Height: -1, Value: synth.Volume } );
+			new StateButton( horiz, { Width: 80, Height: -1, Value: model.Playing, Labels: { "false": "停止中", "true": "再生中" } } );
 
-			new Label( this, { Width: 60, Height: -1, Text: "倍速" } );
-			new Input( this, { Width: 80, Height: -1, Value: synth.Rate } );
-			new Slider( this, { Width: 220, Height: -1 } );
+			new SliderInput( horiz, { Width: 120, Height: -1, Text: "音量", Value: model.Volume } );
+			new SliderInput( horiz, { Width: 120, Height: -1, Text: "倍速", Value: model.Rate } );
 
-			//new Pane( this, { Width: 60, Height: -1, edef: { type: "button", text: "button" } } );
-			//new Pane( this, { Width: 120, Height: -1, edef: { type: "input" } } );
-			//new Pane( this, { Width: 120, Height: -1, edef: { type: "input" } } );
+			horiz.Layout = new Layout.Horiz( { Sep: 2 } );
+		};
 
+		this.BuildHoriz2 = function( com, args, model )
+		{
+			let horiz = new DivPane( com, args );
+			horiz.e.style.zIndex = 1;
+			
+			new SliderInput( horiz, { Width: 120, Height: -1, Text: "NSパン", Value: model.NS_Pan } );
+			new SliderInput( horiz, { Width: 120, Height: -1, Text: "EWパン", Value: model.EW_Pan } );
+			new SliderInput( horiz, { Width: 120, Height: -1, Text: "UDパン", Value: model.UD_Pan } );
 
-			this.Layout = new Layout.Horiz();
+			horiz.Layout = new Layout.Horiz( { Sep: 2 } );
+		};
+
+		this.BuildHoriz3 = function( com, args, model )
+		{
+			let horiz = new DivPane( com, args );
+			horiz.e.style.zIndex = 1;
+			
+			new SliderInput( horiz, { Width: 120, Height: -1, Text: "NS音量", Value: model.NS_Volume } );
+			new SliderInput( horiz, { Width: 120, Height: -1, Text: "EW音量", Value: model.EW_Volume } );
+			new SliderInput( horiz, { Width: 120, Height: -1, Text: "UD音量", Value: model.UD_Volume } );
+
+			horiz.Layout = new Layout.Horiz( { Sep: 2 } );
 		};
 	}
 );

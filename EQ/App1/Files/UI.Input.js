@@ -19,6 +19,27 @@ let Label = class_def
 	}
 );
 
+let SliderInput = class_def
+(
+	DivPane,
+	function( base )
+	{
+		this.Build = function( args )
+		{
+			base.Build.call( this, args );
+
+			let ic = args && args.IConv;
+			let sc = args && args.SConv;
+
+			new Label( this, { Width: -1, Height: 10, Rel: 10, Text: args.Text } );
+			new Input( this, { Width: -1, Height: 10, Rel: 10, Value: args.Value, Conv: ic } );
+			new Slider( this, { Width: -1, Height: 10, Rel: 10, Value: args.Value, Conv: sc } );
+
+			this.Layout = new Layout.Vert;
+		};
+	}
+);
+
 let Slider = class_def
 (
 	Pane,
@@ -26,6 +47,9 @@ let Slider = class_def
 	{
 		this.Build = function( args )
 		{
+			this.Value = args.Value;
+			this.Conv = args.Conv || this.Conv;
+
 			this.e = q.input( null );
 			this.e.type = "range";
 		};
@@ -40,13 +64,14 @@ let Input = class_def
 		this.Build = function( args )
 		{
 			this.Value = args.Value;
+			this.Conv = args.Conv || this.Conv;
 
 			this.e = q.input( null );
 			
 			let self = this;
 			this.e.onkeydown = function( ev )
 			{
-				if( ev.key == "Enter" )  {  self.Value.Set( this.value );  }
+				if( ev.key == "Enter" )  {  self.Value.Set( self.Conv.VtoM( this.value ) );  }
 			};
 
 			this.Value && this.Value.AddView( this );
@@ -56,7 +81,13 @@ let Input = class_def
 		this.Change =
 		this.Update = function()
 		{
-			this.e.value = this.Value && this.Value.Get() || "" ;
+			this.e.value = this.Value && this.Conv.MtoV( this.Value.Get() );
+		};
+
+		this.Conv =
+		{
+			MtoV: function( mv ) { return mv; },
+			VtoM: function( vv ) { return vv; }
 		};
 	}
 );
