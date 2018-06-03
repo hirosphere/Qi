@@ -10,12 +10,12 @@ Content.Wave = class_def
 
 			this.e = q.div( null, { "class": "CONTENT_WAVE" } );
 
-			this.CanvasPane = new EQGraph.CanvasPane( this, { Width: -1, Height: 60, Rel: 30 } );
+			this.CanvasPane = new EQGraph.CanvasPane( this, { Width: -1, Height: 100, Rel: 30 } );
 			new AudioPane( this, { Width: -1, Height: 60, Player: this.AudioPlayer } );
 			let div1 = new DivPane( this, { Width: -1, Height: 160, Rel: 0 } );
 			let div3 = new DivPane( this, { Width: -1, Height: 160, Rel: 0, Class: "WAVE_FILE_INFO" } );
 
-			this.Layout = new Layout.Vert();
+			this.Layout = new Layout.Vert( { Sep: 1 } );
 
 			this.title = q.div( div1.e, { "class": "CONTENT_WAVE_TITLE" } );
 			this.path = q.div( div1.e );

@@ -44,7 +44,7 @@ let AppPane = class_def
 
 				let horiz = new DivPane
 				(
-					vert, { Width: -1, Height: 50, Rel: 10, Layout: new Layout.Horiz() }
+					vert, { Width: -1, Height: 50, Rel: 10, Layout: new Layout.Horiz( { Sep: 1 } ) }
 				);
 				{
 					var side = new SidePane( horiz, { Width: 202, Rel: 0.2, Height: -1, App: this } );

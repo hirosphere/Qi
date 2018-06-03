@@ -82,6 +82,32 @@ let DivPane = class_def
 	}
 );
 
+let HorizPane = class_def
+(
+	Pane,
+	function()
+	{
+		this.Build = function( args )
+		{
+			this.e = q.div( null, { "class": args.Class || "" } );
+			this.Layout = new Layout.Horiz( { Set: args.Sep } );
+		};
+	}
+);
+
+let VertPane = class_def
+(
+	Pane,
+	function()
+	{
+		this.Build = function( args )
+		{
+			this.e = q.div( null, { "class": args.Class || "" } );
+			this.Layout = new Layout.Vert( { Set: args.Sep } );
+		};
+	}
+);
+
 let RootPane = class_def
 (
 	Pane,
@@ -133,6 +159,11 @@ let Layout = new function()
 		{
 			this.Sep = 0;
 
+			this.Initiate = function( args )
+			{
+				this.Sep = args && args.Sep || this.Sep;
+			};
+
 			this.Action = function( pane )
 			{
 				var x_fix_total = this.get_total_sep( pane );
@@ -165,7 +196,7 @@ let Layout = new function()
 					let y_span = ( y_fix < 0 ? y_cont : y_fix );
 
 					this.set_area( part, x_pos, y_pos, x_span, y_span );
-					x_pos += x_span;
+					x_pos += x_span + this.Sep;
 				}
 			};
 

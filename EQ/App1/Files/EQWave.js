@@ -229,17 +229,15 @@ let EQDec = new function()
 			this.Complete = function()
 			{
 				let offset = this.Offset = this.work.acc / this.SampleCount;
-				this.MaxAcc = Math.max
-				(
-					this.work.max - offset,
-					Math.abs( this.work.min - offset )
-				);
 
 				let smpls = this.Samples;
-				for( var i = 0; i < smpls.length; i ++ )  smpls[ i ] -= offset;
+				for( var i = 0, maxacc = 0; i < smpls.length; i ++ )  maxacc = maxabs( smpls[ i ] -= offset, maxacc );
 
+				this.MaxAcc = maxacc;
 				this.Next && this.Next.Complete();
-			}
+			};
+
+			function maxabs( value, max ) { return Math.max( max, Math.abs( value ) ); }
 
 			this.ReadChannelSec = function( view, pos, blockn )
 			{

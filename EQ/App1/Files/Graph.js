@@ -86,12 +86,14 @@ EQGraph.CanvasPane = class_def
 		{
 			S1: { Back: "#000000", NS: "#ffffff", EW: "#80d870", UD: "#40d0d0" },
 			M1: { Back: "#3030A0", NS: "#ffffff", EW: "#c0ffff", UD: "#c0d8FF" },
+			M2: { Back: "#4040C0", NS: "#ffffff", EW: "#ffffff", UD: "#ffffFF" },
 		};
 
 		this.Draw = function( context, width, height )
 		{
-			// context.fillStyle = "#2828b0";
-			let ss = stylesets.M1;
+			context.save();
+
+			let ss = stylesets.M2;
 			context.fillStyle = ss.Back;
 
 			context.fillRect( 0, 0, width - 0, height - 0 );
@@ -99,9 +101,14 @@ EQGraph.CanvasPane = class_def
 			if( this.Wave == null )  return;
 
 			let maxacc = this.Wave.MaxAcc;
-			this.Wave && EQGraph.DrawWave( context, width, height, this.Wave.UD, maxacc, ss.UD );
-			this.Wave && EQGraph.DrawWave( context, width, height, this.Wave.EW, maxacc, ss.EW );
-			this.Wave && EQGraph.DrawWave( context, width, height, this.Wave.NS, maxacc, ss.NS );
+			let h = height / 3;
+			this.Wave && EQGraph.DrawWave( context, width, h, this.Wave.NS, maxacc, ss.NS );
+			context.translate( 0, h * 1 );
+			this.Wave && EQGraph.DrawWave( context, width, h, this.Wave.EW, maxacc, ss.EW );
+			context.translate( 0, h * 1 );
+			this.Wave && EQGraph.DrawWave( context, width, h, this.Wave.UD, maxacc, ss.UD );
+
+			context.restore();
 		};
 	}
 );

@@ -31,11 +31,11 @@ let SliderInput = class_def
 			let ic = args && args.IConv;
 			let sc = args && args.SConv;
 
-			new Label( this, { Width: -1, Height: 10, Rel: 10, Text: args.Text } );
-			new Input( this, { Width: -1, Height: 10, Rel: 10, Value: args.Value, Conv: ic } );
-			new Slider( this, { Width: -1, Height: 10, Rel: 10, Value: args.Value, Conv: sc } );
+			new Label( this, { Width: 70, Height: -1, Rel: 10, Text: args.Text } );
+			new Input( this, { Width: 60, Height: -1, Rel: 10, Value: args.Value, Conv: ic } );
+			new Slider( this, { Width: 160, Height: -1, Rel: 10, Value: args.Value, Conv: sc } );
 
-			this.Layout = new Layout.Vert;
+			this.Layout = new Layout.Horiz;
 		};
 	}
 );
