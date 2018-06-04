@@ -40,6 +40,7 @@ let EQWave = class_def
 			this.IsKiK = dec.IsKiK;
 			this.Channels = dec.Channels;
 			this.SamplingRate = dec.SamplingRate;
+			this.SampleTime = dec.SampleTime / 10;
 
 			let upper = dec.IsKiK && surf;
 			this.NS = dec.Channels[ upper ? 3 : 0 ];
@@ -137,6 +138,7 @@ let EQDec = new function()
 		{
 			IsKiK: isKik,
 			SamplingRate: samplingrate,
+			SampleTime: sampletime,
 			Channels: channel_list.Channels,
 			monitor: rd.monitor
 		};

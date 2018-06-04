@@ -4,7 +4,10 @@ let Index = class_def
 	Node,
 	function( base, ctor )
 	{
-		this.GetNodeByPath;
+		ctor.CreateTempPath = function( path )
+		{
+			;
+		};
 	}
 );
 
@@ -31,17 +34,22 @@ let FolderIndex = class_def
 			var mt;
 			if( mt = this.Name.match( /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})00$/ ) )
 			{
-				return `${mt[1]}/${mt[2]}/${mt[3]}  ${mt[4]}:${mt[5]}`;
+				return `${mt[2]}月${mt[3]}日 ${mt[4]}時${mt[5]}分`;
 			}
 
 			if( mt = this.Name.match( /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(.+)?/ ) )
 			{
-				return `${mt[1]}/${mt[2]}/${mt[3]}  ${mt[4]}:${mt[5]}:${mt[6]} ${mt[7]}`;
+				return `${mt[2]}月${mt[3]}日 ${mt[4]}時${mt[5]}分${mt[6]}秒 ${mt[7]}`;
 			}
 
 			if( mt = this.Name.match( /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(.+)?/ ) )
 			{
-				return `${mt[1]}/${mt[2]}/${mt[3]}  ${mt[4]}:${mt[5]} ${mt[6]}`;
+				return `${mt[2]}月${mt[3]}日 ${mt[4]}時${mt[5]}分 ${mt[6]}`;
+			}
+
+			if( mt = this.Name.match( /(\d{4})/ ) )
+			{
+				return `${mt[1]}年`;
 			}
 			return this.Name;
 		};

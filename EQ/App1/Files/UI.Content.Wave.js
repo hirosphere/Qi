@@ -7,21 +7,16 @@ Content.Wave = class_def
 		this.Build = function()
 		{
 			this.AudioPlayer = EQAudio.CreatePlayer();
+			this.Wave = null;
 
 			this.e = q.div( null, { "class": "CONTENT_WAVE" } );
 
+			this.Info1 = new DivPane( this, { Width: -1, Height: 25, Rel: 0, Class: "WAVE_INFO_1" } );
 			this.CanvasPane = new EQGraph.CanvasPane( this, { Width: -1, Height: 100, Rel: 30 } );
 			new AudioPane( this, { Width: -1, Height: 60, Player: this.AudioPlayer } );
-			let div1 = new DivPane( this, { Width: -1, Height: 160, Rel: 0 } );
-			let div3 = new DivPane( this, { Width: -1, Height: 160, Rel: 0, Class: "WAVE_FILE_INFO" } );
+			this.Info2 = new DivPane( this, { Width: -1, Height: 160, Rel: 0, Class: "WAVE_INFO_2" } );
 
 			this.Layout = new Layout.Vert( { Sep: 1 } );
-
-			this.title = q.div( div1.e, { "class": "CONTENT_WAVE_TITLE" } );
-			this.path = q.div( div1.e );
-
-			let table = q.table( div3.e );
-			this.fileinfo = q.tbody( table );
 		};
 
 		this.SetIndex = function( index )
@@ -39,17 +34,27 @@ Content.Wave = class_def
 
 			function callback( wave )
 			{
-				//make_info_table( self.fileinfo, wave.Monitor );
-				//make_info_table( self.fileinfo, wave.ChannelMonitor );
+				//make_info_table( self.Info2.e, wave.Monitor );
+				//make_info_table( self.Info2.e, wave.ChannelMonitor );
 				//q.text( self.path, wave && wave.GetInfo() );
+				self.Wave = wave;
+				self.UpdateInfo1();
 				self.AudioPlayer.Wave.Set( wave );
 				self.CanvasPane.SetWave( wave );
 			}
 		};
 
-		function make_info_table( tbody, rows )
+		this.UpdateInfo1 = function()
 		{
-			q.clr( tbody );
+			let w = this.Wave;
+			let info = `${ q.frac( w.MaxAcc, 2 ) }gal  ${ w.SampleTime }秒`;
+			q.text( this.Info1.e, info );
+		};
+
+		function make_info_table( com, rows )
+		{
+			q.clr( com );
+			let tbody = q.tbody( q.table( com ) );
 			for( var row of rows )
 			{
 				let tr = q.tr( tbody );
@@ -76,6 +81,6 @@ Content.Wave.FileInfoPane = class_def
 
 			let table = q.table( this.e, { "class": "WAVE_FILE_INFO" } );
 			this.fileinfo = q.tbody( table );
-		}
+		};
 	}
 );

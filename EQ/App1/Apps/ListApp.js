@@ -63,13 +63,12 @@ let AppPane = class_def
 		this.OnEQFSComplete = function()
 		{
 			this.CurrentIndex.Set( this.Index );
-			this.SetHash( location.hash.substr( 1 ) );
 		};
 
 		this.UpdatePageTitle = function()
 		{
 			let cur = this.CurrentIndex.Get();
-			document.title = ( cur && cur.GetCaption() + " - " ) + "ListApp";
+			document.title = ( cur && cur.GetCaption() + " - " ) + "地震波形を聴く";
 			location.hash = "#" + this.GetHash();
 		};
 

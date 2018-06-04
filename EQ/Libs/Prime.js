@@ -14,6 +14,8 @@ function class_def( base, decor )
 
 var q = new function()
 {
+	//  html dom  //
+
 	this.id = function( id ) { return document.getElementById( id ); };
 	
 	this.div = function( com, args ) { return this.e( "div", com, args ); };
