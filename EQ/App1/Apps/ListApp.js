@@ -69,7 +69,6 @@ let AppPane = class_def
 		{
 			let cur = this.CurrentIndex.Get();
 			document.title = ( cur && cur.GetCaption() + " - " ) + "地震波形を聴く";
-			location.hash = "#" + this.GetHash();
 		};
 
 		this.SetHash = function( hash )
