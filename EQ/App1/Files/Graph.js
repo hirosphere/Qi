@@ -93,7 +93,7 @@ EQGraph.CanvasPane = class_def
 		{
 			context.save();
 
-			let ss = stylesets.M2;
+			let ss = stylesets.S1;
 			context.fillStyle = ss.Back;
 
 			context.fillRect( 0, 0, width - 0, height - 0 );

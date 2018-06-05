@@ -2,13 +2,26 @@
 <html>
 <head>
 <meta charset="utf-8">
-<script src="../Qrafts/Files/Prime.js"></script>
-<script src="./Apps/App.js"></script>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBhQjsoTBqzC7xqEpe84bjKW5vTgZnzwl8&callback=initGMap"></script>
+<script src="../Libs/Prime.js?dc=B"></script>
+<script src="./Files/Custom.js?dc=B"></script>
+<script src="./Files/Model.js?dc=B"></script>
+<script src="./Files/EQFS.js?dc=B"></script>
+<script src="./Files/BinReader.js?dc=B"></script>
+<script src="./Files/EQWave.js?dc=B"></script>
+<script src="./Files/Audio.js?dc=B"></script>
+<script src="./Files/Pane.js?dc=B"></script>
+<script src="./Files/Graph.js?dc=B"></script>
+<script src="./Files/UI.Input.js?dc=B"></script>
+<script src="./Files/UI.List.js?dc=B"></script>
+<script src="./Files/UI.Audio.js?dc=B"></script>
+<script src="./Files/UI.Content.js?dc=B"></script>
+<script src="./Files/UI.Content.Wave.js?dc=B"></script>
+<script src="./Files/Index.js?dc=B"></script>
+<script src="./Files/Doc.js?dc=B"></script>
+<script src="./Apps/ListApp.js?dc=B"></script>
 <style>
 
-html { font-size: 14px; font-family: "meirio"; color: #333; }
-
+html, input, textarea { font-size: 14px; font-family: sans-serif; color: #333; }
 html,body
 {
 	margin: 0; padding: 0;
@@ -16,7 +29,19 @@ html,body
 	position: relative; overflow: hidden;
 }
 
-.list {  }
+
+button { font-size: 16px; }
+select { text-align: center; font-size: 23px; }
+option { text-align: center; font-size: 18px; }
+select option[selected] { background: #666; }
+label { text-align: center; vertical-align: middle; }
+
+.app { background: #fff; border: 0px solid #222; }
+.path { padding: 0 13px; line-height: 42px; font-size: 16px; border-bottom: 1px solid #bbb; }
+.side { background: #fff; border: 0px solid #666; }
+.content { background: #fff; border: 0px solid #666; }
+
+.list {}
 
 .list .content
 {
@@ -37,6 +62,29 @@ html,body
 {
 	background: #222; color: #eee;
 }
+
+.PATH_ITEM { padding: 0 0.74em; vertical-align: middle; }
+.PATH_TERM { color: #aa9; font-size: 80%; vertical-align: middle;  }
+
+.COLL_LIST_CONTENT { overflow: auto; padding: 1px; padding-bottom: 60%; }
+.COLL_LIST_ITEM
+{
+	height: 2.8em; line-height: 2.8em;
+	padding-left: 0.78ex;
+	border-bottom: 1px dotted #776;
+	white-space: nowrap;
+}
+
+.COLL_LIST_ITEM.SELECTED { background: #111; color: #eee; }
+
+.CONTENT_LIST { border: 1px solid #fa1; word-wrap: break-word; overflow: auto; }
+.CONTENT_LIST_ITEM { display: inline-block; padding: 0 2em; line-height: 70px;  }
+
+.WAVE_FILE_INFO { overflow: auto; }
+.WAVE_FILE_INFO table{ width: 750px; border-collapse: collapse; font-family: "MS UI Gothic" monospace; color: #333; }
+.WAVE_FILE_INFO td { background: #eef; border: 1px solid #fff; padding: 2px 6px; }
+.WAVE_FILE_INFO td.hdr { background: #ddf; }
+
 
 </style>
 </head>

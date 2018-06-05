@@ -17,10 +17,10 @@ let EQAudio = new function()
 		this.Rate = new Model.Value( 30 );
 		
 		this.NS_Volume = new Model.Value( 0.7 );
-		this.NS_Pan = new Model.Value( -0.3 );
+		this.NS_Pan = new Model.Value( -0.7 );
 
 		this.EW_Volume = new Model.Value( 0.7 );
-		this.EW_Pan = new Model.Value( 0.3 );
+		this.EW_Pan = new Model.Value( 0.7 );
 
 		this.UD_Volume = new Model.Value( 0.7 );
 		this.UD_Pan = new Model.Value( 0 );

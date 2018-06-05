@@ -63,7 +63,7 @@ Model.Value = class_def
 		{
 			if( value === this.Value )  return;
 			this.Value = value;
-			this.Notify( "Change" );
+			this.Notify( "Change", [ value ] );
 		};
 	}
 );
@@ -125,6 +125,7 @@ let NodeSelection = class_def
 
 			let olditem = this.current;
 			let newitem = this.current = node;
+
 			if( olditem != null ) this.Notify( "Unselect", [ olditem ] );
 			if( newitem != null ) this.Notify( "Select", [ newitem ] );
 		};

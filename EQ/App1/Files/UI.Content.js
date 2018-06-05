@@ -6,7 +6,7 @@ let PageSwitchPane = class_def
 	{
 		this.Build = function( args )
 		{
-			this.App = args.App;
+			this.Doc = args.Doc;
 			this.Contents = {};
 			this.CurContent = null;
 
@@ -18,7 +18,7 @@ let PageSwitchPane = class_def
 			{
 				Select: function() { self.Update(); }
 			};
-			this.Cur = this.App.CurrentIndex;
+			this.Cur = this.Doc.CurrentIndex;
 			this.Cur.AddView( view );
 			this.Update();
 		};
@@ -45,11 +45,11 @@ let PageSwitchPane = class_def
 			switch( pageid )
 			{
 				case "Dir":
-					content = new Content.EnterList( this, { Width: 50, Rel: 10, Height: -1, App: this.App } );
+					content = new Content.EnterList( this, { Width: 50, Rel: 10, Height: -1, Doc: this.Doc } );
 					break;
 
 				case "Wave":
-					content = new Content.Wave( this, { Width: 50, Rel: 10, Height: -1, App: this.App } );
+					content = new Content.Wave( this, { Width: 50, Rel: 10, Height: -1, Doc: this.Doc } );
 					break;
 				
 				default:
@@ -80,7 +80,7 @@ Content.EnterList = class_def
 	{
 		this.Build = function( args )
 		{
-			this.App = args.App;
+			this.Doc = args.Doc;
 			this.Node = args.Node;
 
 			this.e = q.div( null, { "class": "CONTENT_LIST" } );
@@ -94,7 +94,7 @@ Content.EnterList = class_def
 			let self = this;
 			index.GetPartNodes( callback );
 			function callback( nodes ) { for( var part of nodes ) new ListItem( self.body, part, onclick );  }
-			function onclick( index )  { self.App.CurrentIndex.Set( index ); }
+			function onclick( index )  { self.Doc.CurrentIndex.Set( index ); }
 		};
 
 		function ListItem( com, index, onclick )

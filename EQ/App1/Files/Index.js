@@ -4,10 +4,14 @@ let Index = class_def
 	Node,
 	function( base, ctor )
 	{
-		ctor.CreateTempPath = function( path )
+		//  Com, Path, Name  //
+
+		this.CreateTempPath = function( path )
 		{
 			;
 		};
+
+		this.TweetText = "トップページ";
 	}
 );
 
@@ -23,10 +27,12 @@ let FolderIndex = class_def
 		{
 			base.Initiate.call( this, com );
 			
-			this.PartMaked = 0;
+			this.LoadState = 0;
 			this.getpartnodescallbacks = [];
 			this.Path = compath + name + ( name.length ? "/" : "" );
 			this.Name = name;
+
+			this.TweetText = this.GetCaption();
 		};
 
 		this.GetCaption = function()
@@ -56,16 +62,16 @@ let FolderIndex = class_def
 
 		this.GetPartNodes = function( callback )
 		{
-			if( this.PartMaked == 2 )
+			if( this.LoadState == 2 )
 			{
 				callback( this.PartNodes );
 				return;
 			}
 
 			this.getpartnodescallbacks.push( callback );
-			if( this.PartMaked == 1 )  return;
+			if( this.LoadState == 1 )  return;
 			
-			this.PartMaked = 1;
+			this.LoadState = 1;
 
 			EQFS.GetIndex( this.Path, onload );
 
@@ -81,7 +87,8 @@ let FolderIndex = class_def
 						item.IsKiK && new WaveIndex( self, self.Path, item.Name, false ); 
 					}
 				}
-				self.PartMaked = 2;
+				self.LoadState = 2;
+
 				for( var callback of self.getpartnodescallbacks ) callback( self.PartNodes );
 				self.getpartnodescallbacks.length = 0;
 			}
@@ -104,6 +111,8 @@ let WaveIndex = class_def
 			var iswave = name.match( /\.kwin$/ );
 
 			if( iswave ) this.Type = "Wave";
+
+			this.TweetText = this.GetCaption();
 		};
 
 		this.GetCaption = function()
@@ -114,7 +123,7 @@ let WaveIndex = class_def
 				let code = mt[ 1 ];
 				let site = EQFS.SiteList[ code ];
 				let surf = ( this.IsSurf ? "" : " (地中)" );
-				return site ? `${ site.Code } ${ site.Name }${ surf }` : this.Name;
+				return site ? `${ site.Code } ${ site.Name } ${ site.Namer }${ surf }` : this.Name;
 			}
 			return this.Name;
 		};
