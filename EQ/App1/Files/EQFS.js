@@ -54,6 +54,9 @@ let EQFS = new function()
 		q.getb( wavespath + path, onload );
 	}
 
+
+	//  Site Info  //
+
 	let sitefs = [ "Code", "Name", "Namer", "Lat", "Lng", "Elev", "Depth", "Pref", "Prefr", "Latj", "Lngj", "Meter" ];
 
 	function MakeSiteList( onload )
@@ -75,31 +78,4 @@ let EQFS = new function()
 			onload( list );
 		}
 	}
-
-	// site info //
-
-	//  file system  //
-
-	this.Root;
-
-	let FSNode = class_def
-	(
-		Node,
-		function( base )
-		{
-			this.Initiate = function( caption, path, name )
-			{
-				base.Initiate.call( this );
-				this.Caption = caption;
-				this.Path = path;
-				this.Name = name;
-			};
-
-			this.GetPartNodes = function( callback )
-			{
-				;
-			};
-		}
-	);
-
 };

@@ -27,10 +27,10 @@ Content.Wave = class_def
 
 		this.Update = function()
 		{
-			//q.text( this.title, this.Index && `${ this.Index.GetCaption() } ${ this.Index.Path }` );
+			console.log( this.Index && `${ this.Index.GetCaption() } ${ this.Index.Path }` );
 
 			let self = this;
-			this.Index && EQWave.Get( this.Index.Path, this.Index.IsSurf, callback );
+			this.Index && EQWave.Get( this.Index.Path, callback );
 
 			function callback( wave )
 			{

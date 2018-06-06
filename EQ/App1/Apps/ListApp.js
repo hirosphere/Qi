@@ -85,7 +85,10 @@ let AppPane = class_def
 
 		this.OnEQFSComplete = function()
 		{
-			this.Doc.CurrentIndex.Set( this.Doc.RootIndex );
+			location.hash ?
+				this.Doc.SetHash( location.hash ) :
+				this.Doc.CurrentIndex.Set( this.Doc.RootIndex );
+			
 			this.Doc.Modified.Set( false );
 		};
 
@@ -97,15 +100,16 @@ let AppPane = class_def
 
 		this.Tweet = function()
 		{
-			let url = location.origin + location.pathname;
+			let url = location.origin + location.pathname + this.Doc.GetHash();
 			let index = this.Doc.CurrentIndex.Get();
-			let twtext = `${ index.TweetText } - 「地震波形の音を聴こう」`;
+			let twtext = `${ index.LongCap } - 震These - 地震波形を「音」で聴くブラウザ画面アプリ。\n\n`;
 			window.open
 			(
 				"http://twitter.com/intent/tweet?" +
-				"url" + encodeURIComponent( url ) +
-				"&text" + encodeURIComponent( twtext )
+				"url=" + encodeURIComponent( url ) +
+				"&text=" + encodeURIComponent( twtext )
 			);
+
 			this.CureHash();
 		};
 

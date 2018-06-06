@@ -25,6 +25,7 @@ var q = new function()
 	this.h3 = function( com, args ) { return this.e( "h3", com, args ); };
 	this.h4 = function( com, args ) { return this.e( "h4", com, args ); };
 
+	this.a = function( com, args ) { return this.e( "a", com, args ); };
 	this.p = function( com, args ) { return this.e( "p", com, args ); };
 	this.span = function( com, args ) { return this.e( "span", com, args ); };
 

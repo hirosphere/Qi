@@ -17,35 +17,65 @@ let Doc = function()
 		Select: function()
 		{
 			self.Modified.Set( true );
-			console.log( self.GetHash() );
 		}
 	};
 
 	this.CurrentIndex.AddView( changeview );
 	
-	this.Modified.AddView( { Change: function() { console.log( "Doc.Modified: ", self.Modified.Get() ); } } );
+	this.Modified.AddView( { Change: function() { self.Modified.Get(); } } );
 	
 	//    //
 
 	this.GetHash = function()
 	{
-		let hash = "#";
 		let index = this.CurrentIndex.Get();
-		hash += "p=" + index.Path + ( index.Type == "Wave" ? ( index.IsSurf ? "/s" : "/u" ) : "" );
-		return hash;
+		return "#" + "Page=" + index.Path;
 	};
 	
-};
-
-let Hash = new function()
-{
-	this.Encode = function( value )
+	this.SetHash = function( hash )
 	{
-		;
+		let self = this;
+		
+		let lines = ( hash + "" ).replace( "#", "" ).split( "&" );
+		let values = {};
+		for( var line of lines )
+		{
+			let kv = line.split( "=" );
+			values[ kv[ 0 ] ] = kv[ 1 ];
+		}
+
+		console.log( "SetHash", values );
+		if( values.Page )
+		{
+			let list = values.Page.split( "/" );
+			makeIndexPath( this.RootIndex, list, onpath );
+		}
+
+		function onpath( node )
+		{
+			console.log( node.LongCap );
+			self.CurrentIndex.Set( node || self.RootIndex );
+		}
 	};
 
-	function encode( value )
+	function makeIndexPath( node, list, callback )
 	{
-		;
+		if( list.length == 0 )
+		{
+			callback( node );
+			return;
+		}
+
+		let self = this;
+		let name = list.shift();
+
+		node.GetPartNodes( onload );
+
+		function onload()
+		{
+			let part = node.NamedPartNodes[ name ];
+			console.log( "makeIndexPath", part && part.LongCap );
+			part && makeIndexPath( part, list, callback );
+		}
 	}
 };

@@ -8,8 +8,12 @@ let EQWave = class_def
 
 		let Wavesets = {};
 
-		ctor.Get = function( filepath, surf, callback )
+		ctor.Get = function( filepath_, callback )
 		{
+			let mt = filepath_.match( /(.+)\+(Surf|Un)$/ );
+			let filepath = mt[ 1 ];
+			let surf = mt[ 2 ] == "Surf";
+			console.log( "EQWave.Get", filepath, mt[2], surf );
 			var wset = Wavesets[ filepath ];
 			if( wset )
 			{
