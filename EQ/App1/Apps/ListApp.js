@@ -116,6 +116,7 @@ let AppPane = class_def
 		this.SetHash = function( hash )
 		{
 			console.log( "AppPane.SetHash", hash );
+			this.Doc.SetHash( hash );
 		};
 
 		this.CureHash = function()
