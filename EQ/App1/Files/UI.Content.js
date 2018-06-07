@@ -38,7 +38,6 @@ let PageSwitchPane = class_def
 		this.MakeContent = function( index )
 		{
 			let pageid = index && index.Type || "null";
-			console.log( "MakeContent", pageid, index );
 			var content = this.Contents[ pageid ];
 			if( content ) return content;
 

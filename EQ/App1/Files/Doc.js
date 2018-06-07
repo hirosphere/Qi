@@ -1,15 +1,16 @@
-let Doc = function()
+
+let DocCore = function()
 {
-	//    //
-
 	this.Modified = new Model.Value( false );
-
 	this.RootIndex = new RootIndex();
 	this.CurrentIndex = new NodeSelection();
-
 	this.Audio = EQAudio.CreatePlayer();
+};
 
-	//    //
+
+let Doc = function()
+{
+	DocCore.call( this );
 
 	let self = this;
 	let changeview =
@@ -19,12 +20,11 @@ let Doc = function()
 			self.Modified.Set( true );
 		}
 	};
-
 	this.CurrentIndex.AddView( changeview );
-	
 	this.Modified.AddView( { Change: function() { self.Modified.Get(); } } );
 	
-	//    //
+
+	//  Hash  //
 
 	this.GetHash = function()
 	{
@@ -44,23 +44,29 @@ let Doc = function()
 			values[ kv[ 0 ] ] = kv[ 1 ];
 		}
 
-		console.log( "SetHash", values );
-		if( values.Page )
+		//  Page  //
+
 		{
-			let list = values.Page.split( "/" );
-			makeIndexPath( this.RootIndex, list, onpath );
+			let page = values.Page;
+			let list = page && page.split( "/" );
+			makeIndexPath
+			(
+				this.RootIndex,
+				list || "", 
+				function( node ) { self.CurrentIndex.Set( node || self.RootIndex ); }
+			);
 		}
 
-		function onpath( node )
-		{
-			console.log( node.LongCap );
-			self.CurrentIndex.Set( node || self.RootIndex );
-		}
+
+		//  Audio  //
+
+
 	};
 
 	function makeIndexPath( node, list, callback )
 	{
-		if( list.length == 0 )
+		node && console.log( list.length, node.Path );
+		if( list.length == 0 || node && node.Type != "Dir" )
 		{
 			callback( node );
 			return;
@@ -74,8 +80,7 @@ let Doc = function()
 		function onload()
 		{
 			let part = node.NamedPartNodes[ name ];
-			console.log( "makeIndexPath", part && part.LongCap );
-			part && makeIndexPath( part, list, callback );
+			part ? makeIndexPath( part, list, callback ) : callback( node );
 		}
 	}
 };

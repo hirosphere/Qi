@@ -124,7 +124,7 @@ var q = new function()
 		{
 			onload( req.responseText );
 		};
-		// console.log( path );
+		// console.log( "HTTP Req", path );
 		req.send( null );
 		return "" + req.responseText;
 	};

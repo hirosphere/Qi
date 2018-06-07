@@ -98,8 +98,8 @@ let FolderIndex = class_def
 					if( item.Type == "Dir" )  new self.PartIndex( self, self.Path, item.Name );
 					if( item.Type == "File" )
 					{
-						new WaveIndex( self, self.Path, item.Name + "+Surf", true );
-						item.IsKiK && new WaveIndex( self, self.Path, item.Name + "+Un", false ); 
+						new WaveIndex( self, self.Path, item, true );
+						item.IsKiK && new WaveIndex( self, self.Path, item, false ); 
 					}
 				}
 				self.LoadState = 2;
@@ -127,14 +127,12 @@ let WaveIndex = class_def
 	Index,
 	function( base )
 	{
-		this.Initiate = function( com, compath, name, issurf )
+		this.Initiate = function( com, compath, info, issurf )
 		{
+			let name = info.Name + ( info.IsKiK ? ( issurf ? "+Sur" : "+Un" ) : "" )
 			base.Initiate.call( this, com, name );
 			this.Path = compath + name;
 			this.IsSurf = issurf;
-			var iswave = name.match( /\.kwin$/ );
-
-			if( iswave ) this.Type = "Wave";
 
 			this.MakeCaption();
 		};

@@ -27,8 +27,6 @@ Content.Wave = class_def
 
 		this.Update = function()
 		{
-			console.log( this.Index && `${ this.Index.GetCaption() } ${ this.Index.Path }` );
-
 			let self = this;
 			this.Index && EQWave.Get( this.Index.Path, callback );
 

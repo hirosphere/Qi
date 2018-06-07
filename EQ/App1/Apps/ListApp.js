@@ -12,7 +12,7 @@ let Main = new function()
 
 		function eqfscomplete()
 		{
-			appPane.OnEQFSComplete();
+			appPane.Initialize();
 		};
 
 		window.addEventListener( "hashchange", function() { appPane.SetHash( location.hash ); } ,  false );
@@ -28,7 +28,7 @@ let AppPane = class_def
 		this.Initiate = function()
 		{
 			base.Initiate.apply( this, arguments );
-		}
+		};
 		
 		this.Build = function()
 		{
@@ -83,7 +83,7 @@ let AppPane = class_def
 			return pane;
 		}
 
-		this.OnEQFSComplete = function()
+		this.Initialize = function()
 		{
 			location.hash ?
 				this.Doc.SetHash( location.hash ) :
@@ -115,7 +115,6 @@ let AppPane = class_def
 
 		this.SetHash = function( hash )
 		{
-			console.log( "AppPane.SetHash", hash );
 			this.Doc.SetHash( hash );
 		};
 
