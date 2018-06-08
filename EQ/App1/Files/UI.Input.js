@@ -1,12 +1,4 @@
 
-let Measure = class_def
-(
-	null,
-	function()
-	{
-	}
-);
-
 let Label = class_def
 (
 	Pane,

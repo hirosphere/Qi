@@ -26,8 +26,22 @@ let AudioPane = class_def
 			new StateButton( horiz, { Width: 80, Height: -1, Value: model.Playing, Labels: { "false": "停止中", "true": "再生中" } } );
 
 			let vert = new VertPane( horiz, { Rel: 10, Height: -1 } );
-			new SliderInput( vert, { Width: 500, Height: 25, Text: "音量", Value: model.Volume } );
-			new SliderInput( vert, { Width: 500, Height: 25, Text: "倍速", Value: model.Rate } );
+			new SliderInput
+			(
+				vert,
+				{
+					Width: 400, Height: 25, Text: "音量", Value: model.Volume,
+					Slider: { Min: 0, Max: 100, Step: 1, Scale: 100 }
+				}
+			);
+			new SliderInput
+			(
+				vert,
+				{
+					Width: 400, Height: 25, Text: "倍速", Value: model.Rate,
+					Slider: { Min: 0, Max: 2000, Step: 1 }
+				}
+			);
 
 			horiz.Layout = new Layout.Horiz( { Sep: 5 } );
 		};
@@ -37,7 +51,7 @@ let AudioPane = class_def
 			let horiz = new HorizPane( com, args );
 
 			{
-				let vert = new VertPane( horiz, { Width: 240, Rel: 0, Height: -1, Sep: 2 } );
+				let vert = new VertPane( horiz, { Width: 320, Rel: 0, Height: -1, Sep: 2 } );
 				vert.e.style.zIndex = 1;
 				
 				new SliderInput( vert, { Width: -1, Height: 25, Text: "NS音量", Value: model.NS_Volume } );
@@ -46,7 +60,7 @@ let AudioPane = class_def
 			}
 
 			{
-				let vert = new VertPane( horiz, { Width: 240, Rel: 0, Height: -1, Sep: 2 } );
+				let vert = new VertPane( horiz, { Width: 320, Rel: 0, Height: -1, Sep: 2 } );
 				vert.e.style.zIndex = 1;
 				
 				new SliderInput( vert, { Width: -1, Height: 25, Text: "NS定位", Value: model.NS_Pan } );

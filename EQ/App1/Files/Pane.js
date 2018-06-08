@@ -6,7 +6,7 @@ let Pane = class_def
 		this.Type = "Pane";
 		let defvals = { Left: 0, Top: 0, Width: 0, Height: 0, Rel: 0, Layout: null, Enable: true };
 
-		this.Initiate = function( com, args )
+		this.Initiate = function( com, args, x1, x2, x3 )
 		{
 			this.PartNodes = [];
 			this.ConcreteArea = { left: 0, top: 0, width: 0, height: 0 };
@@ -17,7 +17,7 @@ let Pane = class_def
 				this[ name ] = ( arg !== undefined ? arg : defvals[ name ] );
 			}
 
-			this.Build( args || {} );
+			this.Build( args, x1, x2, x3 );
 			com && com.Add( this );
 		};
 
