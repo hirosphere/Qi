@@ -1,4 +1,16 @@
 
+let PathOptionPane = class_def
+(
+	Pane,
+	function()
+	{
+		this.Build = function( args )
+		{
+			;
+		};
+	}
+);
+
 let PathSelectPane = class_def
 (
 	Pane,
@@ -75,7 +87,6 @@ let CollListPane = class_def
 			(
 				this, { Width: -1, Height: 40, Rel: 10, Class: this.CssClass + "_CONTENT" }
 			);
-			this.i = new DivPane( this, { Width: -1, Height: 40, Rel: 0, Text: "" } );
 
 			this.Layout = new Layout.Vert();
 
@@ -104,7 +115,6 @@ let CollListPane = class_def
 			let node = this.Selection.GetCurrent();
 			let com = this.ComNode = node && node.Com;
 
-			//q.text( this.i.e, "com change " + ( node && node.GetCaption() || " ??" ) );
 			q.clr( this.Content.e );
 
 			this.items = {};

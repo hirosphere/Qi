@@ -69,6 +69,12 @@ let FolderIndex = class_def
 				this.Caption = `${mt[1]}年`;
 			}
 
+			else if( this.Name == "Instant" )
+			{
+				this.LongCap = 
+				this.Caption = "即時公開データ";
+			}
+
 			else
 			{
 				this.Caption = this.Name;

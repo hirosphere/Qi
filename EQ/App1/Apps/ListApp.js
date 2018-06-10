@@ -3,21 +3,34 @@ let Main = new function()
 {
 	this.Init = function()
 	{
+		let self = this;
 		let root = new RootPane();
 		let appPane = new AppPane( root );
 		root.UpdateLayout();
-
 
 		EQFS.Init( eqfscomplete );
 
 		function eqfscomplete()
 		{
 			appPane.Initialize();
+			self.AppReady = true;
+			console.log( "AppReady" );
 		};
 
 		window.addEventListener( "hashchange", function() { appPane.SetHash( location.hash ); } ,  false );
 	};
+
+	this.OnGMapInit = function()
+	{
+		this.GMapReady = true;
+		console.log( "GMapReady" );
+	};
 };
+
+function initMap()
+{
+	Main.OnGMapInit();
+}
 
 let AppPane = class_def
 (
@@ -38,9 +51,19 @@ let AppPane = class_def
 
 			{
 				let vert = new VertPane( this, { Width: 200, Rel: 10, Height: -1 } );
+
+				{
+					let horiz = new HorizPane( vert, { Width: -1, Height: 50, Rel: 10 } );
+
+					var side = new SidePane( horiz, { Width: 150, Rel: 4, Height: -1,Doc: this.Doc } );
+					var content = new PageSwitchPane
+					(
+						horiz, { Width: 150, Rel: 6, Height: -1, Doc: this.Doc, CssClass: "CONTENT_SWITCH" }
+					);
+				}
 				
 				{
-					let horiz = new HorizPane( vert, { Width: -1, Height: 40 } );
+					let horiz = new HorizPane( vert, { Width: -1, Height: 50 } );
 
 					this.pathsel = new PathSelectPane
 					(
@@ -49,16 +72,6 @@ let AppPane = class_def
 
 					this.CreateSaveTweet( horiz );
 				}
-
-				{
-					let horiz = new HorizPane( vert, { Width: -1, Height: 50, Rel: 10 } );
-
-					var side = new SidePane( horiz, { Width: 380, Rel: 0.2, Height: -1,Doc: this.Doc } );
-					var content = new PageSwitchPane
-					(
-						horiz, { Width: 250, Rel: 10, Height: -1, Doc: this.Doc, CssClass: "CONTENT_SWITCH" }
-					);
-				};
 			}
 
 			this.Layout = new Layout.Horiz();
@@ -102,8 +115,10 @@ let AppPane = class_def
 		{
 			let url = location.origin + location.pathname + this.Doc.GetHash();
 			let index = this.Doc.CurrentIndex.Get();
+
 			let rate = this.Doc.AudioPlayer.Rate.GetValue();
-			let twtext = `${ index.LongCap } ${ rate }倍速 - 震These - 地震波形を「音」で聴くブラウザ画面アプリ。\n\n`;
+			let waveinfo = index && index.Type == "Wave" ? `${ rate }倍速` : "";
+			let twtext = `${ index.LongCap }${ waveinfo } - 震These - 地震波形を「音」で聴くブラウザ画面アプリ。\n\n`;
 			window.open
 			(
 				"http://twitter.com/intent/tweet?" +
