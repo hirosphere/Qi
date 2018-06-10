@@ -27,6 +27,7 @@ let PathSelectPaneB = class_def
 			if( cur == null )  return;
 
 			let path = cur.GetPath();
+			path.pop();
 			let items = this.e.options;
 
 			for( var r = items.length - 1; r >= 0; r -- )
@@ -38,14 +39,14 @@ let PathSelectPaneB = class_def
 			for( var i = r + 1; i < path.length; i ++ )
 			{
 				CreateItem( this.e, path[ i ], i );
-				if( path[ i ] == cur )  this.e.selectedIndex = i;
+				if( path[ i ] == ( cur && cur.Com ) )  this.e.selectedIndex = i;
 			}
 		};
 
 		function CreateItem( con, node, depth )
 		{
 			for( var spc = ""; spc.length < depth; spc += " " );
-			let e = q.option( con, { text: spc + " > " + node.GetCaption() } );
+			let e = q.option( con, { text: spc + " > " + node.LongCap } );
 			e.Node = node;
 			return e;
 		}

@@ -129,7 +129,7 @@ let RootIndex = class_def
 	{
 		this.Initiate = function() { base.Initiate.call( this, null, "", "" ) };
 		this.GetCaption = function() { return "トップ" };
-		this.LongCap = this.Caption = "/トップ/";
+		this.LongCap = this.Caption = "トップ";
 	}
 );
 
