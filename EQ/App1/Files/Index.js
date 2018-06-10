@@ -54,7 +54,7 @@ let FolderIndex = class_def
 			else if( mt = this.Name.match( /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(.+)?/ ) )
 			{
 				this.LongCap = `${mt[1]}年${mt[2]}月${mt[3]}日 ${mt[4]}時${mt[5]}分${mt[6]}秒`;
-				this.Caption = `${mt[2]}月${mt[3]}日 ${mt[4]}時${mt[5]}分${mt[6]}秒 ${mt[7]}`;
+				this.Caption = `${mt[2]}月${mt[3]}日 ${mt[4]}時${mt[5]}分${mt[6]}秒`;
 			}
 
 			else if( mt = this.Name.match( /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(.+)?/ ) )

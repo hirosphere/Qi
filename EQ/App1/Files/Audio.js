@@ -12,42 +12,77 @@ let EQAudio = new function()
 	{
 		this.Wave = new Model.Value( null );
 		
-		this.Playing = new Model.Value( true );
-		this.Volume = new Model.Value( 1 );
-		this.Rate = new Model.Value( 30 );
+		this.Playing = new BoolValue( true );
+		this.Volume = new NumberValue( 1 );
+		this.Rate = new NumberValue( 30 );
+		this.Gain = new NumberValue( 1 );
 		
-		this.NS_Volume = new Model.Value( 0.7 );
-		this.NS_Pan = new Model.Value( -0.7 );
+		this.Begin = new Model.Value( "2014/04/14/ 12:28:0000" );
+		this.Length = new Model.Value( 300 );
 
-		this.EW_Volume = new Model.Value( 0.7 );
-		this.EW_Pan = new Model.Value( 0.7 );
+		this.NS_Volume = new NumberValue( 0.7 );
+		this.NS_Pan = new NumberValue( -0.7 );
 
-		this.UD_Volume = new Model.Value( 0.7 );
-		this.UD_Pan = new Model.Value( 0 );
+		this.EW_Volume = new NumberValue( 0.7 );
+		this.EW_Pan = new NumberValue( 0.7 );
+
+		this.UD_Volume = new NumberValue( 0.7 );
+		this.UD_Pan = new NumberValue( 0 );
 	};
 
 	let Player = function()
 	{
 		PlayerCore.call( this );
 
+		let hashOrder =
+		[
+			this.Rate, this.Playing, this.Volume, this.Gain,
+			this.NS_Volume, this.NS_Pan, this.EW_Volume, this.EW_Pan, this.UD_Volume, this.UD_Pan
+		];
+
 		this.SetHash = function( hash )
 		{
 			let values = hash.split( "," );
-			let order = [ "Rate" ];
-			for( var i = 0; i < values.length; i ++ )
+			for( var i = 0; i < values.length && i < hashOrder.length; i ++ )
 			{
-				this[ order[ i ] ].SetValue( values[ i ] );
+				hashOrder[ i ].SetHash( values[ i ] );
 			}
 		};
 
 		this.GetHash = function()
 		{
-			return "" +
-			[
-				this.Rate.Get()
-			].join( "," );
+			let values = [];
+			for( var value of hashOrder )
+			{
+				values.push( value.GetHash() );
+			}
+			return values.join( "," );
 		};
 	}
+
+	// Value //
+
+	let BoolValue = class_def
+	(
+		Model.Value,
+		function()
+		{
+			this.GetHash = function() { return this.Value ? "1" : "0"; };
+			this.SetHash = function( value ) { this.Set( value == 1 ); };
+		}
+	);
+
+	let NumberValue = class_def
+	(
+		Model.Value,
+		function()
+		{
+			this.GetHash = function() { return this.Value; };
+			this.SetHash = function( value ) { this.Set( value ); };
+		}
+	);
+
+	// View //
 
 	let View = class_def
 	(

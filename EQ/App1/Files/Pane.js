@@ -90,7 +90,8 @@ let HorizPane = class_def
 		this.Build = function( args )
 		{
 			this.e = q.div( null, { "class": args.Class || "" } );
-			this.Layout = new Layout.Horiz( { Set: args.Sep } );
+			this.e.style.zIndex = 1;
+			this.Layout = new Layout.Horiz( { Sep: args.Sep } );
 		};
 	}
 );
@@ -103,7 +104,8 @@ let VertPane = class_def
 		this.Build = function( args )
 		{
 			this.e = q.div( null, { "class": args.Class || "" } );
-			this.Layout = new Layout.Vert( { Set: args.Sep } );
+			this.e.style.zIndex = 1;
+			this.Layout = new Layout.Vert( { Sep: args.Sep } );
 		};
 	}
 );
@@ -203,7 +205,7 @@ let Layout = new function()
 			this.get_total_sep = function( pane )
 			{
 				let len = pane.PartNodes.length;
-				return len > 1 ? this.Sep * len : 0;
+				return len > 1 ? this.Sep * ( len - 1 ) : 0;
 			};
 		}
 	);

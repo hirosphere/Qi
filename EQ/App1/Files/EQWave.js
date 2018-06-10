@@ -14,7 +14,6 @@ let EQWave = class_def
 			mt && ( filepath = mt[ 1 ] );
 			let surf = mt ? ( mt[ 2 ] == "Sur" || mt[ 2 ] == "Surf" ) : true;
 
-			console.log( "EQWave.Get", filepath, mt && mt[2], surf );
 			var wset = Wavesets[ filepath ];
 			if( wset )
 			{
@@ -298,7 +297,7 @@ let EQDec = new function()
 				return pos;
 			};
 
-				function utoi( u4 ) { return 0 ? u4 : 0 }
+				function utoi( v ) { return v < 8 ? v : v - 16; }
 
 			this.ReadSample_8 = function( view, pos, sample, count )
 			{

@@ -20,30 +20,26 @@ let AudioPane = class_def
 
 		this.BuildHoriz1 = function( com, args, model )
 		{
-			let horiz = new DivPane( com, args );
-			horiz.e.style.zIndex = 1;
-			
+			let horiz = new HorizPane( com, args );
+
 			new StateButton( horiz, { Width: 80, Height: -1, Value: model.Playing, Labels: { "false": "停止中", "true": "再生中" } } );
 
-			let vert = new VertPane( horiz, { Rel: 10, Height: -1 } );
-			new SliderInput
-			(
-				vert,
-				{
-					Text: "音量", Width: 400, Height: 25, Value: model.Volume,
-					Slider: { Min: 0, Max: 100, Step: 1, Scale: 100 }
-				}
-			);
-			new SliderInput
-			(
-				vert,
-				{
-					Text: "倍速", Width: 400, Height: 25, Value: model.Rate,
-					Slider: { Min: 0, Max: 2000, Step: 1 }
-				}
-			);
+			{
+				let vert = new VertPane( horiz, { Rel: 10, Height: -1 } );
 
-			horiz.Layout = new Layout.Horiz( { Sep: 5 } );
+				SInp( vert, { Width: -1, Height: 25 }, "音量", model.Volume, 60, 60, 220, 0, 1, 0.01 );
+				SInp( vert, { Width: -1, Height: 25 }, "倍速", model.Rate, 60, 60, 440, 1, 800, 1 );
+			
+				{
+					let horizC = new HorizPane( vert, { Width: -1, Height: 25, Sep: 2 } );
+	
+					// new Label( horizC, { Width: 50, Height: -1, Text: "開始点" } )
+					// new Input( horizC, { Width: 240, Height: -1, Value: model.Begin, } );
+	
+					// new Label( horizC, { Width: 50, Height: -1, Text: "長さ" } )
+					// new Input( horizC, { Width: 50, Height: -1, Value: model.Length, } );
+				}
+			}
 		};
 
 		this.BuildHoriz2 = function( com, args, model )
@@ -52,31 +48,28 @@ let AudioPane = class_def
 
 			{
 				let vert = new VertPane( horiz, { Width: 320, Rel: 0, Height: -1, Sep: 2 } );
-				vert.e.style.zIndex = 1;
 				
-				new SliderInput( vert, { Width: -1, Height: 25, Text: "NS音量", Value: model.NS_Volume } );
-				new SliderInput( vert, { Width: -1, Height: 25, Text: "EW音量", Value: model.EW_Volume } );
-				new SliderInput( vert, { Width: -1, Height: 25, Text: "UD音量", Value: model.UD_Volume } );
+				SInp( vert, { Width: -1, Height: 25 }, "NS音量", model.NS_Volume, 60, 60, 150, 0, 1, 0.1 );
+				SInp( vert, { Width: -1, Height: 25 }, "EW音量", model.EW_Volume, 60, 60, 150, 0, 1, 0.1 );
+				SInp( vert, { Width: -1, Height: 25 }, "UD音量", model.UD_Volume, 60, 60, 150, 0, 1, 0.1 );
 			}
 
 			{
 				let vert = new VertPane( horiz, { Width: 320, Rel: 0, Height: -1, Sep: 2 } );
 				vert.e.style.zIndex = 1;
 				
-				new SliderInput( vert, { Width: -1, Height: 25, Text: "NS定位", Value: model.NS_Pan } );
-				new SliderInput( vert, { Width: -1, Height: 25, Text: "EW定位", Value: model.EW_Pan } );
-				new SliderInput( vert, { Width: -1, Height: 25, Text: "UD定位", Value: model.UD_Pan } );
+				SInp( vert, { Width: -1, Height: 25 }, "NS定位", model.NS_Pan, 60, 60, 150, -1, 1, 0.1 );
+				SInp( vert, { Width: -1, Height: 25 }, "EW定位", model.EW_Pan, 60, 60, 150, -1, 1, 0.1 );
+				SInp( vert, { Width: -1, Height: 25 }, "UD定位", model.UD_Pan, 60, 60, 150, -1, 1, 0.1 );
 			}
 		};
 
-		this.BuildHoriz3 = function( com, args, model )
+		function SInp( com, args, label, value, lwid, iwid, rwid, min, max, step )
 		{
-			let cont = new VertPane( com, args );
-			cont.e.style.zIndex = 1;
-			
-			new SliderInput( cont, { Width: 120, Height: -1, Text: "NS音量", Value: model.NS_Volume } );
-			new SliderInput( cont, { Width: 120, Height: -1, Text: "EW音量", Value: model.EW_Volume } );
-			new SliderInput( cont, { Width: 120, Height: -1, Text: "UD音量", Value: model.UD_Volume } );
+			let horiz = new HorizPane( com, args );
+			new Label( horiz, { Width: lwid, Height: -1, Text: label } );
+			new Input( horiz, { Width: iwid, Height: -1, Value: value } );
+			new Slider( horiz, { Width: rwid, Height: -1, Value: value, Min: min, Max: max, Step: step } );
 		};
 	}
 );

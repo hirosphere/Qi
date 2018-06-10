@@ -37,17 +37,41 @@ let Slider = class_def
 	Pane,
 	function()
 	{
-		this.Min = 0;
-		this.Max = 100;
-		this.Step = 1;
-
 		this.Build = function( args )
 		{
 			this.Value = args.Value;
 
-			this.e = q.input( null );
-			this.e.type = "range";
+			let attrs = { min: args.Min, max: args.Max, step: args.Step };
+			fill( attrs, { min: 0, max: 1, step: 0.1 } );
+
+			this.e = q.input( null, "range", { attrs: attrs } );
+
+			let self = this;
+			this.e.oninput = function()
+			{
+				self.Value.Set( self.VtoM( this.value ) );
+			};
+
+			this.Value && this.Value.AddView( this );
+			this.Change();
 		};
+
+		this.Change = function()
+		{
+			this.e.value = this.Value && this.MtoV( this.Value.Get() );
+		};
+
+		this.MtoV = function( value ) { return value; };
+		this.VtoM = function( value ) { return value; };
+
+		function fill( a, b )
+		{
+			for( var name in b )
+			{
+				if( a[ name ] === undefined )  a[ name ] = b[ name ];
+			}
+		}
+
 	}
 );
 
