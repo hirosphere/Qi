@@ -4,10 +4,10 @@ Content.Wave = class_def
 	Content.Base,
 	function()
 	{
-		this.Build = function()
+		this.Build = function( args )
 		{
-			this.AudioPlayer = EQAudio.CreatePlayer();
 			this.Wave = null;
+			this.AudioPlayer = args.Doc.AudioPlayer;
 
 			this.e = q.div( null, { "class": "CONTENT_WAVE" } );
 

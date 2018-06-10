@@ -37,10 +37,10 @@ let AppPane = class_def
 			this.e = q.div( null, { "class": "APP" } );
 
 			{
-				let vert = new DivPane( this, { Width: 200, Rel: 10, Height: -1, Layout: new Layout.Vert } );
+				let vert = new VertPane( this, { Width: 200, Rel: 10, Height: -1 } );
 				
 				{
-					let horiz = new HorizPane( vert, { Width: -1, Height: 50 } );
+					let horiz = new HorizPane( vert, { Width: -1, Height: 40 } );
 
 					this.pathsel = new PathSelectPane
 					(
@@ -53,7 +53,7 @@ let AppPane = class_def
 				{
 					let horiz = new HorizPane( vert, { Width: -1, Height: 50, Rel: 10 } );
 
-					var side = new SidePane( horiz, { Width: 202, Rel: 0.2, Height: -1,Doc: this.Doc } );
+					var side = new SidePane( horiz, { Width: 380, Rel: 0.2, Height: -1,Doc: this.Doc } );
 					var content = new PageSwitchPane
 					(
 						horiz, { Width: 250, Rel: 10, Height: -1, Doc: this.Doc, CssClass: "CONTENT_SWITCH" }
@@ -102,7 +102,8 @@ let AppPane = class_def
 		{
 			let url = location.origin + location.pathname + this.Doc.GetHash();
 			let index = this.Doc.CurrentIndex.Get();
-			let twtext = `${ index.LongCap } - 震These - 地震波形を「音」で聴くブラウザ画面アプリ。\n\n`;
+			let rate = this.Doc.AudioPlayer.Rate.GetValue();
+			let twtext = `${ index.LongCap } ${ rate }倍速 - 震These - 地震波形を「音」で聴くブラウザ画面アプリ。\n\n`;
 			window.open
 			(
 				"http://twitter.com/intent/tweet?" +

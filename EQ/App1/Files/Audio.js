@@ -8,7 +8,7 @@ let EQAudio = new function()
 		return model;
 	};
 
-	let Player = function()
+	let PlayerCore = function()
 	{
 		this.Wave = new Model.Value( null );
 		
@@ -25,6 +25,29 @@ let EQAudio = new function()
 		this.UD_Volume = new Model.Value( 0.7 );
 		this.UD_Pan = new Model.Value( 0 );
 	};
+
+	let Player = function()
+	{
+		PlayerCore.call( this );
+
+		this.SetHash = function( hash )
+		{
+			let values = hash.split( "," );
+			let order = [ "Rate" ];
+			for( var i = 0; i < values.length; i ++ )
+			{
+				this[ order[ i ] ].SetValue( values[ i ] );
+			}
+		};
+
+		this.GetHash = function()
+		{
+			return "" +
+			[
+				this.Rate.Get()
+			].join( "," );
+		};
+	}
 
 	let View = class_def
 	(

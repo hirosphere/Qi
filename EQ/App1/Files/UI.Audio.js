@@ -30,7 +30,7 @@ let AudioPane = class_def
 			(
 				vert,
 				{
-					Width: 400, Height: 25, Text: "音量", Value: model.Volume,
+					Text: "音量", Width: 400, Height: 25, Value: model.Volume,
 					Slider: { Min: 0, Max: 100, Step: 1, Scale: 100 }
 				}
 			);
@@ -38,7 +38,7 @@ let AudioPane = class_def
 			(
 				vert,
 				{
-					Width: 400, Height: 25, Text: "倍速", Value: model.Rate,
+					Text: "倍速", Width: 400, Height: 25, Value: model.Rate,
 					Slider: { Min: 0, Max: 2000, Step: 1 }
 				}
 			);

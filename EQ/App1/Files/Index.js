@@ -13,6 +13,11 @@ let Index = class_def
 			if( com )  com.NamedPartNodes[ name ] = this;
 		};
 
+		this.MakePath = function( path )
+		{
+			;
+		};
+
 		this.LongCap = "Index";
 	}
 );

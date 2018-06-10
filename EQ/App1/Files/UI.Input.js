@@ -37,10 +37,13 @@ let Slider = class_def
 	Pane,
 	function()
 	{
+		this.Min = 0;
+		this.Max = 100;
+		this.Step = 1;
+
 		this.Build = function( args )
 		{
 			this.Value = args.Value;
-			this.Conv = args.Conv || this.Conv;
 
 			this.e = q.input( null );
 			this.e.type = "range";

@@ -105,21 +105,3 @@ Content.EnterList = class_def
 	}
 );
 
-Content.EQPane = class_def
-(
-	Content.ListPane,
-	function()
-	{
-		;
-	}
-);
-
-Content.WavePane = class_def
-(
-	Pane,
-	function()
-	{
-		;
-	}
-);
-

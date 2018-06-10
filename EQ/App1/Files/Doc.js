@@ -4,7 +4,7 @@ let DocCore = function()
 	this.Modified = new Model.Value( false );
 	this.RootIndex = new RootIndex();
 	this.CurrentIndex = new NodeSelection();
-	this.Audio = EQAudio.CreatePlayer();
+	this.AudioPlayer = EQAudio.CreatePlayer();
 };
 
 
@@ -29,7 +29,10 @@ let Doc = function()
 	this.GetHash = function()
 	{
 		let index = this.CurrentIndex.Get();
-		return "#" + "Page=" + index.Path;
+		return "#" +
+			"Page=" + index.Path +
+			"&Au=" + this.AudioPlayer.GetHash()
+		;
 	};
 	
 	this.SetHash = function( hash )
@@ -46,26 +49,23 @@ let Doc = function()
 
 		//  Page  //
 
-		{
-			let page = values.Page;
-			let list = page && page.split( "/" );
-			makeIndexPath
-			(
-				this.RootIndex,
-				list || "", 
-				function( node ) { self.CurrentIndex.Set( node || self.RootIndex ); }
-			);
-		}
-
+		let page = values.Page;
+		let list = page && page.split( "/" );
+		makeIndexPath
+		(
+			this.RootIndex,
+			list || "", 
+			function( node ) { self.CurrentIndex.Set( node || self.RootIndex ); }
+		);
 
 		//  Audio  //
 
+		this.AudioPlayer.SetHash( values.Au );
 
 	};
 
 	function makeIndexPath( node, list, callback )
 	{
-		node && console.log( list.length, node.Path );
 		if( list.length == 0 || node && node.Type != "Dir" )
 		{
 			callback( node );
