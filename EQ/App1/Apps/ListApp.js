@@ -55,7 +55,8 @@ let AppPane = class_def
 				{
 					let horiz = new HorizPane( vert, { Width: -1, Height: 50, Rel: 10 } );
 
-					var side = new SidePane( horiz, { Width: 150, Rel: 4, Height: -1,Doc: this.Doc } );
+					var side = new SidePane( horiz, { Width: 250, Rel: 0, Height: -1,Doc: this.Doc } );
+					
 					var content = new PageSwitchPane
 					(
 						horiz, { Width: 150, Rel: 6, Height: -1, Doc: this.Doc, CssClass: "CONTENT_SWITCH" }
@@ -151,6 +152,7 @@ let SidePane = class_def
 		{
 			this.e = q.div( null, { "class": "side", text_: "side" } );
 
+			new PathSelectPaneB( this, { Width: -1, Height: 50, Selection: args.Doc.CurrentIndex } );
 			new CollListPane( this, { Width: -1, Height: 50, Rel: 10, Selection: args.Doc.CurrentIndex } );
 			//new Pane( this, { Width: -1, Height: 50, edef: { type: "div", text: "side bottom" } } );
 
