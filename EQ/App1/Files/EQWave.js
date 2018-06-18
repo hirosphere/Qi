@@ -42,9 +42,11 @@ let EQWave = class_def
 		this.Initiate = function( dec, surf )
 		{
 			this.IsKiK = dec.IsKiK;
-			this.Channels = dec.Channels;
+			this.StartTimeStr = dec.StartTimeStr;
 			this.SamplingRate = dec.SamplingRate;
 			this.SampleTime = dec.SampleTime / 10;
+			this.SiteInfo = dec.SiteInfo,
+			this.Channels = dec.Channels;
 
 			let upper = dec.IsKiK && surf;
 			this.NS = dec.Channels[ upper ? 3 : 0 ];
@@ -88,13 +90,14 @@ let EQDec = new function()
 
 		    //  観測点に関する情報  //
 
-		rd.Bcd( 4, 100000, "緯度" );
-		rd.Bcd( 4, 100000, "経度" );
-		rd.Bcd( 4, 100, "標高" );
-		if( isKik ) rd.Bcd( 4, 100, "地中標高" );
+		let site = {};
+		site.Lat = rd.Bcd( 4, 100000, "緯度" );
+		site.Long = rd.Bcd( 4, 100000, "経度" );
+		site.Elev = rd.Bcd( 4, 100, "標高" );
+		if( isKik ) site.Depth = rd.Bcd( 4, 100, "地中標高" );
 
 		rd.Skip( 12, "観測点に関する情報" );
-		rd.BcdDate( "データ開始時刻" );
+		let startTimeBcd = rd.BcdDate( "データ開始時刻" );
 		let sampletime = rd.Uint32( "計測時間" );
 
 		rd.BcdDate( "最終時刻校正時刻" );
@@ -136,13 +139,15 @@ let EQDec = new function()
 
 		channel_list.ReadSecBlock();
 		
-		//  //
+		// output //
 		
 		let rt =
 		{
 			IsKiK: isKik,
 			SamplingRate: samplingrate,
+			StartTimeStr: startTimeBcd,
 			SampleTime: sampletime,
+			SiteInfo: site,
 			Channels: channel_list.Channels,
 			monitor: rd.monitor
 		};

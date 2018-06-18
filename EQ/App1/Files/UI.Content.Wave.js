@@ -45,7 +45,11 @@ Content.Wave = class_def
 		this.UpdateInfo1 = function()
 		{
 			let w = this.Wave;
-			let info = `${ q.frac( w.MaxAcc, 2 ) }gal  ${ w.SampleTime }秒`;
+			let ws = w && w.SiteInfo;
+			let n = this.Index;
+			let s = n && n.Site || {};
+			let elevdep = ws.Elev + "m" + ( ws.Depth != null && ` ${ws.Depth}m` || "" ); 
+			let info = `${s.Code} ${s.Name} ( ${ elevdep } ) - ${ w.StartTimeStr } - ${ q.frac( w.MaxAcc, 2 ) }gal - ${ w.SampleTime }秒`;
 			q.text( this.Info1.e, info );
 		};
 

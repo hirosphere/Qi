@@ -52,6 +52,8 @@ let Pane = class_def
 				let c = this.ConcreteArea;
 				let st = this.e.style;
 
+				this.Test && console.log( Math.floor( c.Top ), Math.floor( c.Height ) );
+
 				st.left = c.Left + "px";
 				st.top = c.Top + "px";
 				st.width = c.Width + "px";
@@ -179,6 +181,7 @@ let Layout = new function()
 
 				let x_rem = Math.max( this.get_x_cont( pane ) - x_fix_total, 0 );
 				let y_cont = this.get_y_cont( pane );
+				//pane.Test && console.log( "x_rem, y_cont", x_rem, y_cont );
 				var x_pos = 0;
 				for( var part of pane.PartNodes )
 				{
@@ -197,6 +200,7 @@ let Layout = new function()
 					let y_fix = this.get_y_fix( part );
 					let y_span = ( y_fix < 0 ? y_cont : y_fix );
 
+					//pane.Test && console.log( Math.floor( x_pos ), Math.floor( x_span ), part.Rel );
 					this.set_area( part, x_pos, y_pos, x_span, y_span );
 					x_pos += x_span + this.Sep;
 				}

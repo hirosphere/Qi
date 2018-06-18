@@ -25,7 +25,7 @@ var q = new function()
 	this.h3 = function( com, args ) { return this.e( "h3", com, args ); };
 	this.h4 = function( com, args ) { return this.e( "h4", com, args ); };
 
-	this.a = function( com, args ) { return this.e( "a", com, args ); };
+	this.a = this.anc = function( com, args ) { return this.e( "a", com, args ); };
 	this.p = function( com, args ) { return this.e( "p", com, args ); };
 	this.span = function( com, args ) { return this.e( "span", com, args ); };
 
@@ -46,6 +46,17 @@ var q = new function()
 	};
 	this.check = function( com, args ) { return this.input( com, "checkbox", args ); };
 	this.range = function( com, args ) { return this.input( com, "range", args ); };
+
+	this.vert = function( com, args ) { return this.flex( com, args, "column" ); };
+	this.horiz = function( com, args ) { return this.flex( com, args, "row" ); };
+	this.flex = function( com, args, dir )
+	{
+		let e = q.div( com, args );
+		e.style.display = "flex";
+		e.style.flexDirection = dir;
+		return e;
+	};
+
 	this.fr = function() { return document.createDocumentFragment(); };
 
 	this.e = function( type, com, args  )
@@ -57,6 +68,7 @@ var q = new function()
 			if( args.class !== undefined )  e.className = args.class;
 			if( args.attrs != null )  for( var fn in args.attrs )  e[ fn ] = args.attrs[ fn ];
 			if( args.style != null )  for( var fn in args.style )  e.style[ fn ] = args.style[ fn ];
+			if( args.flex != null ) e.style.flex = args.flex;
 		}
 		com && com.appendChild( e );
 		return e;
@@ -74,6 +86,11 @@ var q = new function()
 	this.text = function( e, text )
 	{
 		e.innerHTML = this.ht_plain( text );
+	};
+
+	this.style = function( e, style )
+	{
+		for( var name in style ) e.style[ name ] = style[ name ];
 	};
 
 	this.ht_plain = function( text )

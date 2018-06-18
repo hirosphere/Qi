@@ -77,7 +77,7 @@ let FolderIndex = class_def
 
 			else
 			{
-				this.Caption = this.Name;
+				this.LongCap = this.Caption = this.Name;
 			}
 		}
 
@@ -128,7 +128,7 @@ let RootIndex = class_def
 	function( base )
 	{
 		this.Initiate = function() { base.Initiate.call( this, null, "", "" ) };
-		this.GetCaption = function() { return "トップ" };
+		this.GetCaption = function() { return this.Caption; };
 		this.LongCap = this.Caption = "トップ";
 	}
 );

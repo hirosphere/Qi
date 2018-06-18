@@ -50,28 +50,27 @@ let AppPane = class_def
 			this.e = q.div( null, { "class": "APP" } );
 
 			{
-				let vert = new VertPane( this, { Width: 200, Rel: 10, Height: -1 } );
+				let vert = new VertPane( this, { Width: 250, Rel: 1, Height: -1 } );
+				
+				{
+					let horiz = new HorizPane( vert, { Width: -1, Height: 50 } );
+					
+					this.pathsel = new PathSelectPane
+					(
+						horiz, { Width: 250, Rel: 1, Height: -1, Class: "path", Selection: this.Doc.CurrentIndex }
+					);
+
+					this.CreateSaveTweet( horiz );
+				}
 
 				{
 					let horiz = new HorizPane( vert, { Width: -1, Height: 50, Rel: 10 } );
 
-					var side = new SidePane( horiz, { Width: 250, Rel: 0, Height: -1,Doc: this.Doc } );
-					
-					var content = new PageSwitchPane
+					let side = new SidePane( horiz, { Width: 250, Rel: 0.3, Height: -1,Doc: this.Doc } );
+					let content = new PageSwitchPane
 					(
-						horiz, { Width: 150, Rel: 6, Height: -1, Doc: this.Doc, CssClass: "CONTENT_SWITCH" }
+						horiz, { Width: 150, Rel: 7, Height: -1, Doc: this.Doc, CssClass: "CONTENT_SWITCH" }
 					);
-				}
-				
-				{
-					let horiz = new HorizPane( vert, { Width: -1, Height: 50 } );
-
-					this.pathsel = new PathSelectPane
-					(
-						horiz, { Width: 100, Rel: 10, Height: -1, Class: "path", Selection: this.Doc.CurrentIndex }
-					);
-
-					this.CreateSaveTweet( horiz );
 				}
 			}
 
@@ -152,10 +151,12 @@ let SidePane = class_def
 		{
 			this.e = q.div( null, { "class": "side", text_: "side" } );
 
-			new PathSelectPaneB( this, { Width: -1, Height: 50, Selection: args.Doc.CurrentIndex } );
-			new CollListPane( this, { Width: -1, Height: 50, Rel: 10, Selection: args.Doc.CurrentIndex } );
-			//new Pane( this, { Width: -1, Height: 50, edef: { type: "div", text: "side bottom" } } );
+			//new PathSelectPaneB( this, { Width: -1, Height: 50, Rel: 0, Selection: args.Doc.CurrentIndex } );
+			//let map = new MapPane( this, { Width: -1, Height: 50, Rel: 90 } );
+			let list = new CollListPane( this, { Width: -1, Height: 50, Rel: 100, Selection: args.Doc.CurrentIndex } );
+			//let list2 = new CollListPane( this, { Width: -1, Height: 200, Rel: 0, Selection: args.Doc.CurrentIndex } );
 
+			//list.Test = true;
 			this.Layout = new Layout.Vert();
 		};
 	}

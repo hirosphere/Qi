@@ -11,27 +11,6 @@ let Label = class_def
 	}
 );
 
-let SliderInput = class_def
-(
-	DivPane,
-	function( base )
-	{
-		this.Build = function( args )
-		{
-			base.Build.call( this, args );
-
-			let ic = args && args.IConv;
-			let sc = args && args.SConv;
-
-			new Label( this, { Width: 60, Height: -1, Rel: 0, Text: args.Text } );
-			new Input( this, { Width: 45, Height: -1, Rel: 0, Value: args.Value, Conv: ic } );
-			new Slider( this, { Width: 80, Height: -1, Rel: 10, Value: args.Value, Conv: sc } );
-
-			this.Layout = new Layout.Horiz;
-		};
-	}
-);
-
 let Slider = class_def
 (
 	Pane,
@@ -107,6 +86,27 @@ let Input = class_def
 		{
 			MtoV: function( mv ) { return mv; },
 			VtoM: function( vv ) { return vv; }
+		};
+	}
+);
+
+let ButtonSelectPane = class_def
+(
+	HorizPane,
+	function( base )
+	{
+		this.Build = function( args )
+		{
+			base.Build.call( this, args );
+
+			let self = this;
+			this.Selection = args.Selection;
+		};
+
+		this.AddItem = function( caption, size, tag )
+		{
+			let edef = { type: "button", text: caption };
+			new Pane( this, { Width: size, Height: -1, edef: edef } );
 		};
 	}
 );

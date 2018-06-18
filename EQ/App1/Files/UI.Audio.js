@@ -25,7 +25,7 @@ let AudioPane = class_def
 			new StateButton( horiz, { Width: 80, Height: -1, Value: model.Playing, Labels: { "false": "停止中", "true": "再生中" } } );
 
 			{
-				let vert = new VertPane( horiz, { Rel: 10, Height: -1, Sep: 3 } );
+				let vert = new VertPane( horiz, { Width: 10, Rel: 10, Height: -1, Sep: 3 } );
 
 				SInp( vert, { Width: -1, Height: 25 }, "音量", model.Volume, [ 60, 60, 100], [ 0, 0, 8 ], [ 0, 1, 0.01 ] );
 				SInp( vert, { Width: -1, Height: 25 }, "倍速", model.Rate, [ 60, 60, 100 ], [ 0, 0, 8 ], [ 1, 800, 1 ] );
@@ -47,20 +47,20 @@ let AudioPane = class_def
 			let horiz = new HorizPane( com, args );
 
 			{
-				let vert = new VertPane( horiz, { Width: 320, Rel: 5, Height: -1, Sep: 2 } );
+				let vert = new VertPane( horiz, { Width: 220, Rel: 5, Height: -1, Sep: 2 } );
 				
-				SInp( vert, { Width: -1, Height: 25 }, "NS音量", model.NS_Volume, [ 70, 60, 150 ], [ 0, 0, 8 ], [ 0, 1, 0.1 ] );
-				SInp( vert, { Width: -1, Height: 25 }, "EW音量", model.EW_Volume, [ 70, 60, 150 ], [ 0, 0, 8 ], [ 0, 1, 0.1 ] );
-				SInp( vert, { Width: -1, Height: 25 }, "UD音量", model.UD_Volume, [ 70, 60, 150 ], [ 0, 0, 8 ], [ 0, 1, 0.1 ] );
+				SInp( vert, { Width: -1, Height: 25 }, "NS音量", model.NS_Volume, [ 70, 60, 80 ], [ 0, 0, 8 ], [ 0, 1, 0.1 ] );
+				SInp( vert, { Width: -1, Height: 25 }, "EW音量", model.EW_Volume, [ 70, 60, 80 ], [ 0, 0, 8 ], [ 0, 1, 0.1 ] );
+				SInp( vert, { Width: -1, Height: 25 }, "UD音量", model.UD_Volume, [ 70, 60, 80 ], [ 0, 0, 8 ], [ 0, 1, 0.1 ] );
 			}
 
 			{
-				let vert = new VertPane( horiz, { Width: 320, Rel: 5, Height: -1, Sep: 2 } );
+				let vert = new VertPane( horiz, { Width: 220, Rel: 5, Height: -1, Sep: 2 } );
 				vert.e.style.zIndex = 1;
 				
-				SInp( vert, { Width: -1, Height: 25 }, "NS定位", model.NS_Pan, [ 70, 60, 150 ], [ 0, 0, 8 ], [ -1, 1, 0.1 ] );
-				SInp( vert, { Width: -1, Height: 25 }, "EW定位", model.EW_Pan, [ 70, 60, 150 ], [ 0, 0, 8 ], [ -1, 1, 0.1 ] );
-				SInp( vert, { Width: -1, Height: 25 }, "UD定位", model.UD_Pan, [ 70, 60, 150 ], [ 0, 0, 8 ], [ -1, 1, 0.1 ] );
+				SInp( vert, { Width: -1, Height: 25 }, "NS定位", model.NS_Pan, [ 70, 60, 80 ], [ 0, 0, 8 ], [ -1, 1, 0.1 ] );
+				SInp( vert, { Width: -1, Height: 25 }, "EW定位", model.EW_Pan, [ 70, 60, 80 ], [ 0, 0, 8 ], [ -1, 1, 0.1 ] );
+				SInp( vert, { Width: -1, Height: 25 }, "UD定位", model.UD_Pan, [ 70, 60, 80 ], [ 0, 0, 8 ], [ -1, 1, 0.1 ] );
 			}
 		};
 
