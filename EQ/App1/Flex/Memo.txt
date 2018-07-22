@@ -1,0 +1,15 @@
+
+* 画面構成ツリー
+
+html	
+	body	
+		.APP
+			.PATH
+				.PATH_LIST
+					.PATH_LIST_ITEM
+					.PATH_LIST_TERM
+				.PATH_PAD
+				.PATH_R
+			.APP_CONTENT
+			.APP_DEBUG
+

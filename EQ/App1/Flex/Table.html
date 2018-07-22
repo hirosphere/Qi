@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Table</title>
+<meta charset="utf-8"/>
+<style>
+* { margin: 0; padding: 0; }
+
+</style>
+</head>
+<body>
+
+<div style="height: 400px; border: 2px solid #444; padding: 10px;">
+<div style="border: 2px solid #fb5;">
+</div>
+</div>
+
+<script>
+
+function class_def( Base, dec )
+{
+	let This = function(){ this.Initiate.apply( this, arguments ); };
+
+	let PC = function(){};
+	if( Base )
+	{
+		PC.Base = Base.PC;
+		PC.prototype = new Base.PC();
+	}
+	dec.call( PC.prototype, Base && Base.prototype );
+
+	if( PC.prototype.Initiate == undefined ) PC.prototype.Initiate = function(){};
+
+	This.prototype = new PC();
+	This.PC = PC;
+	return This;
+}
+
+let A = class_def
+(
+	null,
+	function()
+	{
+		this.Initiate = function() { console.log( "A.Initiate()" ); };
+		this.toString = function() { return "A"; };
+	}
+);
+
+let B = class_def
+(
+	A,
+	function( base )
+	{
+		this.Initiate = function() { base.Initiate.call( this ); console.log( "B.Initiate()" ); };
+		this.toString = function() { return "B"; };
+	}
+);
+
+let a = new B();
+console.log( a + "" );
+
+A.PC.prototype.Initiate = function(){ console.log( "A.Initiate()-m" ); }
+new B();
+
+
+
+
+
+
+</script>
+
+</body>
+</html>

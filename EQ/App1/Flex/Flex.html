@@ -3,68 +3,156 @@
 <head>
 <meta charset="utf-8">
 <title></title>
-<script src="../../Libs/Prime.js?dc=ac"></script>
+<script src="../../Libs/Prime.js?dc=ad"></script>
 
-<script src="./Model.js?dc=ac"></script>
-<script src="./EQFS.js?dc=ac"></script>
-<script src="./EQWave.js?dc=ac"></script>
-<script src="./Audio.js?dc=ac"></script>
-<script src="./Graph.js?dc=ac"></script>
-<script src="./Index.js?dc=ac"></script>
-<script src="./Doc.js?dc=ac"></script>
-<script src="./UI.js?dc=ac"></script>
-<script src="./UI.List.js?dc=ac"></script>
-<script src="./Map.js?dc=ac"></script>
-<script src="./Page.Root.js?dc=ac"></script>
-<script src="./Page.Wave.js?dc=ac"></script>
-<script src="./App.js?dc=ac"></script>
-<script src="./Custom.js?dc=ac"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBhQjsoTBqzC7xqEpe84bjKW5vTgZnzwl8&callback=initMap"></script>
+<script src="./Model.js?dc=ad"></script>
+<script src="./EQFS.js?dc=ad"></script>
+<script src="./EQWave.js?dc=ad"></script>
+<script src="./BinReader.js?dc=ad"></script>
+<script src="./Audio.js?dc=ad"></script>
+<script src="./Graph.js?dc=ad"></script>
+<script src="./Index.js?dc=ad"></script>
+<script src="./Doc.js?dc=ad"></script>
+<script src="./Hash.js?dc=ad"></script>
+<script src="./UI.js?dc=ad"></script>
+<script src="./UI.List.js?dc=ad"></script>
+<script src="./UI.Audio.js?dc=ad"></script>
+<script src="./Map.js?dc=ad"></script>
+<script src="./Page.js?dc=ad"></script>
+<script src="./Page.List.js?dc=ad"></script>
+<script src="./Page.Wave.js?dc=ad"></script>
+<script src="./App.js?dc=ad"></script>
+<script src="./Custom.js?dc=ad"></script>
+
 <style>
+
+* { margin: 0; padding: 0; }
+
 html
 {
-	height: 100%; font-size: 14px;
+	height: 100vh;
+	font-size: 14px;
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	color: #333;
 	display: flex;
 }
 
 body
 {
-	flex: 1 0; margin: 0px; padding: 0px;
+	flex: 1;
+	margin: 0px; padding: 4px;
+	background: #6a2;
 	display: flex;
 }
 
 a { color: #44c; text-decoration: none; }
 
-.App
+.APP
 {
-	flex: 1; border: 0px solid #6a2; border-radius: 10px; padding: 0px;
+	flex: 1; border: 0px solid #6a2; border-radius: 8px;
+	background: #fff;
+	margin: 0px; padding: 1px 5px;
+	display: flex; flex-direction: column;
 }
 
-.Content
-{
-	flex: 10; border: 1px dotted #887;
-	padding: 0px;
-}
+	.APP_PATH
+	{
+		flex: 0 0 40px;
+		line-height: 40px;
+		padding: 0px 0 0px 1ex;
+		margin-bottom: 1px;
+		display: flex; flex-direction: row;
+	}
 
-.Path
-{
-	flex: 0 0 40px; border: 0px dotted #887;
-	padding: 0px 0 0px 1ex; line-height: 40px;
-}
+		.PATH_LIST { }
+			.PATH_ITEM { cursor: pointer; padding: 1em 1ex; }
+			.PATH_ITEM_TERM { color: #776; font-size: 0px; margin-right: 7px; }
 
-.Path .RDiv { flex: 1 0 300px; justify-content: right; }
-.Path button { width: 90px; }
+		.APP_PATH_PAD { flex: 1;  }
+		.APP_PATH button { width: 90px; }
 
-.RP { flex: 10; }
+	.APP_CONTENT
+	{
+		flex: 1; border: 1px dotted #887;
+		padding: 0px;
+		display: flex; flex-direction: row;
+	}
 
-.WP { flex: 10; }
-.WP_Body { flex: 10; } 
-.WP_Bar { flex: 0 0 46px; background: #605850; }
-.WP_Site_List { flex: 3 0 0; min-width: 180px; ; background: #ffc8d0; }
-.WP_Site_Map { flex: 9.0 0 0; min-width: 180px; background: #ace; }
-.WP_Content { flex: 12 0 200px; background: #eeb; }
+		.ROOT_PAGE, .YEAR_PAGE, EQ_PAGE, FOLDER_PAGE
+		{
+			flex: 1;
+			display: flex; flex-direction: row;
+		}
 
+			.INDEX_SIDE_HEADER { flex: 0 0 220px; font-size: 16px; }
+
+		.ROOT_PAGE  /* horiz */ {}
+		.YEAR_PAGE  /* horiz */ {}
+		.EQ_PAGE  /* horiz */ {}
+		.FOLDER_PAGE  /* horiz */ {}
+
+			.ENTER_LIST
+			{
+				flex: 1;  position: relative;
+				/*box-sizing: border-box;*/
+				overflow: auto; max-height: 1000px;
+				border: 0px solid #adf; background: #e8e8e8;
+				padding: 20px 40px; margin: 0px;
+				font-size: 0px;
+				word-break: break-all;
+			}
+
+				.ENTER_ITEM
+				{
+					display: inline-block; cursor: default;
+					border: 1px solid #aaa;  border-radius: 6px;
+					background: #fff;
+					margin: 0 1px 5px 0;
+					padding: 16px 1.9em; line-height: 1em; font-size: 14px;
+					color: #333;
+				}
+
+		.PeerList
+		{
+
+		}
+
+		.PeerItem
+		{
+
+		}
+
+		.PeerItem_Selected
+		{
+
+		}
+
+		.WP_col
+		{
+			flex: 1;
+		}
+			.WP_BODY_row { flex: 1; } 
+				.WP_BAR_c { flex: 0 0 40px; background: #bbb; }
+				.WP_SITE_LIST
+				{
+					flex: 0.2 0 220px; overflow: auto;
+					position: relative;
+					cursor: default; background: #cce0ff; padding: 1ex;
+				}
+				.WP_SITE_LIST_ITEM
+				{
+					display: inline-block; border-radius: 5px; background: #fff;
+					margin: 0 1px 1px 0; border: 1px solid #c0d0f4;
+					padding: 6px 10px;
+					font-size: 14px;
+				}
+				.WP_SITE_LIST_ITEM.SELECTED { background: #8ee; color: #333; border-color: #666; }
+				.WP_SITE_LIST_ITEM_TERM { font-size: 0; }
+				.WP_SITE_MAP { flex: 2.0; margin-top: 0px; }
+				.WP_CONTENT { flex: 1; background: #fff; }
+					.WP_GRAPH {  }
+
+	.APP_INFO { flex: 0 0 32px; line-height: 32px; font-size: 13px; }
 
 </style>
 </head>

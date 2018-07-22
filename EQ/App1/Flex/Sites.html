@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Sites</title>
+<script src="../../Libs/Prime.js?dc=ad"></script>
+
+<script src="./Model.js?dc=ad"></script>
+<script src="./EQFS.js?dc=ad"></script>
+<script src="./Index.js?dc=ad"></script>
+
+<style>
+
+* { margin: 0; padding: 0; }
+
+html
+{
+	height: 100vh;
+	font-size: 14px;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	color: #333;
+}
+
+body
+{
+	margin: 0px; padding: 10px;
+	background: #ecece6;
+}
+
+a { color: #44c; text-decoration: none; }
+
+.Map
+{
+	width: 600px; height: 500px; border: 2px solid #888; border-radius: 10px;
+	background: #fff;
+}
+
+</style>
+</head>
+<body onload="Main.Init()">
+
+<script>
+
+let Main = new function()
+{
+	this.Init = async function()
+	{
+		await EQFS.Init();
+		new App( document.body );
+	};
+};
+
+let App = function( com )
+{
+	let e = q.div( com );
+	let map = new Map( e );
+};
+
+let Map = class_def
+(
+	null,
+	function()
+	{
+		this.Initiate = function( com )
+		{
+			this.Items = {};
+			this.Center = { Lat:38, Lng: 136 };
+
+			this.e = q.div( com, { "class": "Map", style: { overflow: "auto" } } );
+			this.ViewPort = q.div
+			(
+				this.e,
+				{
+					style:
+					{
+						position: "relative"
+					}
+				}
+			);
+
+			this.MakeSites();
+			this.Update();
+			this.Adjust();
+		};
+
+		this.AddItem = function( item )
+		{
+			this.Items[ item.Id ] = item;
+			this.ViewPort.appendChild( item.e );
+		};
+
+		this.Update = function()
+		{
+			let dplng = 300;
+			let lng_width = 24;
+			let width = lng_width * dplng;
+			let height = width;
+			let center = { x: width / 2, y: height / 2 };
+
+			this.ViewPort.style.width = width + "px";
+			this.ViewPort.style.height = height + "px";
+
+			for( let id in this.Items )
+			{
+				let item = this.Items[ id ];
+
+				let left = center.x + ( item.Lng - this.Center.Lng ) * dplng;
+				let top = center.y - ( item.Lat - this.Center.Lat ) * dplng;
+
+				item.e.style.left = left + "px";
+				item.e.style.top = top + "px";
+				// console.log( item.Site.Code, item.e.style.left, item.e.style.top );
+			}
+		};
+
+		this.Adjust = function()
+		{
+			this.e.scrollLeft = this.e.scrollWidth / 2;
+			this.e.scrollTop = this.e.scrollHeight / 2;
+		};
+
+		this.MakeSites = function()
+		{
+			var num = 1;
+			for( let id in EQFS.SiteList )
+			{
+				let site = EQFS.SiteList[ id ];
+				this.AddItem( new Map.Item( "●" + site.Name, site.Lat, site.Lng, site ) );
+			}
+		};
+	}
+);
+
+Map.Item = class_def
+(
+	null,
+	function()
+	{
+		var nextid = 0;
+
+		this.Initiate = function( cap, lat, lng, site )
+		{
+			this.Id = ++ nextid;
+			this.e = q.div( null, { text: cap } );
+			this.e.style.position = "absolute";
+			this.e.style.width = "12em";
+			this.Lat = lat;
+			this.Lng = lng;
+			this.Site = site;
+		};
+
+	}
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html>

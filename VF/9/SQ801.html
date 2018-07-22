@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>SQ801</title>
+<script src="../../Base/Prime.js"></script>
+<script src="./Common/Common.js"></script>
+<style>
+*
+{
+	margin: 0; padding: 0;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+html
+{
+	background: hsl( 93, 50%, 80% );
+	padding: 12px;
+}
+
+body
+{
+	margin: 0px auto;
+	padding: 30px 24px;
+	border-radius: 16px;
+	min-height: 90vh;
+	background: #fff;
+}
+
+.KB
+{
+	border: 1px solid hsl( 30, 6%, 60% );
+	background: hsl( 30, 20%, 96% );
+	border-radius: 6px;
+	width: auto; height: 220px; margin: 10px 0;
+	padding: 4px;
+	position: relative;
+	overflow: hidden;
+}
+
+.KB_ITEM
+{
+	position: absolute;
+	display: inline-block;
+	border: 1px solid hsl( 30, 6%, 60% );
+}
+.KB_W
+{
+	background: hsl( 30, 70%, 100% );
+	width: 65px;
+	height: 220px;
+}
+.KB_B
+{
+	background: hsl( 30, 10%, 5% );
+	margin-left: 10px;
+	width: 45px;
+	height: 125px;
+	z-index: 2;
+}
+
+.INPUT_TABLE { border: 1px solid #999; padding: 12px; }
+.INPUT_TABLE .CAP { font-size: 13px; }
+.INPUT_TABLE .INPUT { margin: 0 0.2ex 0 1ex; width: 110px; height: 34px; font-size: 18px; }
+.INPUT_TABLE .UNIT { font-size: 14px; }
+.INPUT_TABLE .RANGE { margin: 0 1ex; width: 400px; padding: 6px }
+
+</style>
+</head>
+<body onload="Main.Initiate();">
+<script>
+
+let Main = new function()
+{
+	this.Initiate = function()
+	{
+		new App();
+	};
+};
+
+// UI //
+
+let App = class_def
+(
+	null,
+	function()
+	{
+		this.Initiate = function()
+		{
+			this.Doc = new Document();
+			this.e = q.div( document.body, { "class": "APP" } );
+			new ControlPane( this.e, this.Doc );
+		};
+	}
+);
+
+let LogMeasure = class_def
+(
+	Measure,
+	function()
+	{
+		this.BaseFreq = 1;
+		this.OctStep = 120;
+
+		this.VtoM = function( value )
+		{
+			return ( Math.log( value ) / Math.LN2 ) * this.OctStep;
+		};
+
+		this.MtoV = function( measure )
+		{
+			return Math.pow( 2, measure / this.OctStep );
+		};
+	}
+);
+
+let ControlPane = function( com, doc )
+{
+	let e = q.col( com );
+	{
+		let meas1 = new Measure( { RStep: 0.1 } );
+		let meas2 = new LogMeasure( { RMax: 120 * 14, RStep: 1 } );
+
+		let pitems = [];
+		pitems[ 0 ] =
+		{
+			Size: 100, Label: "300Hz", Color: "",
+			Type: "PW", Freq: 300
+		};
+
+		let table = q.table( e, { "class": "INPUT_TABLE" } );
+		let col = q.tbody( table, {} );
+
+		CreateInput( col, "音量", "%", doc.Synth.Volume, meas1 );
+		CreateInput( col, "調律", "Hz", doc.Synth.Tune, meas2 );
+		CreateInput( col, "Osc2音量", "%", doc.Synth.Osc2Level, meas1 );
+		CreateInput( col, "Osc2ずらし", "C", doc.Synth.Osc2Detune, meas2 );
+
+		new Keyboard
+		(
+			e, 0, 27,
+			function( command, key )
+			{
+				//console.log( command, key );
+				doc.Synth.Impl.PutKeyCommand( command, key );
+			}
+		);
+	}
+};
+
+function CreateInput( com, label, unit, value, measure )
+{
+	let row = q.tr( com, {} );
+	q.label( q.td( row ), { text: label, "class": "CAP" } );
+	new Input( q.td( row ), value, { "class": "INPUT" } );
+	q.label( q.td( row ), { text: unit, "class": "UNIT" } );
+	new Slider( q.td( row ), value, { "class": "RANGE" }, measure );
+}
+
+let Keyboard = class_def
+(
+	null,
+	function()
+	{
+		this.Initiate = function( com, start, count, onchange )
+		{
+			this.e = q.div( com, { "class": "KB" } );
+			this.BC = q.div( this.e, { "class": "KB_BCON" } )
+			this.WC = q.div( this.e, { "class": "KB_WCON" } )
+
+			this.e.ontouchstart = function( ev )
+			{
+				ev.preventDefault();
+			};
+
+			for( let i = 0; i < count; i ++ )
+			{
+				let oct = Math.floor( i / 12 );
+				let key = i % 12;
+				let iv = ivtab[ key ];
+				let left = 65 * ( 140 * oct + iv[ 0 ] ) / 20;
+				new Item( this.e, i, left, iv[ 1 ], onchange );
+			}
+		};
+
+		let ivtab =
+		[
+			[ 0, 0 ], [ 10, 1 ], [ 20, 0 ], [ 30, 1 ],
+			[ 40, 0 ], [ 60, 0 ], [ 70, 1 ], [ 80, 0 ],
+			[ 90, 1 ], [ 100, 0 ], [ 110, 1 ], [ 120, 0 ]
+		];
+
+		function Item( com, key, left, isblack, onchange )
+		{
+			let cn = isblack ? "KB_B" : "KB_W";
+			let e = q.div( com, { "class": "KB_ITEM " + cn } );
+			e.style.left = left + "px";
+
+			e.ontouchstart = function() { onchange( "on", key ); };
+			e.ontouchend = function() { onchange( "off", key ); };
+		};
+	}
+);
+
+// Doc //
+
+let Document = class_def
+(
+	null,
+	function()
+	{
+		this.Initiate = function()
+		{
+			this.Synth = new Synth();
+		};
+	}
+);
+
+// Audio //
+
+let Synth = class_def
+(
+	null,
+	function()
+	{
+		this.Initiate = function()
+		{
+			this.Change = new Value( false );
+			this.Volume = new Value( 10, onchange );
+			this.Tune = new Value( 220, onchange );
+			this.Osc2Level = new Value( 50, onchange );
+			this.Osc2Detune = new Value( 5, onchange );
+
+			this.Impl = new SynthImpl( this );
+
+			let self = this;
+			function onchange()
+			{
+				self.Change.Set( true, true );
+			}
+		};
+	}
+);
+
+let SynthImpl = class_def
+(
+	null,
+	function()
+	{
+		this.Initiate = function( model )
+		{
+			this.Model = model;
+
+			let self = this;
+			this.Context = new AudioContext();
+			this.Volume = this.Context.createGain();
+			this.Voice = new Voice( this.Model, this.Context, this.Volume );
+			this.Volume.connect( this.Context.destination );
+			this.Model.Change.AddClient( ()=>self.Update() );
+		};
+
+		this.PutKeyCommand = function( command, key )
+		{
+			this.Voice.PutKeyCommand( command, key );
+		};
+
+		this.Update = function()
+		{
+			this.Volume.gain.value = this.Model.Volume.Value / 100;
+		};
+
+	}
+);
+
+let Voice = class_def
+(
+	null,
+	function()
+	{
+		this.Initiate = function( model, context, destination )
+		{
+			this.Model = model;
+
+			let self = this;
+			this.Context = context;
+
+			this.Osc1 = this.Context.createOscillator();
+			this.Osc2 = this.Context.createOscillator();
+			this.Osc2Gain = this.Context.createGain();
+			this.EnvGain = this.Context.createGain();
+
+			this.Osc1.type = "square";
+			this.EnvGain.gain.value = 0;
+
+			this.Osc1.connect( this.EnvGain );
+			this.Osc2.connect( this.Osc2Gain );
+			this.Osc2Gain.connect( this.EnvGain );
+			this.EnvGain.connect( destination );
+
+			this.Osc1.start();
+			this.Osc2.start();
+
+			this.Model.Change.AddClient( ()=>self.Update() );
+		};
+
+		this.PutKeyCommand = function( command, key )
+		{
+			let cur = this.Context.currentTime;
+			if( command == "on" )
+			{
+				this.Osc1.detune.value =
+				this.Osc2.detune.value = ( 0 + key + 3 ) * 100;
+				this.EnvGain.gain.cancelScheduledValues( cur );
+				this.EnvGain.gain.linearRampToValueAtTime( 1, cur + 0.001 )
+				//this.EnvGain.gain.linearRampToValueAtTime( 0, cur + 0.01 )
+			}
+			else if( command == "off" )
+			{
+				this.EnvGain.gain.cancelScheduledValues( cur );
+				this.EnvGain.gain.linearRampToValueAtTime( 0, cur + 0.01 )
+			}
+		};
+
+		this.Update = function()
+		{
+			this.Osc1.frequency.value = this.Model.Tune.Value;
+			this.Osc2.frequency.value = this.Model.Tune.Value + this.Model.Osc2Detune.Value;
+			this.Osc2Gain.gain.value = this.Model.Osc2Level.Value / 100;
+		};
+
+	}
+);
+
+//  //
+
+//  //
+
+//  //
+
+
+</script>
+</body>
+</html>

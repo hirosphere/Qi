@@ -1,15 +1,28 @@
-function class_def( base, decor )
+function class_def( Base, decorator )
 {
-	var ctor = function()
+	let This = function()
 	{
 		this.Initiate.apply( this, arguments );
 	};
-	var proto = ctor.prototype;
-	proto.Initiate = function(){};
-	var baseproto = base && base.prototype;
-	if( baseproto ) for( var fn in baseproto )  proto[ fn ] = baseproto[ fn ];
-	decor.call( proto, baseproto, ctor, base );
-	return ctor;
+
+	let ProtoCtor = function(){};
+
+	if( Base )
+	{
+		ProtoCtor.prototype = new Base.ProtoCtor();
+	}
+
+	decorator.call( ProtoCtor.prototype, Base && Base.prototype, This );
+
+	if( ! ProtoCtor.prototype.Initiate )
+	{
+		ProtoCtor.prototype.Initiate = function(){};
+	}
+
+	This.prototype = new ProtoCtor();
+	This.ProtoCtor = ProtoCtor;
+	
+	return This;
 }
 
 var q = new function()
@@ -34,6 +47,7 @@ var q = new function()
 	this.tr = function( com, args ) { return this.e( "tr", com, args ); };
 	this.td = function( com, args ) { return this.e( "td", com, args ); };
 
+	this.label = function( com, args ) { return this.e( "label", com, args ); };
 	this.textarea = function( com, args ) { return this.e( "textarea", com, args ); };
 	this.button = function( com, args ) { return this.e( "button", com, args ); };
 	this.select = function( com, args ) { return this.e( "select", com, args ); };
