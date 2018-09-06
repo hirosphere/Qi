@@ -118,7 +118,7 @@ let AppPane = class_def
 
 			let rate = this.Doc.AudioPlayer.Rate.GetValue();
 			let waveinfo = index && index.Type == "Wave" ? ` ${ rate }倍速` : "";
-			let twtext = `${ index.LongCap }${ waveinfo } - #震These - 地震波形を「音」で聴くブラウザ画面アプリ。\n\n`;
+			let twtext = `${ index.LongCap }${ waveinfo } - 地震波形を耳で解析。\n\n`;
 			window.open
 			(
 				"http://twitter.com/intent/tweet?" +
