@@ -47,14 +47,14 @@ body
 .KB_W
 {
 	background: hsl( 30, 70%, 100% );
-	width: 65px;
+	width: 45px;
 	height: 220px;
 }
 .KB_B
 {
 	background: hsl( 30, 10%, 5% );
 	margin-left: 10px;
-	width: 45px;
+	width: 25px;
 	height: 125px;
 	z-index: 2;
 }
@@ -306,19 +306,22 @@ let Voice = class_def
 
 		this.PutKeyCommand = function( command, key )
 		{
-			let cur = this.Context.currentTime + 0.02;
+			let cur = this.Context.currentTime + 0.01;
+			console.clear();
+			console.log( "cur", cur );
 			if( command == "on" )
 			{
 				this.Osc1.detune.value =
 				this.Osc2.detune.value = ( 0 + key + 3 ) * 100;
+
 				this.EnvGain.gain.cancelScheduledValues( cur );
-				this.EnvGain.gain.linearRampToValueAtTime( 1, cur + 0.6 )
+				this.EnvGain.gain.setTargetAtTime( 1, cur, 0.1 )
 				//this.EnvGain.gain.linearRampToValueAtTime( 0, cur + 0.01 )
 			}
 			else if( command == "off" )
 			{
 				this.EnvGain.gain.cancelScheduledValues( cur );
-				this.EnvGain.gain.linearRampToValueAtTime( 0, cur + 0.6 )
+				this.EnvGain.gain.setTargetAtTime( 0, cur, 0.01 )
 			}
 		};
 
