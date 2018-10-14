@@ -191,6 +191,9 @@ let エレメントの型 = 既存の型を装飾します
 	{
 		イベント:
 		[
+			[ "フォーカス", "focus" ],
+			[ "フォーカス移動", "blur" ],
+
 			[ "キーダウン", "keydown" ],
 			[ "キーアップ", "keyup" ],
 			[ "キープレス", "keypress" ],
@@ -241,7 +244,7 @@ let 便利 = new function()
 		return エレメント;
 	};
 
-	let エレメントリスト = [ "div", "p", "span", "table", "tbody", "tr", "td", "input" ];
+	let エレメントリスト = [ "div", "p", "span", "table", "tbody", "tr", "td", "input", "option", "select" ];
 
 	for( let エレメント名 of エレメントリスト )
 	{
