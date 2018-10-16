@@ -12,8 +12,19 @@ Content.Wave = class_def
 			this.e = q.div( null, { "class": "CONTENT_WAVE" } );
 
 			this.Info1 = new DivPane( this, { Width: -1, Height: 25, Rel: 0, Class: "WAVE_INFO_1" } );
+			this.Info1_Text = q.span( this.Info1.e, { text:"span" } );
+			q.span( this.Info1.e, { text:" データ元: " } );
+			q.a
+			(
+				this.Info1.e,
+				{ text:"K-NET KiK-net",
+				attrs: { href: "http://www.kyoshin.bosai.go.jp/kyoshin/", target: "_blank", alt: "防災科学技術研究所 強震観測網" }
+			} );
+
 			this.CanvasPane = new EQGraph.CanvasPane( this, { Width: -1, Height: 100, Rel: 30 } );
+			
 			new AudioPane( this, { Width: -1, Height: 60, Player: this.AudioPlayer } );
+			
 			this.Info2 = new DivPane( this, { Width: -1, Height: 160, Rel: 0, Class: "WAVE_INFO_2" } );
 
 			this.Layout = new Layout.Vert( { Sep: 1 } );
@@ -34,6 +45,7 @@ Content.Wave = class_def
 			{
 				//make_info_table( self.Info2.e, wave.Monitor );
 				//make_info_table( self.Info2.e, wave.ChannelMonitor );
+				//make_info_table( self.Info2.e, "wave.ChannelMonitor" );
 				//q.text( self.path, wave && wave.GetInfo() );
 				self.Wave = wave;
 				self.UpdateInfo1();
@@ -49,8 +61,9 @@ Content.Wave = class_def
 			let n = this.Index;
 			let s = n && n.Site || {};
 			let elevdep = ws.Elev + "m" + ( ws.Depth != null && ` ${ws.Depth}m` || "" ); 
-			let info = `${s.Code} ${s.Name} ( ${ elevdep } ) - ${ w.StartTimeStr } - ${ q.frac( w.MaxAcc, 2 ) }gal - ${ w.SampleTime }秒`;
-			q.text( this.Info1.e, info );
+			let info = `${s.Code} ${s.Name} ( ${ elevdep } ), ${ w.StartTimeStr }, ${ q.frac( w.MaxAcc, 2 ) }gal, ${ w.SampleTime }秒 `;
+			q.text( this.Info1_Text, info );
+			//console.log( this.Info1_Text, info );
 		};
 
 		function make_info_table( com, rows )
