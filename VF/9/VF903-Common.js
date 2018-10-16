@@ -339,6 +339,9 @@ let 音響文脈の型 = 既存の型を装飾します
 	{
 		メソッド:
 		[
+			[ "その刻の値", "setValueAtTime" ],
+			[ "その刻へ直線変化", "linearRampToValueAtTime" ],
+			//[ "", "" ],
 		],
 
 		プロパティ:
