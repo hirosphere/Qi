@@ -49,18 +49,32 @@ p { font-size: 16px; }
 
 </style>
 </head>
-<body onload="メイン.はじめよ();">
+<body onload="メイン.開始();">
 <script>
 
 let メイン = new function()
 {
 	let これ = this;
 
-	これ.はじめよ = function()
+	これ.開始 = function()
 	{
-		//これ.アプリ画面 = new アプリ画面の型();
+		console.log( "メイン.開始" );
+		//これ.アプリ画面 = アプリ画面の型.作成();
 	};
 };
+
+let アプリ画面の型 = 型を作成
+(
+	function()
+	{
+		let この型 = this;
+
+		この型.開始する = function()
+		{
+			;
+		};
+	}
+);
 
 
 </script>
