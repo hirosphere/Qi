@@ -55,13 +55,11 @@ p { font-size: 16px; }
 
 let メイン = new function()
 {
-	let これ = this;
+	let それ = this;
 
-	これ.開始 = function()
+	それ.開始 = function()
 	{
-		document.getElementById( "test" ).innerText = "(日本語シンボルプログラミング)";
-		console.log( "メイン.開始" );
-		//これ.アプリ画面 = アプリ画面の型.作成();
+		それ.アプリ画面 = アプリ画面の型.作成();
 	};
 };
 
@@ -73,6 +71,7 @@ let アプリ画面の型 = 型を作成
 
 		この型.開始する = function()
 		{
+			document.getElementById( "test" ).innerText = "(日本語シンボルプログラミング)";
 			;
 		};
 	}
