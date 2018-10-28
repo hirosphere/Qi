@@ -86,10 +86,21 @@ new function()
 		return Math.round( 値 / 規模 ) * 規模;
 	};
 
+	この世界.エレメントを作成 = function( タイプ名, 幹エレメント, その他 )
+	{
+		let エレメント = document.createElement( タイプ名 );
+		if( その他.文 != なし ) エレメント.文を設定( その他.文 );
+
+		if( 幹エレメント != なし ) 幹エレメント.appendChild( エレメント );
+		return エレメント;
+	};
+
 	;
 };
 
 //  ブラウザオブジェクト  //
+
+let ローカルホストか = function() { return location.host.match( /localhost$/i ) != null; };
 
 既存の型を装飾
 (
@@ -119,7 +130,9 @@ new function()
 	{
 		let この実体 = this;
 
-		この実体.Idでエレメント取得 = this.getElementById;
+		この実体.Idで =
+		この実体.Idでエレメント取得 =
+			this.getElementById;
 
 		return { イベント: なし };
 	}

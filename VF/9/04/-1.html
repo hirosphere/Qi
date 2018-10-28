@@ -4,6 +4,9 @@
 <meta charset="UTF-8"/>
 <title>VF904-1</title>
 <script src="Prime.js"></script>
+<script src="Model.js"></script>
+<script src="Audio.js"></script>
+<script src="GUI.js"></script>
 <style>
 *
 {
@@ -50,7 +53,6 @@ p { font-size: 16px; }
 </style>
 </head>
 <body onload="メイン.開始();">
-<p id="test">..</p>
 <script>
 
 let メイン = new function()
@@ -71,8 +73,34 @@ let アプリ画面の型 = 型を作成
 
 		この型.開始する = function()
 		{
-			document.getElementById( "test" ).文を設定( "(日本語, F)" );
+			let この実体 = this;
+			この実体.エレメント = エレメントを作成( "div", この文書.body, { 文: "VF-904 アプリケーション" } );
+			エレメントを作成( "p", この実体.エレメント, { 文: ローカルホストか() ? "〇" : "●" } )
+			//この文書.Idで( "test" ).文を設定( "(日本語, G)" );
 			;
+		};
+
+		この型.xxxする = function()
+		{
+			let この実体 = this;
+		};
+	}
+);
+
+let xxxの型 = 型を作成
+(
+	function()
+	{
+		let この型 = this;
+
+		この型.開始する = function()
+		{
+			let この実体 = this;
+		};
+
+		この型.xxxする = function()
+		{
+			let この実体 = this;
 		};
 	}
 );
