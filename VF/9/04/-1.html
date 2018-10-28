@@ -50,6 +50,7 @@ p { font-size: 16px; }
 </style>
 </head>
 <body onload="メイン.開始();">
+<p id="test">..</p>
 <script>
 
 let メイン = new function()
@@ -58,6 +59,7 @@ let メイン = new function()
 
 	これ.開始 = function()
 	{
+		document.getElementById( "test" ).innerText = "(日本語シンボルプログラミング)";
 		console.log( "メイン.開始" );
 		//これ.アプリ画面 = アプリ画面の型.作成();
 	};
