@@ -48,6 +48,19 @@ let 既存の実体を装飾 = function( 実体, 内容, 装飾関数 )
 		}
 	}
 
+	if( 内容.イベント != なし )
+	{
+		for( 名前 in 内容.イベント )
+		{
+			let 元の名前 = 内容.イベント[ 名前 ];
+
+			実体[ 名前 ] = function( 処理, オプション )
+			{
+				this.addEventListener( 元の名前, 処理, オプション );
+			};
+		}
+	}
+
 	return 実体;
 };
 
@@ -182,7 +195,12 @@ new function()
 既存の型を装飾
 (
 	HTMLElement,
-	{},
+	{
+		イベント:
+		{
+			クリックされた: "click"
+		}
+	},
 	function()
 	{
 		let 典型 = this;
