@@ -158,7 +158,9 @@ new function()
 	この世界.エレメントを作成 = function( タイプ名, 幹エレメント, その他 )
 	{
 		let エレメント = document.createElement( タイプ名 );
+		if( その他.属性 != なし )  for( let 名前 in その他.属性 )  エレメント[ 名前 ] = その他.属性[ 名前 ];
 		if( その他.文 != なし ) エレメント.文を設定( その他.文 );
+		if( その他.クラス != なし ) エレメント.className = その他.クラス;
 
 		if( 幹エレメント != なし ) 幹エレメント.appendChild( エレメント );
 		return エレメント;
@@ -183,8 +185,11 @@ new function()
 			return エレメントを作成( type, 幹エレメント, その他 );
 		};
 	}
-
 	
+	この世界.スライダーを作成 = function( 幹エレメント, その他 )
+	{
+		return エレメントを作成( "input", 幹エレメント, その他 );
+	};
 
 	この世界.ローカルホストか = location.host.match( /localhost$/i ) != null;
 
@@ -195,12 +200,17 @@ new function()
 既存の型を装飾
 (
 	HTMLElement,
+	
 	{
 		イベント:
 		{
-			クリックされた: "click"
+			クリック: "click",
+			マウスダウン: "mousedown",
+			マウスアップ: "mouseup",
+			マウスムーブ: "mousemove",
 		}
 	},
+
 	function()
 	{
 		let 典型 = this;
@@ -209,6 +219,19 @@ new function()
 		{
 			this.innerHTML = 文をHTMLに変換( 文 );
 		};
+	}
+);
+
+既存の型を装飾
+(
+	HTMLInputElement,
+	
+	{
+		イベント:
+		{
+			入力された: "input",
+			変更された: "change",
+		}
 	}
 );
 
@@ -225,7 +248,7 @@ new function()
 
 // . Audio API //
 
-let 音響文脈 = 既存の型を装飾
+let 音響文脈の型 = 既存の型を装飾
 (
 	AudioContext,
 	{},
@@ -235,3 +258,42 @@ let 音響文脈 = 既存の型を装飾
 	}
 );
 
+既存の型を装飾
+(
+	AudioParam,
+	{},
+	function()
+	{
+		;
+	}
+);
+
+既存の型を装飾
+(
+	AudioNode,
+	{},
+	function()
+	{
+		;
+	}
+);
+
+既存の型を装飾
+(
+	GainNode,
+	{},
+	function()
+	{
+		;
+	}
+);
+
+既存の型を装飾
+(
+	OscillatorNode,
+	{},
+	function()
+	{
+		;
+	}
+);

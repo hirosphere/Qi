@@ -37,6 +37,8 @@ select { height: 2em; font-size: 16px; }
 
 p { font-size: 16px; }
 
+.PANE { padding: 2em 0; }
+
 .INPUT
 {
 	padding: 1em; line-height: 3em;
@@ -77,20 +79,62 @@ let アプリ画面の型 = 型を作成
 
 			この文書.title += ( ` ( ${ ローカルホストか ? "Local" : "Web" } )` );
 
+			let シンセ = シンセの型.作成();
+
 			この実体.エレメント = Divを作成( この文書.body, { 文: "VF-904 アプリケーション" } );
+
 			{
-				let ペイン = Divを作成( この実体.エレメント, { クラス: "" } );
+				let ペイン = Divを作成( この実体.エレメント, { クラス: "PANE" } );
 
 				let ボタン1 = Buttonを作成( ペイン, { 文: "ボタン1" } );
 
 				let ctr = 1;
-				ボタン1.クリックされた( function() { console.log( ctr ++ ) } );
+				ボタン1.マウスダウン( function() { シンセ.ノート処理( 0, true ); } );
+				ボタン1.マウスアップ( function() { シンセ.ノート処理( 0, false ); } );
+			}
+
+			{
+				let ペイン = Divを作成( この実体.エレメント, { クラス: "PANE" } );
+
+				let 音量 = Inputを作成( ペイン, { 属性: { type: "range" } } );
+
+				let ctr = 1;
+				音量.変更された( function() { シンセ.ノートオン(); } );
 			}
 
 			エレメントを作成
-			( "p", この実体.エレメント, { 文: `18.10.30. E ( ${ ローカルホストか ? "Local" : "Web" } )` } )
+			( "p", この実体.エレメント, { 文: `18.10.30. F ( ${ ローカルホストか ? "Local" : "Web" } )` } )
 			
 			;
+		};
+
+		この型.xxxする = function()
+		{
+			let この実体 = this;
+		};
+	}
+);
+
+let シンセの型 = 型を作成
+(
+	function()
+	{
+		let この型 = this;
+
+		この型.開始する = function()
+		{
+			let この実体 = this;
+
+			let 音響文脈 = 音響文脈の型.作成();
+
+			;
+			;
+			;
+		};
+
+		この型.ノート処理 = function( チャンネル, 開始 )
+		{
+			let この実体 = this;
 		};
 
 		この型.xxxする = function()
