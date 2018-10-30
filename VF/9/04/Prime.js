@@ -35,14 +35,25 @@ let 拡張型を作成 = function( 基底の型, 典型装飾関数 )
 	return 型を作成( 典型装飾関数, 基底の型 );
 };
 
-let 既存の実体を装飾 = function( 実体, 装飾関数 )
+let 既存の実体を装飾 = function( 実体, 内容, 装飾関数 )
 {
-	let 装飾返り値 = 装飾関数.call( 実体 );
+	装飾関数 && 装飾関数.call( 実体 );
+
+	if( 内容.フィールド != なし )
+	{
+		for( 名前 in 内容.フィールド )
+		{
+			let 元の名前 = 内容.フィールド[ 名前 ];
+			実体[ 名前 ] = 実体[ 元の名前 ];
+		}
+	}
+
+	return 実体;
 };
 
-let 既存の型を装飾 = function( 既存の型, 典型装飾関数 )
+let 既存の型を装飾 = function( 既存の型, 内容, 典型装飾関数 )
 {
-	let 装飾返り値 = 既存の実体を装飾( 既存の型.prototype, 典型装飾関数 );
+	既存の実体を装飾( 既存の型.prototype, 内容, 典型装飾関数 );
 
 	既存の型.作成 = function()
 	{
@@ -50,6 +61,8 @@ let 既存の型を装飾 = function( 既存の型, 典型装飾関数 )
 
 		return 実体;
 	};
+
+	return 既存の型;
 };
 
 let 値の型 = 型を作成
@@ -87,6 +100,7 @@ let 値の型 = 型を作成
 既存の実体を装飾
 (
 	Array,
+	{},
 	function()
 	{
 		let この型 = this;
@@ -168,6 +182,7 @@ new function()
 既存の型を装飾
 (
 	HTMLElement,
+	{},
 	function()
 	{
 		let 典型 = this;
@@ -176,28 +191,17 @@ new function()
 		{
 			this.innerHTML = 文をHTMLに変換( 文 );
 		};
-
-		let イベント =
-		{
-			クリックされた: "click",
-		};
-
-		return [ イベント ];
 	}
 );
 
 既存の実体を装飾
 (
 	この文書,
-	function()
 	{
-		let この実体 = this;
-
-		この実体.Idで =
-		この実体.Idでエレメント取得 =
-			this.getElementById;
-
-		return { イベント: なし };
+		フィールド:
+		{
+			Idで: "getElementById"
+		}
 	}
 );
 
@@ -206,6 +210,7 @@ new function()
 let 音響文脈 = 既存の型を装飾
 (
 	AudioContext,
+	{},
 	function()
 	{
 		;
