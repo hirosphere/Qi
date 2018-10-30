@@ -52,10 +52,52 @@ let 既存の型を装飾 = function( 既存の型, 典型装飾関数 )
 	};
 };
 
+let 値の型 = 型を作成
+(
+	function()
+	{
+		let この型 = this;
+
+		この型.開始する = function( 初期値 )
+		{
+			let この実体 = this;
+			この実体.変更処理リスト = [];
+		};
+
+		この型.値が変更された = function( 処理 )
+		{
+			let この実体 = this;
+			この実体.変更処理リスト.先頭に追加( 処理 );
+		};
+
+		この型.値を設定 = function( 値 )
+		{
+			let この実体 = this;
+		};
+
+		この型.値の変更を通知する = function()
+		{
+			let この実体 = this;
+		};
+	}
+);
+
+//  基本型・実体装飾  //
+
+既存の実体を装飾
+(
+	Array,
+	function()
+	{
+		let この型 = this;
+		この型.先頭に追加 = this.push;
+	}
+);
+
 let この世界 = window;
 let この文書 = document;
 
-//  DOM, HTML  //
+//  DOM, HTML, 利便  //
 
 new function()
 {
@@ -95,12 +137,33 @@ new function()
 		return エレメント;
 	};
 
-	;
+	for
+	(
+		let Type of
+		[
+			"Div", "H1", "H2", "H3", "H4", "H5", "H6", "P",
+			"Article", "Header",
+			"Span",
+			"Table", "TBody", "TH", "TR", "TD", 
+			"Form", "Input", "Button"
+		]
+	)
+	{
+		let type = Type.toLowerCase();
+
+		この世界[ Type + "を作成" ] = function( 幹エレメント, その他 )
+		{
+			return エレメントを作成( type, 幹エレメント, その他 );
+		};
+	}
+
+	
+
+	この世界.ローカルホストか = location.host.match( /localhost$/i ) != null;
+
 };
 
 //  ブラウザオブジェクト  //
-
-let ローカルホストか = function() { return location.host.match( /localhost$/i ) != null; };
 
 既存の型を装飾
 (
@@ -139,4 +202,13 @@ let ローカルホストか = function() { return location.host.match( /localho
 );
 
 // . Audio API //
+
+let 音響文脈 = 既存の型を装飾
+(
+	AudioContext,
+	function()
+	{
+		;
+	}
+);
 
