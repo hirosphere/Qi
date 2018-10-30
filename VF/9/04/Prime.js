@@ -72,6 +72,15 @@ let 既存の型を装飾 = function( 既存の型, 内容, 典型装飾関数 )
 	{
 		let 実体 = new 既存の型();
 
+		if( 内容 && 内容.実体フィールド )
+		{
+			for( let 名前 in 内容.実体フィールド )
+			{
+				let 元の名前 = 内容.実体フィールド[ 名前 ];
+				実体[ 名前 ] = 実体[ 元の名前 ];
+			}
+		}
+
 		return 実体;
 	};
 
@@ -251,31 +260,35 @@ new function()
 let 音響文脈の型 = 既存の型を装飾
 (
 	AudioContext,
-	{},
-	function()
 	{
-		;
+		フィールド:
+		{
+			オシレーターを作成: "createOscillator",
+		},
+
+		実体フィールド:
+		{
+			出力: "destination"
+		}
 	}
 );
 
 既存の型を装飾
 (
 	AudioParam,
-	{},
-	function()
-	{
-		;
-	}
+	{}
 );
 
 既存の型を装飾
 (
 	AudioNode,
-	{},
-	function()
 	{
-		;
-	}
+		フィールド:
+		{
+			接続: "connect",
+			切断: "disconnect",
+		}
+	},
 );
 
 既存の型を装飾
@@ -291,7 +304,18 @@ let 音響文脈の型 = 既存の型を装飾
 既存の型を装飾
 (
 	OscillatorNode,
-	{},
+	{
+		フィールド:
+		{
+			開始: "start",
+			終了: "stop",
+		},
+		
+		実体フィールド:
+		{
+			周波数: "frequency"
+		}
+	},
 	function()
 	{
 		;
