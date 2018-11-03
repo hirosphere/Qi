@@ -37,6 +37,15 @@ select { height: 2em; font-size: 16px; }
 
 p { font-size: 16px; }
 
+.UN1 { border: 0px solid #666; margin-bottom: 30px; }
+
+.UN1 .VT1 { line-height: 1.0; margin-bottom: 6px; }
+.UN1 .VT1 ._TITLE { font-size: 16px; text-align: left; }
+.UN1 .VT1 ._VROW { vertical-align: baseline; }
+.UN1 .VT1 ._VCELL { min-width: 5ex; font-size: 50px; }
+.UN1 .VT1 ._VALUE { }
+.UN1 .VT1 ._UNIT{ font-size: 16px; margin-left: 0.4ex; color: #776; }
+
 .PANE { padding: 2em 0; }
 
 .INPUT
@@ -77,37 +86,28 @@ let アプリケーションの型 = 型を作成
 		{
 			let この実体 = this;
 
-			この文書.title += ( ` ( ${ ローカルホストか ? "Local" : "Web" } )` );
+			この文書.表題( ( ローカルホストか ? "● " : "" ) + "VF-904-1" );
 
-			let 列車 = 列車の型.作成();
+			let ドキュメント = ドキュメントの型.作成();
+			let 列車 = ドキュメント.列車;
 
 			let シンセ = シンセの型.作成();
 
 			この実体.エレメント = Divを作成( この文書.body, {  } );
 
-			運転制御盤1の型.作成( この実体.エレメント, { 列車: 列車, クラス名: "APP" } );
+			運転制御盤1の型.作成( この実体.エレメント, { 列車: 列車, クラス名: "UN1" } );
+			運転制御盤1の型.作成( この実体.エレメント, { 列車: 列車, クラス名: "UN2" } );
 
 			{
 				let ペイン = Divを作成( この実体.エレメント, { クラス: "PANE" } );
 
-				let ボタン1 = Buttonを作成( ペイン, { 文: "ボタン1" } );
+				//let 音量 = Inputを作成( ペイン, { 属性: { type: "range" } } );
 
-				let ctr = 1;
-				ボタン1.マウスダウン( function() { シンセ.ノート処理( 0, true ); } );
-				ボタン1.マウスアップ( function() { シンセ.ノート処理( 0, false ); } );
-			}
-
-			{
-				let ペイン = Divを作成( この実体.エレメント, { クラス: "PANE" } );
-
-				let 音量 = Inputを作成( ペイン, { 属性: { type: "range" } } );
-
-				let ctr = 1;
-				音量.変更された( function() { シンセ.ノートオン(); } );
+				//音量.変更された( function() {  } );
 			}
 
 			エレメントを作成
-			( "p", この実体.エレメント, { 文: `18.10.30. G ( ${ ローカルホストか ? "Local" : "Web" } )` } )
+			( "p", この実体.エレメント, { 文: `18.11.04. B ( ${ ローカルホストか ? "Local" : "Web" } )` } )
 			
 			;
 		};

@@ -93,17 +93,6 @@ let 既存の型を装飾 = function( 既存の型, 内容, 典型装飾関数 )
 
 //  基本型・実体装飾  //
 
-既存の実体を装飾
-(
-	Array,
-	{},
-	function()
-	{
-		let この型 = this;
-		この型.先頭に追加 = this.push;
-	}
-);
-
 //  DOM, HTML, 利便  //
 
 let この世界 = 既存の実体を装飾
@@ -125,6 +114,10 @@ let この文書 = 既存の実体を装飾
 		フィールド:
 		{
 			Idで: "getElementById"
+		},
+		プロパティ:
+		{
+			表題: "title"
 		}
 	}
 );
@@ -197,9 +190,9 @@ new function()
 		return エレメントを作成( "input", 幹エレメント, その他 );
 	};
 
-	この世界.ローカルホストか = location.host.match( /localhost$/i ) != null;
-
 };
+
+let ローカルホストか = location.host.match( /localhost$/i ) != null;
 
 //  ブラウザオブジェクト  //
 
