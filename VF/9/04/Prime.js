@@ -147,9 +147,10 @@ new function()
 
 	//  //
 
-	この世界.桁を整理 = function( 値, 規模 )
+	この世界.少数を整理 = function( 値, 桁数 )
 	{
-		return Math.round( 値 / 規模 ) * 規模;
+		let 乗除 = Math.pow( 10, 桁数 );
+		return Math.round( 値 * 乗除 ) / 乗除;
 	};
 
 	この世界.エレメントを作成 = function( タイプ名, 幹エレメント, その他 )

@@ -39,12 +39,15 @@ p { font-size: 16px; }
 
 .UN1 { border: 0px solid #666; margin-bottom: 30px; }
 
-.UN1 .VT1 { line-height: 1.0; margin-bottom: 6px; }
+.UN1 .VT1 { line-height: 1.0; margin-bottom: 9px; }
 .UN1 .VT1 ._TITLE { font-size: 16px; text-align: left; }
 .UN1 .VT1 ._VROW { vertical-align: baseline; }
 .UN1 .VT1 ._VCELL { min-width: 5ex; font-size: 50px; }
 .UN1 .VT1 ._VALUE { }
 .UN1 .VT1 ._UNIT{ font-size: 16px; margin-left: 0.4ex; color: #776; }
+
+.UN1 .VT2 { line-height: 1.0; margin-bottom: 9px; font-size: 13px; }
+.UN1 .VT2 ._VCELL { min-width: 6em; font-size: 15px; }
 
 .PANE { padding: 2em 0; }
 
@@ -96,7 +99,7 @@ let アプリケーションの型 = 型を作成
 			この実体.エレメント = Divを作成( この文書.body, {  } );
 
 			運転制御盤1の型.作成( この実体.エレメント, { 列車: 列車, クラス名: "UN1" } );
-			運転制御盤1の型.作成( この実体.エレメント, { 列車: 列車, クラス名: "UN2" } );
+			//運転制御盤1の型.作成( この実体.エレメント, { 列車: 列車, クラス名: "UN2" } );
 
 			{
 				let ペイン = Divを作成( この実体.エレメント, { クラス: "PANE" } );
@@ -107,7 +110,7 @@ let アプリケーションの型 = 型を作成
 			}
 
 			エレメントを作成
-			( "p", この実体.エレメント, { 文: `18.11.04. C ( ${ ローカルホストか ? "Local" : "Web" } )` } )
+			( "p", この実体.エレメント, { 文: `18.11.04. D ( ${ ローカルホストか ? "Local" : "Web" } )` } )
 			
 			;
 		};
