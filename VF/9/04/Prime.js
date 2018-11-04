@@ -260,6 +260,7 @@ let 音響文脈の型 = 既存の型を装飾
 		フィールド:
 		{
 			その時の値: "setValueAtTime",
+			その時へ直線変化: "linearRampToValueAtTime"
 		},
 		プロパティ:
 		{
