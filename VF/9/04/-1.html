@@ -17,15 +17,15 @@
 html
 {
 	background: hsl( 210, 60%, 90% );
-	padding: 12px;
+	padding: 45px;
 }
 
 body
 {
 	margin: 0px auto;
 	width: 1200px;
-	padding: 22px;
-	border-radius: 8px;
+	padding: 15px 45px;
+	border-radius: 15px;
 	min-height: 90vh;
 	background: #fff;
 }
@@ -40,16 +40,16 @@ p { font-size: 16px; }
 .UN1 { border: 0px solid #666; margin-bottom: 0px; }
 
 .UN1 .VT1 { line-height: 1.0; margin-bottom: 9px; }
-.UN1 .VT1 ._TITLE { font-size: 16px; text-align: left; }
+.UN1 .VT1 ._TITLE { font-size: 15px; text-align: left; }
 .UN1 .VT1 ._VROW { vertical-align: baseline; }
 .UN1 .VT1 ._VCELL { min-width: 6.2ex; font-size: 50px; }
 .UN1 .VT1 ._VALUE { }
-.UN1 .VT1 ._UNIT{ font-size: 16px; margin-left: 0.4ex; color:hsl( 45, 3%, 55% ); }
+.UN1 .VT1 ._UNIT{ font-size: 18px; margin-left: 0.2ex; color:hsl( 45, 3%, 55% ); }
 
 .UN1 .VT2 { line-height: 1.0; margin-bottom: 1px; margin: 15px 5px; font-size: 16px; }
-.UN1 .VT2 ._TITLE { background: hsl( 210, 60%, 90% ); padding: 0.8ex 0.8ex; font-size: 13px; line-height: 1.0em; }
-.UN1 .VT2 ._VCELL { min-width: 11ex; padding-bottom: 1ex; font-size: 20px; line-height: 1.2em; }
-.UN1 .VT2 ._UNIT{ font-size: 15px; margin-left: 0.2ex; color:hsl( 45, 2%, 55% ); }
+.UN1 .VT2 ._TITLE { background: hsl( 210, 60%, 90% ); padding: 0.4ex 0.4ex; font-size: 13px; line-height: 1.0em; }
+.UN1 .VT2 ._VCELL { min-width: 11ex; padding-bottom: 0.5ex; font-size: 20px; line-height: 1.1em; color: hsl( 45, 1%, 25% ) }
+.UN1 .VT2 ._UNIT{ font-size: 14px; margin-left: 0.1ex; color:hsl( 45, 2%, 55% ); }
 
 .PANE { padding: 2em 0; }
 
@@ -116,7 +116,7 @@ let アプリケーションの型 = 型を作成
 			//運転制御盤1の型.作成( この実体.エレメント, { 列車: 列車, クラス名: "UN2" } );
 
 			エレメントを作成
-			( "p", この実体.エレメント, { 文: `18.11.18. A ( ${ ローカルホストか ? "Local" : "Web" } )` } )
+			( "p", この実体.エレメント, { 文: `18.11.18. B ( ${ ローカルホストか ? "Local" : "Web" } )` } )
 			
 			;
 		};
