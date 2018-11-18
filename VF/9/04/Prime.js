@@ -20,7 +20,7 @@ let 型を作成 = function( 典型装飾関数, 基底の型 )
 		型.prototype.開始する = function(){};
 	}
 
-	型.作成 = function()
+	型.実体を作成 = 型.作成 = function()
 	{
 		let 実体 = new 型();
 		型.prototype.開始する.apply( 実体, arguments );
@@ -242,7 +242,9 @@ let 音響文脈の型 = 既存の型を装飾
 		フィールド:
 		{
 			オシレーターを作成: "createOscillator",
+			フィルターを作成: "createBiquadFilter",
 			ゲインを作成: "createGain",
+			倍音表を作成: "createPeriodicWave",
 		},
 
 		プロパティ:

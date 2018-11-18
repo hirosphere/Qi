@@ -17,15 +17,15 @@
 html
 {
 	background: hsl( 210, 60%, 90% );
-	padding: 50px;
+	padding: 12px;
 }
 
 body
 {
 	margin: 0px auto;
-	width: 820px;
-	padding: 40px 40px;
-	border-radius: 16px;
+	width: 1200px;
+	padding: 22px;
+	border-radius: 8px;
 	min-height: 90vh;
 	background: #fff;
 }
@@ -37,18 +37,19 @@ select { height: 2em; font-size: 16px; }
 
 p { font-size: 16px; }
 
-.UN1 { border: 0px solid #666; margin-bottom: 30px; }
+.UN1 { border: 0px solid #666; margin-bottom: 0px; }
 
 .UN1 .VT1 { line-height: 1.0; margin-bottom: 9px; }
 .UN1 .VT1 ._TITLE { font-size: 16px; text-align: left; }
 .UN1 .VT1 ._VROW { vertical-align: baseline; }
 .UN1 .VT1 ._VCELL { min-width: 6.2ex; font-size: 50px; }
 .UN1 .VT1 ._VALUE { }
-.UN1 .VT1 ._UNIT{ font-size: 16px; margin-left: 0.4ex; color: #776; }
+.UN1 .VT1 ._UNIT{ font-size: 16px; margin-left: 0.4ex; color:hsl( 45, 3%, 55% ); }
 
-.UN1 .VT2 { line-height: 1.0; margin-bottom: 1px; margin: 15px 5px; font-size: 13px; }
-.UN1 .VT2 ._TITLE { padding-right: 3em; }
-.UN1 .VT2 ._VCELL { min-width: 3em; padding-right: 2em; font-size: 15px; }
+.UN1 .VT2 { line-height: 1.0; margin-bottom: 1px; margin: 15px 5px; font-size: 16px; }
+.UN1 .VT2 ._TITLE { background: hsl( 210, 60%, 90% ); padding: 0.8ex 0.8ex; font-size: 13px; line-height: 1.0em; }
+.UN1 .VT2 ._VCELL { min-width: 11ex; padding-bottom: 1ex; font-size: 20px; line-height: 1.2em; }
+.UN1 .VT2 ._UNIT{ font-size: 15px; margin-left: 0.2ex; color:hsl( 45, 2%, 55% ); }
 
 .PANE { padding: 2em 0; }
 
@@ -102,120 +103,22 @@ let アプリケーションの型 = 型を作成
 			この実体.エレメント = Divを作成( この文書.body, {  } );
 
 			運転制御盤1の型.作成( この実体.エレメント, { 列車: 列車, クラス名: "UN1" } );
-			//運転制御盤1の型.作成( この実体.エレメント, { 列車: 列車, クラス名: "UN2" } );
+			項目表示1の型.作成( この実体.エレメント, { 列車: 列車, クラス名: "UN1" } );
 
 			{
 				let ペイン = Divを作成( この実体.エレメント, { クラス: "PANE" } );
 
 				let 音量 = Inputを作成( ペイン, { クラス: "VOLUME", 属性: { type: "range", min: 0, max: 100 } } );
 
-				音量.変更された( function() { シンセ.全音量.値を設定( this.value ); } );
+				音量.入力された( function() { シンセ.全音量.値を設定( this.value ); } );
 			}
+
+			//運転制御盤1の型.作成( この実体.エレメント, { 列車: 列車, クラス名: "UN2" } );
 
 			エレメントを作成
-			( "p", この実体.エレメント, { 文: `18.11.04. E ( ${ ローカルホストか ? "Local" : "Web" } )` } )
+			( "p", この実体.エレメント, { 文: `18.11.18. A ( ${ ローカルホストか ? "Local" : "Web" } )` } )
 			
 			;
-		};
-
-		この型.xxxする = function()
-		{
-			let この実体 = this;
-		};
-	}
-);
-
-let シンセの型 = 型を作成
-(
-	function()
-	{
-		let この型 = this;
-
-		この型.開始する = function( ドキュメント )
-		{
-			let この実体 = this;
-			let 列車 = ドキュメント.列車;
-
-			//  モデル  //
-
-			この実体.全音量 = 値の型.作成( 40 );
-
-			//  要素を作成  //
-
-			let 音響文脈 = 音響文脈の型.作成();
-
-			let 発振器1 = 音響文脈.オシレーターを作成();
-			let ゲイン1 = 音響文脈.ゲインを作成();
-			let 全音量ゲイン = 音響文脈.ゲインを作成();
-			;
-
-			//  値の設定  //
-			let いま = 音響文脈.現在時刻();
-
-			//発振器1.周波数().その時の値( 440 * 3, いま + 0 );
-			//発振器1.周波数().その時の値( 440 * 4, いま + 0.05 );
-			//発振器1.周波数().その時の値( 440 * 5, いま + 0.1 );
-			ゲイン1.ゲイン().値( 0.5 );
-			;
-
-			//  接続  //
-			
-			発振器1.接続( ゲイン1 );
-			ゲイン1.接続( 全音量ゲイン );
-			全音量ゲイン.接続( 音響文脈.出力() );
-			;
-
-			発振器1.開始( いま + 0 );
-			//発振器1.終了( いま + 0.15 );
-
-			//  //
-
-			function 更新()
-			{
-				let いま = 音響文脈.現在時刻();
-				//console.log(この実体.全音量.値 / 100)
-				発振器1.周波数().その時へ直線変化( 列車.時速.値 * 5, いま + ドキュメント.コマ秒 );
-				全音量ゲイン.ゲイン().値( この実体.全音量.値 / 100 );
-			}
-
-			この実体.全音量.変更された( 更新 );
-			列車.時速.変更された( 更新 );
-
-			更新();
-
-		};
-
-		この型.更新 = function()
-		{
-			let この実体 = this;
-		};
-
-		この型.ノート処理 = function( チャンネル, 開始 )
-		{
-			let この実体 = this;
-		};
-
-		この型.xxxする = function()
-		{
-			let この実体 = this;
-		};
-	}
-);
-
-let xxxの型 = 型を作成
-(
-	function()
-	{
-		let この型 = this;
-
-		この型.開始する = function()
-		{
-			let この実体 = this;
-		};
-
-		この型.xxxする = function()
-		{
-			let この実体 = this;
 		};
 	}
 );
