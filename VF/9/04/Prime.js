@@ -244,6 +244,7 @@ let 音響文脈の型 = 既存の型を装飾
 			オシレーターを作成: "createOscillator",
 			フィルターを作成: "createBiquadFilter",
 			ゲインを作成: "createGain",
+			振幅を作成: "createGain",
 			倍音表を作成: "createPeriodicWave",
 		},
 
@@ -262,7 +263,8 @@ let 音響文脈の型 = 既存の型を装飾
 		フィールド:
 		{
 			その時の値: "setValueAtTime",
-			その時へ直線変化: "linearRampToValueAtTime"
+			その時へ直線変化: "linearRampToValueAtTime",
+			その時刻へ直線変化: "linearRampToValueAtTime",
 		},
 		プロパティ:
 		{
@@ -290,6 +292,7 @@ let 音響文脈の型 = 既存の型を装飾
 		プロパティ:
 		{
 			ゲイン: "gain",
+			振幅: "gain",
 			利得: "gain",
 		}
 	}
@@ -307,7 +310,8 @@ let 音響文脈の型 = 既存の型を装飾
 
 		プロパティ:
 		{
-			周波数: "frequency"
+			周波数: "frequency",
+			ピッチ: "detune",
 		}
 	},
 	function()
