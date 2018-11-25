@@ -40,16 +40,47 @@ p { font-size: 16px; }
 .UN1 { border: 0px solid #666; margin-bottom: 0px; }
 
 .UN1 .VT1 { line-height: 1.0; margin-bottom: 9px; }
-.UN1 .VT1 ._TITLE { font-size: 15px; text-align: left; }
+.UN1 .VT1 ._TITLE { font-size: 16px; text-align: left; }
 .UN1 .VT1 ._VROW { vertical-align: baseline; }
 .UN1 .VT1 ._VCELL { min-width: 6.2ex; font-size: 50px; }
 .UN1 .VT1 ._VALUE { }
 .UN1 .VT1 ._UNIT{ font-size: 18px; margin-left: 0.2ex; color:hsl( 45, 3%, 55% ); }
 
-.UN1 .VT2 { line-height: 1.0; margin-bottom: 1px; margin: 15px 5px; font-size: 16px; }
-.UN1 .VT2 ._TITLE { background: hsl( 210, 60%, 90% ); padding: 0.46ex 0.4ex; font-size: 13px; line-height: 1.0em; }
-.UN1 .VT2 ._VCELL { min-width: 11ex; padding-bottom: 0.5ex; font-size: 20px; line-height: 1.1em; color: hsl( 45, 1%, 25% ) }
+.UN1 .VT2 { line-height: 1.0; margin-bottom: 1px; margin: 15px 5px; }
+
+.UN1 .VT2 ._TITLE
+{
+	background: hsl( 120, 45%, 87% );
+	padding: 0.7ex;
+	font-size: 13px;
+	line-height: 1.0em;
+}
+.UN1 .VT2 ._TITLE._EDITABLE { background: hsl( 225, 45%, 90% ); }
+
+.UN1 .VT2 ._VCELL
+{
+	min-width: 11ex; padding-bottom: 0.0ex;
+	font-size: 20px; line-height: 2em;
+	color: hsl( 45, 1%, 25% );
+}
 .UN1 .VT2 ._UNIT{ font-size: 14px; margin-left: 0.1ex; color:hsl( 45, 2%, 55% ); }
+
+._VCELL { cursor: default; }
+
+.VT1 ._SELFRAME,
+.VT2 ._SELFRAME
+{
+	display: inline-block; box-sizing: border-box;
+	width: 100%; height: 100%;
+}
+
+.VT1 ._SELFRAME._SELECTED,
+.VT2 ._SELFRAME._SELECTED
+{
+	border: 0px solid hsl( 25, 90%, 75% );
+	background: hsl( 30, 0%, 93% );
+}
+
 
 .PANE { padding: 2em 0; }
 
@@ -102,8 +133,10 @@ let アプリケーションの型 = 型を作成
 
 			この実体.エレメント = Divを作成( この文書.body, {  } );
 
-			運転制御盤1の型.作成( この実体.エレメント, { 列車: 列車, クラス名: "UN1" } );
-			項目表示1の型.作成( この実体.エレメント, { 列車: 列車, クラス名: "UN1" } );
+			let 項目選択 = 単一選択の型.作成();
+
+			運転制御盤1の型.作成( この実体.エレメント, "UN1", 列車, 項目選択 );
+			項目表示1の型.作成( この実体.エレメント, "UN1", 列車, 項目選択 );
 
 			{
 				let ペイン = Divを作成( この実体.エレメント, { クラス: "PANE" } );
@@ -116,7 +149,7 @@ let アプリケーションの型 = 型を作成
 			//運転制御盤1の型.作成( この実体.エレメント, { 列車: 列車, クラス名: "UN2" } );
 
 			エレメントを作成
-			( "p", この実体.エレメント, { 文: `18.11.20. A ( ${ ローカルホストか ? "L" : "W" } )\n${ navigator.userAgent }` } )
+			( "p", この実体.エレメント, { 文: `18.11.25. A ( ${ ローカルホストか ? "L" : "W" } )\n${ navigator.userAgent }` } )
 			
 			;
 		};

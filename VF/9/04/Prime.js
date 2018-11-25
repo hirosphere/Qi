@@ -1,6 +1,8 @@
 
 //  基本  //
 
+let はい = true;
+let いいえ = false;
 let なし = null;
 let 未定義 = undefined;
 
@@ -145,14 +147,6 @@ new function()
 	
 	function hp_rep( ch )  {  return ht_rep_table[ ch ];  }
 
-	//  //
-
-	この世界.少数を整理 = function( 値, 桁数 )
-	{
-		let 乗除 = Math.pow( 10, 桁数 );
-		return Math.round( 値 * 乗除 ) / 乗除;
-	};
-
 	この世界.エレメントを作成 = function( タイプ名, 幹エレメント, その他 )
 	{
 		let エレメント = document.createElement( タイプ名 );
@@ -186,9 +180,19 @@ new function()
 		};
 	}
 	
-	この世界.スライダーを作成 = function( 幹エレメント, その他 )
+	//  //
+
+	この世界.小数を整理 = function( 値, 桁数 )
 	{
-		return エレメントを作成( "input", 幹エレメント, その他 );
+		let 乗除 = Math.pow( 10, 桁数 );
+		return Math.round( 値 * 乗除 ) / 乗除;
+	};
+
+	let 次の連番 = 1;
+
+	この世界.次の連番 = function()
+	{
+		return 次の連番 ++;
 	};
 
 };
