@@ -15,7 +15,7 @@ let 型を作成 = function( 典型装飾関数, 基底の型 )
 		型.prototype = new 基底の型();
 	}
 
-	典型装飾関数.call( 型.prototype );
+	典型装飾関数.call( 型.prototype, 基底の型 && 基底の型.prototype || なし );
 
 	if( 型.prototype.開始する == undefined )
 	{

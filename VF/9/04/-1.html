@@ -46,21 +46,27 @@ p { font-size: 16px; }
 .UN1 .VT1 ._VALUE { }
 .UN1 .VT1 ._UNIT{ font-size: 18px; margin-left: 0.2ex; color:hsl( 45, 3%, 55% ); }
 
-.UN1 .VT2 { line-height: 1.0; margin-bottom: 1px; margin: 15px 5px; }
+.UN1 .VT2
+{
+	margin-bottom: 1px; margin: 15px 5px;
+	border-collapse: collapse;
+}
+
+.VT2 td { border: 1px solid hsl( 45, 1%, 25% ); }
 
 .UN1 .VT2 ._TITLE
 {
-	background: hsl( 120, 45%, 87% );
-	padding: 0.7ex;
-	font-size: 13px;
+	background: hsl( 176, 45%, 87% );
+	padding: 0.3ex;
+	font-size: 14px;
 	line-height: 1.0em;
 }
-.UN1 .VT2 ._TITLE._EDITABLE { background: hsl( 225, 45%, 90% ); }
+.UN1 .VT2 ._TITLE._EDITABLE { background: hsl( 210, 50%, 86% ); }
 
 .UN1 .VT2 ._VCELL
 {
-	min-width: 11ex; padding-bottom: 0.0ex;
-	font-size: 20px; line-height: 2em;
+	min-width: 12ex; padding-bottom: 0.0ex;
+	font-size: 21px; line-height: 1.7em;
 	color: hsl( 45, 1%, 25% );
 }
 .UN1 .VT2 ._UNIT{ font-size: 14px; margin-left: 0.1ex; color:hsl( 45, 2%, 55% ); }
@@ -136,7 +142,10 @@ let アプリケーションの型 = 型を作成
 			let 項目選択 = 単一選択の型.作成();
 
 			運転制御盤1の型.作成( この実体.エレメント, "UN1", 列車, 項目選択 );
+
 			項目表示1の型.作成( この実体.エレメント, "UN1", 列車, 項目選択 );
+
+			数値入力ペインの型.作成( この実体.エレメント, "INPUT", 項目選択 );
 
 			{
 				let ペイン = Divを作成( この実体.エレメント, { クラス: "PANE" } );
@@ -149,7 +158,7 @@ let アプリケーションの型 = 型を作成
 			//運転制御盤1の型.作成( この実体.エレメント, { 列車: 列車, クラス名: "UN2" } );
 
 			エレメントを作成
-			( "p", この実体.エレメント, { 文: `18.11.25. A ( ${ ローカルホストか ? "L" : "W" } )\n${ navigator.userAgent }` } )
+			( "p", この実体.エレメント, { 文: `18.11.26. A ( ${ ローカルホストか ? "L" : "W" } )\n${ navigator.userAgent }` } )
 			
 			;
 		};
