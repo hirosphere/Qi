@@ -18,6 +18,7 @@ html
 {
 	background: hsl( 210, 60%, 90% );
 	padding: 45px;
+	padding: 0px;
 }
 
 body
@@ -48,28 +49,30 @@ p { font-size: 16px; }
 
 .UN1 .VT2
 {
-	margin-bottom: 1px; margin: 15px 5px;
+	margin-bottom: 1px; margin: 15px 0px;
 	border-collapse: collapse;
 }
 
-.VT2 td { border: 1px solid hsl( 45, 1%, 25% ); }
+.VT2 td { border: 2px solid hsl( 45, 1%, 100% ); }
 
 .UN1 .VT2 ._TITLE
 {
-	background: hsl( 176, 45%, 87% );
+	background: hsl( 120, 45%, 87% );
 	padding: 0.3ex;
 	font-size: 14px;
 	line-height: 1.0em;
 }
-.UN1 .VT2 ._TITLE._EDITABLE { background: hsl( 210, 50%, 86% ); }
+.UN1 .VT2 ._TITLE._EDITABLE { background: hsl( 180, 50%, 86% ); }
 
 .UN1 .VT2 ._VCELL
 {
-	min-width: 12ex; padding-bottom: 0.0ex;
-	font-size: 21px; line-height: 1.7em;
+	min-width: 120px;
+	height: 34px;
+	line-height: 34px;
+	font-size: 24px;
 	color: hsl( 45, 1%, 25% );
 }
-.UN1 .VT2 ._UNIT{ font-size: 14px; margin-left: 0.1ex; color:hsl( 45, 2%, 55% ); }
+.UN1 .VT2 ._UNIT{ font-size: 14px; margin-left: 0.3ex; color:hsl( 45, 5%, 55% ); }
 
 ._VCELL { cursor: default; }
 
@@ -77,14 +80,22 @@ p { font-size: 16px; }
 .VT2 ._SELFRAME
 {
 	display: inline-block; box-sizing: border-box;
+	border: 2px solid hsl( 25, 0%, 100% );
 	width: 100%; height: 100%;
+	padding: 0;
+}
+
+.VT2 ._SELFRAME
+{
+	border: 1px solid hsl( 25, 0%, 93% );
+	padding: 0 0.3ex;
 }
 
 .VT1 ._SELFRAME._SELECTED,
 .VT2 ._SELFRAME._SELECTED
 {
-	border: 0px solid hsl( 25, 90%, 75% );
-	background: hsl( 30, 0%, 93% );
+	border: 1px solid hsl( 25, 90%, 75% );
+	background: hsl( 30, 0%, 100% );
 }
 
 
@@ -92,12 +103,12 @@ p { font-size: 16px; }
 
 .INPUT
 {
-	padding: 1em; line-height: 3em;
-	vertical-align: middle; border: 1px solid #cca;
+	padding: 0em; line-height: 3em;
+	vertical-align: middle; border: 0px solid #cca;
 }
 .INPUT label { margin-right: 1em;  font-size: 17px; }
 .INPUT input[type="range"] { vertical-align: middle; margin-right: 1ex; width: 300px; }
-.INPUT input { width: 3em; margin-right: 1em; font-size: 17px; } 
+.INPUT input { width: 3em; margin-right: 1em; font-size: 40px; } 
 
 .INFO{ margin-bottom: 12px; }
 .INFO_CELL { font-size: 40px; line-height: 1; }
@@ -145,7 +156,9 @@ let アプリケーションの型 = 型を作成
 
 			項目表示1の型.作成( この実体.エレメント, "UN1", 列車, 項目選択 );
 
-			数値入力ペインの型.作成( この実体.エレメント, "INPUT", 項目選択 );
+			let 入力ペイン = 数値入力ペインの型.作成( この実体.エレメント, "INPUT" );
+
+			項目選択.変更処理を登録( ( 項目 ) => 入力ペイン.項目を設定( 項目 ) );
 
 			{
 				let ペイン = Divを作成( この実体.エレメント, { クラス: "PANE" } );
@@ -158,7 +171,7 @@ let アプリケーションの型 = 型を作成
 			//運転制御盤1の型.作成( この実体.エレメント, { 列車: 列車, クラス名: "UN2" } );
 
 			エレメントを作成
-			( "p", この実体.エレメント, { 文: `18.11.26. A ( ${ ローカルホストか ? "L" : "W" } )\n${ navigator.userAgent }` } )
+			( "p", この実体.エレメント, { 文: `18.11.30. A ( ${ ローカルホストか ? "L" : "W" } )\n${ navigator.userAgent }` } )
 			
 			;
 		};

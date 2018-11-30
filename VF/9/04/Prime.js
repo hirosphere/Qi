@@ -246,17 +246,41 @@ let 音響文脈の型 = 既存の型を装飾
 		フィールド:
 		{
 			オシレーターを作成: "createOscillator",
+			発振器を作成: "createOscillator",
 			フィルターを作成: "createBiquadFilter",
 			ゲインを作成: "createGain",
+			制幅器を作成: "createGain",
 			振幅を作成: "createGain",
 			倍音表を作成: "createPeriodicWave",
+			波形変形器を作成: "createWaveShaper",
 		},
-
 		プロパティ:
 		{
 			出力: "destination",
 			現在時刻: "currentTime"
 		}
+	},
+	function()
+	{
+		let この典型 = this;
+
+		この典型.固定値を作成 = function( 初期値 )
+		{
+			let この実体 = this;
+
+			if( この実体.固定値源 == なし )
+			{
+				この実体.固定値源 = この実体.発振器を作成();
+				この実体.固定値源.周波数().値( 10 );
+				この実体.固定値源.開始();
+				この実体.固定値源.周波数().その時刻の値( 0, この実体.現在時刻() + 0.025 );
+			}
+
+			let 制幅器 = この実体.制幅器を作成();
+			この実体.固定値源.接続( 制幅器 );
+			制幅器.振幅().値( 初期値 );
+			return 制幅器;
+		};
 	}
 );
 
@@ -267,6 +291,7 @@ let 音響文脈の型 = 既存の型を装飾
 		フィールド:
 		{
 			その時の値: "setValueAtTime",
+			その時刻の値: "setValueAtTime",
 			その時へ直線変化: "linearRampToValueAtTime",
 			その時刻へ直線変化: "linearRampToValueAtTime",
 		},
@@ -299,6 +324,19 @@ let 音響文脈の型 = 既存の型を装飾
 			振幅: "gain",
 			利得: "gain",
 		}
+	},
+	function()
+	{
+		let この典型 = this;
+
+		この典型.後続を作成 = function( 初期値 )
+		{
+			let この実体 = this;
+			let 後続 = この実体.context.制幅器を作成();
+			この実体.接続( 後続 );
+			後続.振幅().値( 初期値 );
+			return 後続;
+		};
 	}
 );
 
@@ -316,10 +354,7 @@ let 音響文脈の型 = 既存の型を装飾
 		{
 			周波数: "frequency",
 			ピッチ: "detune",
+			波形: "type",
 		}
-	},
-	function()
-	{
-		;
 	}
 );

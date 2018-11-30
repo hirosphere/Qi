@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<script src="Prime.js"></script>
+<script src="Model.js"></script>
+<script src="Audio.js"></script>
+<script src="GUI.js"></script>
+<style>
+*
+{
+	margin: 0; padding: 0; color: #222;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+html
+{
+	background: hsl( 210, 60%, 90% );
+	padding: 45px;
+	padding: 0px;
+}
+
+body
+{
+	margin: 0px auto;
+	width: 1200px;
+	padding: 15px 45px;
+	border-radius: 15px;
+	min-height: 90vh;
+	background: #fff;
+}
+
+button { font-size: 16px; }
+button { padding: 16px 24px; }
+
+select { height: 2em; font-size: 16px; }
+
+p { font-size: 16px; }
+
+.UN1 { border: 0px solid #666; margin-bottom: 0px; }
+
+.UN1 .VT1 { line-height: 1.0; margin-bottom: 9px; }
+.UN1 .VT1 ._TITLE { font-size: 16px; text-align: left; }
+.UN1 .VT1 ._VROW { vertical-align: baseline; }
+.UN1 .VT1 ._VCELL { min-width: 6.2ex; font-size: 50px; }
+.UN1 .VT1 ._VALUE { }
+.UN1 .VT1 ._UNIT{ font-size: 18px; margin-left: 0.2ex; color:hsl( 45, 3%, 55% ); }
+
+.UN1 .VT2
+{
+	margin-bottom: 1px; margin: 15px 0px;
+	border-collapse: collapse;
+}
+
+.VT2 td { border: 2px solid hsl( 45, 1%, 100% ); }
+
+.UN1 .VT2 ._TITLE
+{
+	background: hsl( 120, 45%, 87% );
+	padding: 0.3ex;
+	font-size: 14px;
+	line-height: 1.0em;
+}
+.UN1 .VT2 ._TITLE._EDITABLE { background: hsl( 180, 50%, 86% ); }
+
+.UN1 .VT2 ._VCELL
+{
+	min-width: 120px;
+	height: 34px;
+	line-height: 34px;
+	font-size: 24px;
+	color: hsl( 45, 1%, 25% );
+}
+.UN1 .VT2 ._UNIT{ font-size: 14px; margin-left: 0.3ex; color:hsl( 45, 5%, 55% ); }
+
+._VCELL { cursor: default; }
+
+.VT1 ._SELFRAME,
+.VT2 ._SELFRAME
+{
+	display: inline-block; box-sizing: border-box;
+	border: 2px solid hsl( 25, 0%, 100% );
+	width: 100%; height: 100%;
+	padding: 0;
+}
+
+.VT2 ._SELFRAME
+{
+	border: 1px solid hsl( 25, 0%, 93% );
+	padding: 0 0.3ex;
+}
+
+.VT1 ._SELFRAME._SELECTED,
+.VT2 ._SELFRAME._SELECTED
+{
+	border: 1px solid hsl( 25, 90%, 75% );
+	background: hsl( 30, 0%, 100% );
+}
+
+
+.PANE { padding: 2em 0; }
+
+.INPUT
+{
+	padding: 0em; line-height: 3em;
+	vertical-align: middle; border: 0px solid #cca;
+}
+.INPUT label { margin-right: 1em;  font-size: 17px; }
+.INPUT input[type="range"] { vertical-align: middle; margin-right: 1ex; width: 300px; }
+.INPUT input { width: 3em; margin-right: 1em; font-size: 40px; } 
+
+.INFO{ margin-bottom: 12px; }
+.INFO_CELL { font-size: 40px; line-height: 1; }
+.INFO_UNIT { margin-left: 0.4ex; font-size: 19px; color: #998; }
+
+.VOLUME { width: 400px; }
+
+</style>
+</head>
+<body onload="メイン.開始();">
+<script>
+
+let メイン = new function()
+{
+	let この実体 = this;
+
+	この実体.開始 = function()
+	{
+		この実体.アプリケーション = アプリケーションの型.作成();
+	};
+};
+
+let アプリケーションの型 = 型を作成
+(
+	function()
+	{
+		let この型 = this;
+
+		この型.開始する = function()
+		{
+			let この実体 = this;
+
+			この文書.表題( ( ローカルホストか ? "● " : "" ) + "VF-904-PW1" );
+
+			let ドキュメント =
+			{
+				パルス幅: 値の型.作成( 0.5 )
+			};
+
+			let シンセ = PWシンセの型.作成( ドキュメント );
+
+			この実体.エレメント = Divを作成( この文書.body, {  } );
+
+			let 項目選択 = 単一選択の型.作成();
+
+			PW項目表示の型.作成( この実体.エレメント, "UN1", ドキュメント, 項目選択 );
+
+			let 入力ペイン = 数値入力ペインの型.作成( この実体.エレメント, "INPUT" );
+
+			項目選択.変更処理を登録( ( 項目 ) => 入力ペイン.項目を設定( 項目 ) );
+
+			{
+				let ペイン = Divを作成( この実体.エレメント, { クラス: "PANE" } );
+
+				let 音量 = Inputを作成( ペイン, { クラス: "VOLUME", 属性: { type: "range", min: 0, max: 100 } } );
+
+				音量.入力された( function() { シンセ.全音量.値を設定( this.value ); } );
+			}
+
+			エレメントを作成
+			( "p", この実体.エレメント, { 文: `18.11.26. A ( ${ ローカルホストか ? "L" : "W" } )\n${ navigator.userAgent }` } )
+			
+			;
+		};
+	}
+);
+
+let PW項目表示の型 = 型を作成
+(
+	function()
+	{
+		let この典型 = this;
+
+		この典型.開始する = function( 幹エレメント, クラス名, ドキュメント, 選択器 )
+		{
+			const この実体 = this;
+
+			const エレメント = Divを作成( 幹エレメント, { クラス: クラス名 } );
+
+			let テーブル = 数値表示テーブルの型.作成( エレメント, "VT2" );
+			let 行 = テーブル.行を作成();
+
+			行.項目を作成( "加速度減衰率", ドキュメント.パルス幅, true, [ 1, "%", (v)=>v*100, (m)=>v/100 ], 選択器 );
+		};
+	}
+);
+
+let PWシンセの型 = 型を作成
+(
+	function()
+	{
+		let この型 = this;
+
+		この型.開始する = function( ドキュメント )
+		{
+			let この実体 = this;
+
+			//  モデル  //
+
+			この実体.全音量 = 値の型.作成( 25 );
+
+			//  要素を作成  //
+
+			let 音響文脈 = 音響文脈の型.作成();
+			let 全制幅器 = 音響文脈.制幅器を作成();
+			全制幅器.利得().値( 0 );
+			全制幅器.接続( 音響文脈.出力() );
+
+			PW発振器の型.作成( 音響文脈, 全制幅器 );
+
+
+			function 随時更新()
+			{
+				let 現在 = 音響文脈.現在時刻();
+				全制幅器.利得().その時へ直線変化( この実体.全音量.値 / 100, 現在 + 0.1 );
+			}
+
+			この実体.全音量.変更処理を登録( 随時更新 );
+		};
+	}
+);
+
+let PW発振器の型 = 型を作成
+(
+	function()
+	{
+		const この型 = this;
+
+		この型.開始する = function( 音響文脈, 出力先 )
+		{
+			const この実体 = this;
+
+			const 波形変形器 = 音響文脈.波形変形器を作成();
+
+			const 変形テーブル = new Float32Array( 64 );
+
+			for( let i in 変形テーブル )
+			{
+				const len = 変形テーブル.length;
+				変形テーブル[ i ] = ( i < len * ( 1 / 4 ) ? -1 : ( i < len * ( 3 / 4 ) ? 0 : 1) );
+			}
+			波形変形器.curve = 変形テーブル;
+			//波形変形器.oversample = "x4";
+
+			//const 発振器x = 発振器の型.作成( 音響文脈, 出力先, 660, 0.0, "sine" );
+			const 発振器1 = 発振器の型.作成( 音響文脈, 波形変形器, 2100, 0.5, "triangle" );
+			const 発振器2 = 発振器の型.作成( 音響文脈, 波形変形器, 1 / 30, 1, "sine" );
+			//const 発振器3 = 発振器の型.作成( 音響文脈, 発振器2.制幅器.振幅(), 1 / 4, 10000 );
+			const 発振器4 = 発振器の型.作成( 音響文脈, 発振器2.発振器.周波数(), 1 / 120, 30, "triangle" );
+			
+			//波形変形器.接続( 発振器x.制幅器.振幅() );
+			波形変形器.接続( 出力先 );
+		};
+	}
+);
+
+
+let 発振器の型 = 型を作成
+(
+	function()
+	{
+		let この型 = this;
+
+		この型.開始する = function( 音響文脈, 出力先, 周波数, 振幅, 波形 )
+		{
+			let この実体 = this;
+
+			この実体.発振器 = 音響文脈.発振器を作成();
+			この実体.制幅器 = 音響文脈.制幅器を作成();
+
+			この実体.発振器.周波数().値( 周波数 );
+			if( 波形 )  この実体.発振器.波形( 波形 );
+			この実体.制幅器.振幅().値( 振幅 );
+
+			この実体.発振器.接続( この実体.制幅器 );
+			この実体.制幅器.接続( 出力先 );
+
+			この実体.発振器.開始();
+
+		};
+	}
+);
+
+</script>
+</body>
+</html>
