@@ -38,9 +38,9 @@ select { height: 2em; font-size: 16px; }
 
 p { font-size: 16px; }
 
-.UN1 { border: 0px solid #666; margin-bottom: 15px; }
+.UN1 { border: 0px solid #666; margin-bottom: 5px; }
 
-.UN1 .VT1 { line-height: 1.0; margin-bottom: 9px; }
+.UN1 .VT1 { line-height: 1.0; margin-bottom: 4px; }
 .UN1 .VT1 ._TITLE { font-size: 16px; text-align: left; }
 .UN1 .VT1 ._VROW { vertical-align: baseline; }
 .UN1 .VT1 ._VCELL { min-width: 6.2ex; font-size: 50px; }
@@ -104,23 +104,24 @@ p { font-size: 16px; }
 .INPUT
 {
 	padding: 0em; border: 0px solid #cca; border-radius: 5px;
-	background: hsl( 35, 10%, 90% ); padding: 4px 7px;
-	font-size: 0px; line-height: 1em;
+	background: hsl( 35, 10%, 95% ); padding: 8px 7px;
+	font-size: 24px; line-height: 1em;
 }
 .INPUT ._TITLE
 {
-	display: inline-block; width: 7em; margin-right: 1em;
-	vertical-align: middle; font-size: 26px;
+	display: inline-block; min-width: 7em; margin-right: 1em;
+	vertical-align: middle; font-size: 20px;
 }
 .INPUT ._TEXT
 {
-	width: 13ex; margin-right: 0.2ex; height: 1.1em; vertical-align: middle;
-	font-family: "arial"; font-size: 30px; color: hsl( 45, 1%, 25% );
+	width: 13ex; margin-right: 0.2ex; height: 1.3em; vertical-align: middle;
+	padding: 0 0.2ex; text-align: right; 
+	font-family: "arial"; font-size: 24px; color: hsl( 45, 1%, 25% );
 } 
 .INPUT ._UNIT
 {
-	display: inline-block; width: 6ex; margin-right: 1ex; vertical-align: middle;
-	font-family: "arial"; font-size: 18px; color: hsl( 45, 3%, 60% );
+	display: inline-block; width: 6ex; margin-right: 1ex; vertical-align: text-bottom;
+	font-family: "arial"; font-size: 18px; color: hsl( 45, 3%, 50% );
 } 
 .INPUT ._RANGE { vertical-align: middle; margin-right: 1ex; width: 350px; }
 
@@ -159,23 +160,21 @@ let アプリケーションの型 = 型を作成
 
 			let ドキュメント = ドキュメントの型.作成();
 			let 列車 = ドキュメント.列車;
-
 			let シンセ = シンセの型.作成( ドキュメント );
 
 			この実体.エレメント = Divを作成( この文書.body, {  } );
+			{
+				let 項目選択 = 単一選択の型.作成();
 
-			let 項目選択 = 単一選択の型.作成();
+				運転制御盤1の型.作成( この実体.エレメント, "UN1", 列車, 項目選択 );
+				項目表示1の型.作成( この実体.エレメント, "UN1", 列車, シンセ, 項目選択 );
+				let 入力ペイン = 数値入力ペインの型.作成( この実体.エレメント, "INPUT" );
 
-			運転制御盤1の型.作成( この実体.エレメント, "UN1", 列車, 項目選択 );
-
-			let 入力ペイン = 数値入力ペインの型.作成( この実体.エレメント, "INPUT" );
-
-			項目表示1の型.作成( この実体.エレメント, "UN1", 列車, シンセ, 項目選択 );
-
-			項目選択.変更処理を登録( ( 項目 ) => 入力ペイン.項目を設定( 項目 ) );
+				項目選択.変更処理を登録( ( 項目 ) => 入力ペイン.項目を設定( 項目 ) );
+			}
 
 			エレメントを作成
-			( "p", この実体.エレメント, { 文: `18.12.01. A ( ${ ローカルホストか ? "L" : "W" } )\n${ navigator.userAgent }` } )
+			( "p", この実体.エレメント, { 文: `18.12.03. B ( ${ ローカルホストか ? "L" : "W" } )\n${ navigator.userAgent }` } )
 			
 			;
 		};
