@@ -164,7 +164,7 @@ let アプリケーションの型 = 型を作成
 
 				let 音量 = Inputを作成( ペイン, { クラス: "VOLUME", 属性: { type: "range", min: 0, max: 100 } } );
 
-				音量.入力された( function() { シンセ.全音量.値を設定( this.value ); } );
+				音量.入力処理を追加( function() { シンセ.全音量.値を設定( this.value ); } );
 			}
 
 			エレメントを作成

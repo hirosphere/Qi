@@ -70,7 +70,7 @@ let 既存の実体を装飾 = function( 実体, 内容, 装飾関数 )
 		{
 			let 元の名前 = 内容.イベント[ 名前 ];
 
-			実体[ 名前 ] = function( 処理, オプション )
+			実体[ 名前 + "処理を追加" ] = function( 処理, オプション )
 			{
 				this.addEventListener( 元の名前, 処理, オプション );
 			};
@@ -190,9 +190,12 @@ new function()
 
 	let 次の連番 = 1;
 
-	この世界.次の連番 = function()
+	この世界.次の連番 = function( 実体 )
 	{
-		return 次の連番 ++;
+		if( 実体 && 実体.実行時連番 ) return;
+		let 連番 = 次の連番 ++;
+		if( 実体 ) 実体.実行時連番 = 連番;
+		return 連番;
 	};
 
 };
@@ -231,8 +234,8 @@ let ローカルホストか = location.host.match( /localhost$/i ) != null;
 	{
 		イベント:
 		{
-			入力された: "input",
-			変更された: "change",
+			入力: "input",
+			変更: "change",
 		}
 	}
 );
