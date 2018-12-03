@@ -31,14 +31,12 @@ body
 	background: #fff;
 }
 
-button { font-size: 16px; }
-button { padding: 14px 28px; }
-
 select { height: 2em; font-size: 16px; }
 
 p { font-size: 16px; }
 
 .UN1 { border: 0px solid #666; margin-bottom: 5px; }
+.UN1 button { padding: 14px 28px; font-size: 16px; }
 
 .UN1 .VT1 { line-height: 1.0; margin-bottom: 4px; }
 .UN1 .VT1 ._TITLE { font-size: 16px; text-align: left; }
@@ -123,7 +121,8 @@ p { font-size: 16px; }
 	display: inline-block; width: 6ex; margin-right: 1ex; vertical-align: text-bottom;
 	font-family: "arial"; font-size: 18px; color: hsl( 45, 3%, 50% );
 } 
-.INPUT ._RANGE { vertical-align: middle; margin-right: 1ex; width: 350px; }
+.INPUT button { padding: 6px 15px; }
+.INPUT ._RANGE { vertical-align: middle; margin: 0 20px; width: 300px; }
 
 .INFO{ margin-bottom: 12px; }
 .INFO_CELL { font-size: 40px; line-height: 1; }
@@ -167,16 +166,18 @@ let アプリケーションの型 = 型を作成
 				let 項目選択 = 単一選択の型.作成();
 
 				運転制御盤1の型.作成( この実体.エレメント, "UN1", 列車, 項目選択 );
-				項目表示1の型.作成( この実体.エレメント, "UN1", 列車, シンセ, 項目選択 );
+				項目表示1の型.作成( この実体.エレメント, "UN1", ドキュメント, シンセ, 項目選択 );
 				let 入力ペイン = 数値入力ペインの型.作成( この実体.エレメント, "INPUT" );
 
 				項目選択.変更処理を登録( ( 項目 ) => 入力ペイン.項目を設定( 項目 ) );
 			}
 
 			エレメントを作成
-			( "p", この実体.エレメント, { 文: `18.12.03. B ( ${ ローカルホストか ? "L" : "W" } )\n${ navigator.userAgent }` } )
-			
-			;
+			(
+				"p", この実体.エレメント,
+				{ 文: `18.12.03. B ( ${ ローカルホストか ? "L" : "W" } )\n${ navigator.userAgent }`,
+				スタイル: { fontSize: "10px", color: "hsl( 15, 2%, 60% )", marginTop: "20px" } }
+			);
 		};
 	}
 );
