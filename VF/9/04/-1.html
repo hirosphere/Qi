@@ -48,8 +48,10 @@ p { font-size: 16px; }
 .VT2
 {
 	margin: 0px 0px 0px;
-	border-collapse: collapse;
+	height: 150px; padding-bottom: 50px; overflow: auto;
 }
+
+.VT2 table { border-collapse: collapse; }
 
 .VT2 td { border: 2px solid hsl( 45, 1%, 100% ); border-radius: 3px; }
 
@@ -57,12 +59,12 @@ p { font-size: 16px; }
 {
 	background: hsl( 90, 60%, 87% );
 	padding: 0.3ex;
-	font-size: 14px;
+	font-size: 14px; height: 1em;
 	line-height: 1.0em;
 }
-.UN1 .VT2 ._TITLE._EDITABLE { background: hsl( 195, 50%, 86% ); }
+.VT2 ._TITLE._EDITABLE { background: hsl( 195, 50%, 86% ); }
 
-.UN1 .VT2 ._VCELL
+.VT2 ._VCELL
 {
 	min-width: 120px;
 	height: 34px;
@@ -70,7 +72,7 @@ p { font-size: 16px; }
 	font-size: 24px;
 	color: hsl( 45, 1%, 25% );
 }
-.UN1 .VT2 ._UNIT{ font-size: 14px; margin-left: 0.3ex; color:hsl( 45, 5%, 55% ); }
+.VT2 ._UNIT{ font-size: 14px; margin-left: 0.3ex; color:hsl( 45, 5%, 55% ); }
 
 ._VCELL { cursor: default; }
 
@@ -175,7 +177,7 @@ let アプリケーションの型 = 型を作成
 			エレメントを作成
 			(
 				"p", この実体.エレメント,
-				{ 文: `18.12.03. B ( ${ ローカルホストか ? "L" : "W" } )\n${ navigator.userAgent }`,
+				{ 文: `18.12.08. A ( ${ ローカルホストか ? "L" : "W" } )\n${ navigator.userAgent }`,
 				スタイル: { fontSize: "10px", color: "hsl( 15, 2%, 60% )", marginTop: "20px" } }
 			);
 		};
