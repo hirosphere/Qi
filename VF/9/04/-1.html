@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <title>VF904-1</title>
 <script src="Prime.js"></script>
+<script src="Cell.js"></script>
 <script src="Model.js"></script>
 <script src="Audio.js"></script>
 <script src="GUI.js"></script>
@@ -25,7 +26,7 @@ body
 {
 	margin: 0px auto;
 	width: 1000px;
-	padding: 15px 45px;
+	padding: 13px 20px 10px;
 	border-radius: 15px;
 	min-height: 90vh;
 	background: #fff;
@@ -36,22 +37,29 @@ select { height: 2em; font-size: 16px; }
 p { font-size: 16px; }
 
 .UN1 { border: 0px solid #666; margin-bottom: 5px; }
-.UN1 button { padding: 14px 28px; font-size: 16px; }
+.UN1 button { padding: 12px 24px; font-size: 16px; }
 
-.UN1 .VT1 { line-height: 1.0; margin-bottom: 4px; }
+.TITLE
+{
+	border-bottom: 1px solid hsl( 25, 90%, 75% ); margin-bottom: 13px;
+	padding: 0 0 4px; font-size: 30px; line-height: 1em;
+}
+.UN1 ._DIV1 {  }
+.UN1 ._DIV1 button { vertical-align: 30px; padding: 9px 18px; margin-right: 1px; }
+.UN1 .VT1 { display: inline-block; line-height: 1.0; margin-right: 20px; }
 .UN1 .VT1 ._TITLE { font-size: 16px; text-align: left; }
 .UN1 .VT1 ._VROW { vertical-align: baseline; }
-.UN1 .VT1 ._VCELL { min-width: 6.2ex; font-size: 50px; }
+.UN1 .VT1 ._VCELL { min-width: 6.2ex; font-size: 45px; }
 .UN1 .VT1 ._VALUE { }
-.UN1 .VT1 ._UNIT{ font-size: 18px; margin-left: 0.2ex; color:hsl( 45, 3%, 55% ); }
+.UN1 .VT1 ._UNIT{ font-size: 15px; margin-left: 0.2ex; color:hsl( 45, 3%, 55% ); }
 
-.VT2
+.SCR2
 {
-	margin: 0px 0px 0px;
+	margin: 0px 0px 4px;
 	height: 150px; padding-bottom: 50px; overflow: auto;
 }
 
-.VT2 table { border-collapse: collapse; }
+.VT2 { border-collapse: collapse; }
 
 .VT2 td { border: 2px solid hsl( 45, 1%, 100% ); border-radius: 3px; }
 
@@ -66,7 +74,7 @@ p { font-size: 16px; }
 
 .VT2 ._VCELL
 {
-	min-width: 120px;
+	max-width: 120px; overflow: hidden; word-break: keep-all;
 	height: 34px;
 	line-height: 34px;
 	font-size: 24px;
@@ -157,28 +165,32 @@ let アプリケーションの型 = 型を作成
 		{
 			let この実体 = this;
 
-			この文書.表題( ( ローカルホストか ? "● " : "" ) + "VF-904-1" );
-
 			let ドキュメント = ドキュメントの型.作成();
 			let 列車 = ドキュメント.列車;
 			let シンセ = シンセの型.作成( ドキュメント );
 
-			この実体.エレメント = Divを作成( この文書.body, {  } );
+			let エレメント = Divを作成( この文書.body, {  } );
 			{
 				let 項目選択 = 単一選択の型.作成();
 
-				運転制御盤1の型.作成( この実体.エレメント, "UN1", 列車, 項目選択 );
-				項目表示1の型.作成( この実体.エレメント, "UN1", ドキュメント, シンセ, 項目選択 );
-				let 入力ペイン = 数値入力ペインの型.作成( この実体.エレメント, "INPUT" );
+				タイトルペインの型.作成( エレメント, ドキュメント );
+				運転制御盤1の型.作成( エレメント, "UN1", 列車, 項目選択 );
+				
+				let スクロールフレーム2 = Divを作成( エレメント, { クラス: "SCR2" } );
+				{
+					項目表示1の型.作成( スクロールフレーム2, "UN1", ドキュメント, シンセ, 項目選択 );
+				}
+
+				let 入力ペイン = 入力ペインの型.作成( エレメント, "INPUT" );
 
 				項目選択.変更処理を登録( ( 項目 ) => 入力ペイン.項目を設定( 項目 ) );
 			}
 
 			エレメントを作成
 			(
-				"p", この実体.エレメント,
-				{ 文: `18.12.08. B ( ${ ローカルホストか ? "L" : "W" } )\n${ navigator.userAgent }`,
-				スタイル: { fontSize: "10px", color: "hsl( 15, 2%, 60% )", marginTop: "20px" } }
+				"p", エレメント,
+				{ 文: `18.12.09. A ( ${ ローカルホストか ? "L" : "W" } )\n${ navigator.userAgent }`,
+				スタイル: { fontSize: "11px", color: "hsl( 15, 2%, 40% )", marginTop: "40px" } }
 			);
 		};
 	}

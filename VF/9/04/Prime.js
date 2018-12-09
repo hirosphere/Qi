@@ -1,14 +1,17 @@
 
 //  基本  //
 
-let はい = true;
-let いいえ = false;
-let なし = null;
-let 未定義 = undefined;
+const はい = true;
+const いいえ = false;
+const なし = null;
+const 未定義 = undefined;
 
-let 型を作成 = function( 典型装飾関数, 基底の型 )
+const 未定義補完 = function( 値, 補完値 ) { return 値 === undefined ? 補完値 : 値 };
+const 補完 = 未定義補完;
+
+const 型を作成 = function( 典型装飾関数, 基底の型 )
 {
-	let 型 = function(){};
+	const 型 = function(){};
 
 	if( 基底の型 != undefined )
 	{
@@ -24,7 +27,7 @@ let 型を作成 = function( 典型装飾関数, 基底の型 )
 
 	型.実体を作成 = 型.作成 = function()
 	{
-		let 実体 = new 型();
+		const 実体 = new 型();
 		型.prototype.開始する.apply( 実体, arguments );
 		return 実体;
 	};
@@ -32,7 +35,7 @@ let 型を作成 = function( 典型装飾関数, 基底の型 )
 	return 型;
 };
 
-let 拡張型を作成 = function( 基底の型, 典型装飾関数 )
+const 拡張型を作成 = function( 基底の型, 典型装飾関数 )
 {
 	return 型を作成( 典型装飾関数, 基底の型 );
 };
@@ -195,7 +198,7 @@ new function()
 
 	この世界.次の連番 = function( 実体 )
 	{
-		if( 実体 && 実体.実行時連番 ) return;
+		if( 実体 && 実体.実行時連番 ) return 実体.実行時連番;
 		let 連番 = 次の連番 ++;
 		if( 実体 ) 実体.実行時連番 = 連番;
 		return 連番;
