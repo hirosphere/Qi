@@ -174,7 +174,7 @@ new function()
 			"Article", "Header",
 			"Span",
 			"Table", "TBody", "TH", "TR", "TD", 
-			"Form", "Input", "Button"
+			"Form", "Input", "Button", "Select", "Option"
 		]
 	)
 	{
@@ -246,6 +246,19 @@ let ローカルホストか = location.host.match( /localhost$/i ) != null;
 	}
 );
 
+既存の型を装飾
+(
+	HTMLSelectElement,
+	
+	{
+		イベント:
+		{
+			入力: "input",
+			変更: "change",
+		}
+	}
+);
+
 // . Audio API //
 
 let 音響文脈の型 = 既存の型を装飾
@@ -263,12 +276,14 @@ let 音響文脈の型 = 既存の型を装飾
 			倍音表を作成: "createPeriodicWave",
 			波形変形器を作成: "createWaveShaper",
 		},
+		
 		プロパティ:
 		{
 			出力: "destination",
 			現在時刻: "currentTime"
 		}
 	},
+
 	function()
 	{
 		let この典型 = this;
