@@ -24,10 +24,10 @@ html
 
 body
 {
-	margin: 14px auto;
+	margin: 0px auto;
 	width: 850px;
-	padding: 0px 20px 10px;
-	border-radius: 20px;
+	padding: 0px 35px 10px;
+	border-radius: 0px;
 	min-height: 90vh;
 	background: #fff;
 }
@@ -36,50 +36,48 @@ select { height: 2em; font-size: 16px; }
 
 p { font-size: 16px; }
 
-.UN1 { border: 0px solid #666; margin-bottom: 5px; }
-.UN1 button { padding: 12px 24px; font-size: 16px; }
-
 .HEAD
 {
-	border-bottom: 1px solid hsl( 25, 90%, 75% ); margin-bottom: 24px;
-	padding: 32px 12px 32px; font-size: 28px; line-height: 1em;
+	border-bottom: 1px solid hsl( 25, 90%, 75% ); margin-bottom: 12px;
+	padding: 12px 8px 12px; font-size: 24px; line-height: 1em;
 }
-.HEAD ._TITLE { margin-right: 130px; vertical-align: middle; }
-.HEAD button { vertical-align: middle; padding: 5px 15px; margin-right: 1px; }
+.HEAD ._TITLE { margin-right: 230px; vertical-align: middle; }
+.HEAD button { vertical-align: middle; padding: 6px 16px; margin-right: 1px; }
+
+.UN1 { border: 0px solid #666; margin-bottom: 5px; }
+.UN1 button { padding: 12px 24px; font-size: 16px; }
 
 .UN1 ._DIV1 {  }
 .UN1 .VT1 { display: inline-block; line-height: 1.0; margin-right: 20px; }
 .UN1 .VT1 ._TITLE { font-size: 16px; text-align: left; }
 .UN1 .VT1 ._VROW { vertical-align: baseline; }
-.UN1 .VT1 ._VCELL { min-width: 6.2ex; font-size: 45px; }
+.UN1 .VT1 ._VCELL { min-width: 6.2ex; font-size: 48px; }
 .UN1 .VT1 ._VALUE { }
 .UN1 .VT1 ._UNIT{ font-size: 15px; margin-left: 0.2ex; color:hsl( 45, 3%, 55% ); }
 
 .SCR2
 {
 	margin: 0px 0px 4px;
-	height: 140px; padding-bottom: 50px; overflow: auto;
+	height: 240px; padding-bottom: 50px; overflow: auto;
 }
 
+._MOSEL { margin-bottom: 10px; }
+._MOSEL select { font-size: 20px; }
+._MOSEL option { font-size: 15px; }
+
 .VT2 { border-collapse: collapse; }
-
-.VT2 td { border: 2px solid hsl( 45, 1%, 100% ); border-radius: 3px; }
-
+.VT2 td { border: 1px solid hsl( 45, 1%, 100% ); border-radius: 3px; }
 .VT2 ._TITLE
 {
-	background: hsl( 90, 60%, 87% );
+	background: hsl( 90, 50%, 80% );
 	padding: 0.3ex;
 	font-size: 14px; height: 1em;
 	line-height: 1.0em;
 }
-.VT2 ._TITLE._EDITABLE { background: hsl( 195, 50%, 86% ); }
+.VT2 ._TITLE._EDITABLE { background: hsl( 210, 55%, 90% ); }
 
 .VT2 ._VCELL
 {
-	max-width: 120px; word-break: keep-all;
-	height: 34px;
-	line-height: 34px;
-	font-size: 24px;
 	color: hsl( 45, 1%, 25% );
 }
 .VT2 ._UNIT{ font-size: 14px; margin-left: 0.3ex; color:hsl( 45, 5%, 55% ); }
@@ -90,15 +88,17 @@ p { font-size: 16px; }
 .VT2 ._SELFRAME
 {
 	display: inline-block; box-sizing: border-box;
-	border: 2px solid hsl( 25, 0%, 100% );
-	width: 100%; height: 100%;
+	border: 1px solid hsl( 25, 0%, 100% );
+	word-break: keep-all; overflow: hidden;
 	padding: 0;
 }
 
-.VT2 ._SELFRAME_
+.VT2 ._SELFRAME
 {
-	border: 1px solid hsl( 25, 0%, 93% );
-	padding: 0 0.3ex;
+	border: 1px solid hsl( 25, 0%, 70% );
+	width: 135px; height: 47px; line-height: 43px;
+	padding: 0 0.4ex;
+	font-size: 24px;
 }
 
 .VT1 ._SELFRAME._SELECTED,
@@ -192,7 +192,7 @@ let アプリケーションの型 = 型を作成
 			エレメントを作成
 			(
 				"p", エレメント,
-				{ 文: `18.12.09. A ( ${ ローカルホストか ? "L" : "W" } )\n${ navigator.userAgent }`,
+				{ 文: `18.12.09. B ( ${ ローカルホストか ? "L" : "W" } )\n${ navigator.userAgent }`,
 				スタイル: { fontSize: "11px", color: "hsl( 15, 2%, 40% )", marginTop: "40px" } }
 			);
 		};
