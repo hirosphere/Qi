@@ -20,13 +20,15 @@ body
 
 .DIV1 { padding: 20px; }
 
-button { padding: 16px 24px; }
+button { padding: 16px 24px; border-radius: 6px; }
 
 </style>
 </head>
 <body onload="window.main = new Main();">
 
-<div class="DIV1"><button onclick="main.start()">開始</button>
+<div class="DIV1">
+	<button onclick="main.drive.start()">開始</button>
+	<button onclick="main.drive.stop()">停止</button>
 </div>
 
 <script>
@@ -36,14 +38,10 @@ const version = "18.12.16 905 A";
 const Main = function()
 {
 	const context = new AudioContext();
-	const psg = new PWM( context, context.destination, 0.3 );
-	const drive = new Drive( context, psg );
-
-	this.start = function()
-	{
-		drive.start();
-		context.resume();
-	};
+	const filter = new BiquadFilterNode( context, { frequency: 310, Q: 26.0 } );
+	filter.connect( context.destination );
+	const psg = new PWM( context, filter, 0.3, "vvvf_1" );
+	const drive = this.drive = new Drive( context, psg );
 };
 
 const Drive = function( context, sound )
@@ -54,48 +52,105 @@ const Drive = function( context, sound )
 
 	this.start = function()
 	{
-		const cur = context.currentTime;
+		context.resume();
+		let cur = context.currentTime;
 
 		drive.offset.cancelAndHoldAtTime( cur );
-		drive.offset.linearRampToValueAtTime( 1, cur + 20  );
-		drive.offset.linearRampToValueAtTime( 1, cur + 25  );
-		drive.offset.linearRampToValueAtTime( 0, cur + 45  );
+		drive.offset.linearRampToValueAtTime( 1, cur += 28  );
+		drive.offset.linearRampToValueAtTime( 1, cur += 3  );
+		drive.offset.linearRampToValueAtTime( 0, cur += 28  );
+	};
+
+	this.stop = function()
+	{
+		let cur = context.currentTime;
+
+		drive.offset.cancelAndHoldAtTime( cur );
+		drive.offset.linearRampToValueAtTime( 0, cur += 0.20  );
 	};
 
 };
 
-const PWM = function( context, dest, volume )
+const PWM = function( context, dest, volume, type )
 {
-	const sc_pwm = context.createScriptProcessor( 4096, 1, 1 );
 	const ga_out = new GainNode( context, { gain: volume } );
-	const conv = create_conv1( context, ga_out );
+	const sc_conv = context.createScriptProcessor( 0, 1, 1 );
+	const convs = {};
 
-	conv.connect( ga_out );
+	sc_conv.connect( ga_out );
+	
 	ga_out.connect( dest );
+	this.power_in = sc_conv;
 
-	this.power_in = conv;
+	this.set_type = function( name )
+	{
+		const ctor = vfsets[ name ] || vfsets.ei_03;
+		const conv = convs[ name ] = convs[ name ] || new ctor();
+		sc_conv.onaudioprocess = ( ev ) => conv.audioprocess
+		(
+			ev.outputBuffer.getChannelData( 0 ),
+			ev.inputBuffer.getChannelData( 0 ),
+			context.sampleRate
+		);
+	};
 
-	const cur = context.currentTime;
+	this.set_type( type );
 };
 
-const create_conv1 = function( context, dest )
+const vfsets = {};
+
+vfsets.ei_03 = function()
 {
-	const sc_pwm = context.createScriptProcessor( 4096, 1, 1 );
-
-	let phase = 0;
 	const oversample = 8;
+	let phase = 0;
 
-	sc_pwm.onaudioprocess = ( ev ) =>
+	this.audioprocess = function( out, inp, samplerate )
 	{
-		const out = ev.outputBuffer.getChannelData( 0 );
-		const inp = ev.inputBuffer.getChannelData( 0 );
+		const osrate = samplerate * oversample;
 
 		for( let i = 0; i < out.length; i ++ )
 		{
-			//out[ i ] = Math.random() * 2 - 1;
 			const voltage = inp[ i ];
 			const freq = eidan_freq( voltage );
-			let step = freq / ( context.sampleRate * oversample );
+			let step = freq / osrate;
+
+			let acc = 0;
+			for( let j = 0; j < oversample; j ++ )
+			{
+				const carr = phase % 1;
+				phase += step;
+				const s = voltage + carr;
+				acc += ( s >= 1 ? 1 : 0 );
+			}
+			out[ i ] = acc / oversample;
+		}
+	};
+};
+
+function eidan_freq( pw )
+{
+	const w = ( pw < 0.5 ? pw : 1 - pw );
+	if( w < 0.020 ) return 150;
+	if( w < 0.040 ) return 300;
+	if( w < 0.060 ) return 600;
+	return 900;
+}
+
+
+vfsets.vvvf_1 = function()
+{
+	const oversample = 8;
+	let phase = 0;
+
+	this.audioprocess = function( out, inp, samplerate )
+	{
+		const osrate = samplerate * oversample;
+		
+		for( let i = 0; i < out.length; i ++ )
+		{
+			const voltage = inp[ i ];
+			const freq = freq_conv( voltage );
+			let step = freq / osrate;
 
 			let acc = 0;
 			for( let j = 0; j < oversample; j ++ )
@@ -109,22 +164,18 @@ const create_conv1 = function( context, dest )
 		}
 	};
 
-	sc_pwm.connect( dest );
-	return sc_pwm;
-};
+	function freq_conv( voltage )
+	{
+		const mod = voltage * 150;
+		if( mod < 7 )  return 300;
+		if( mod < 11 )  return mod * 27;
+		if( mod < 15 )  return mod * 19;
+		if( mod < 23 )  return mod * 13;
+		if( mod < 33 )  return mod * 9;
+		if( mod < 80 )  return mod * 3;
 
-function eidan_freq( pw )
-{
-	const w = ( pw < 0.5 ? pw : 1 - pw );
-	if( w < 0.02 ) return 150;
-	if( w < 0.04 ) return 300;
-	if( w < 0.06 ) return 600;
-	return 900;
-}
-
-const settings =
-{
-	"pwm1": { type: "pwm", freq: [ [ null, 200 ] ] }
+		return mod;
+	};
 };
 
 </script>
