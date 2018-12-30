@@ -27,9 +27,13 @@ button { padding: 16px 24px; border-radius: 6px; }
 <body onload="window.main = new Main();">
 
 <div class="DIV1">
-	<button onclick="main.drive.start()">開始</button>
+	<button onclick="main.drive.start( 'pwt1' )">PWM テスト</button>
+	<button onclick="main.drive.start( 'ei_03' )">営団 PWM</button>
+	<button onclick="main.drive.start( 'gto_1' )">GTO 1</button>
 	<button onclick="main.drive.stop()">停止</button>
 </div>
+
+<p id="dummy"></p>
 
 <script>
 
@@ -38,10 +42,15 @@ const version = "18.12.16 905 A";
 const Main = function()
 {
 	const context = new AudioContext();
-	const filter = new BiquadFilterNode( context, { frequency: 310, Q: 26.0 } );
+	const filter = new BiquadFilterNode( context, { frequency: 2000, Q: 0.0 } );
 	filter.connect( context.destination );
-	const psg = new PWM( context, filter, 0.3, "vvvf_1" );
+	const psg = new PWM( context, filter, 0.6, "ei_03" );
+	//const psg = new PWM( context, filter, 0.6, "vvvf_1" );
 	const drive = this.drive = new Drive( context, psg );
+
+	const dummy_el = document.getElementById( "dummy" );
+	let dummy_ctr = 0;
+	setInterval( ()=>{ dummy_el.textContent = ( new Date().getMilliseconds() ); }, 1000 / 1 );
 };
 
 const Drive = function( context, sound )
@@ -50,15 +59,15 @@ const Drive = function( context, sound )
 	drive.connect( sound.power_in );
 	drive.start();
 
-	this.start = function()
+	this.start = function( setting_name )
 	{
 		context.resume();
 		let cur = context.currentTime;
 
 		drive.offset.cancelAndHoldAtTime( cur );
-		drive.offset.linearRampToValueAtTime( 1, cur += 28  );
-		drive.offset.linearRampToValueAtTime( 1, cur += 3  );
-		drive.offset.linearRampToValueAtTime( 0, cur += 28  );
+		drive.offset.linearRampToValueAtTime( 0.1, cur += 45  );
+		cur += 7;
+		drive.offset.linearRampToValueAtTime( 0, cur += 20  );
 	};
 
 	this.stop = function()
@@ -69,6 +78,25 @@ const Drive = function( context, sound )
 		drive.offset.linearRampToValueAtTime( 0, cur += 0.20  );
 	};
 
+};
+
+Drive.sets =
+{
+	pwt1:
+	{
+		md: "test",
+		drive: [ [ 1, 10 ], 3, [ 0, 10 ] ]
+	},
+	ei_03:
+	{
+		md: "ei_03",
+		drive: [ [ 1, 10 ], 3, [ 0, 10 ] ]
+	},
+	gto_1:
+	{
+		md: "gto_1",
+		drive: [ [ 1, 10 ], 3, [ 0, 10 ] ]
+	},
 };
 
 const PWM = function( context, dest, volume, type )
@@ -139,8 +167,10 @@ function eidan_freq( pw )
 
 vfsets.vvvf_1 = function()
 {
-	const oversample = 8;
-	let phase = 0;
+	const oversample = 1;
+	let modu_phase = 0;
+	let ac_phase = 0;
+	let ac_freq = 300;
 
 	this.audioprocess = function( out, inp, samplerate )
 	{
@@ -149,19 +179,49 @@ vfsets.vvvf_1 = function()
 		for( let i = 0; i < out.length; i ++ )
 		{
 			const voltage = inp[ i ];
-			const freq = freq_conv( voltage );
-			let step = freq / osrate;
+			const modu_freq = voltage * 120;
 
-			let acc = 0;
-			for( let j = 0; j < oversample; j ++ )
+			const modu_wave = voltage * get_sin( modu_phase );
 			{
-				const carr = phase % 1;
-				phase += step;
-				const s = voltage + carr;
-				acc += ( s >= 1 ? 1 : 0 );
+				modu_phase += modu_freq / samplerate;
+				modu_phase %= 1;
+				if( modu_phase >= 1 ) modu_phase -= 1;
 			}
-			out[ i ] = acc / oversample;
+
+			{
+				ac_phase += ac_freq / samplerate;
+				ac_phase %= 1;
+			}
+
+			{
+				const carr_phase = get_c_phase( voltage, ac_phase, modu_phase );
+				out[ i ] = get_pulse( modu_wave, carr_phase );
+			}
 		}
+	};
+
+	function get_pulse( modu_wave, carr_phase )
+	{
+		const tri_phase = - ( carr_phase * 4 - 2 );
+		const carr_wave =
+		(
+			tri_phase >= 0 ?
+				( tri_phase > 1 ? 2 - tri_phase : tri_phase ) :
+				( tri_phase > - 1 ? tri_phase : - 2 - tri_phase )
+		);
+		const a = modu_wave + carr_wave;
+		if( a >= 1 ) return 1;
+		if( a <= -1 ) return -1;
+		return 0;
+	};
+
+	function get_c_phase( voltage, async_carr_phase, modu_phase )
+	{
+		if( voltage < 0.2 ) return async_carr_phase;
+		if( voltage < 0.3 ) return ( modu_phase * 9 ) % 1;
+		if( voltage < 0.5 ) return ( modu_phase * 5 ) % 1;
+		if( voltage < 0.8 ) return ( modu_phase * 3 ) % 1;
+		return modu_phase;
 	};
 
 	function freq_conv( voltage )
@@ -169,13 +229,32 @@ vfsets.vvvf_1 = function()
 		const mod = voltage * 150;
 		if( mod < 7 )  return 300;
 		if( mod < 11 )  return mod * 27;
-		if( mod < 15 )  return mod * 19;
+		//if( mod < 15 )  return mod * 19;
 		if( mod < 23 )  return mod * 13;
 		if( mod < 33 )  return mod * 9;
+		if( mod < 60 )  return mod * 5;
 		if( mod < 80 )  return mod * 3;
 
 		return mod;
 	};
+};
+
+const vtop = function( voltage, plevel, sample_rate, freq )
+{
+	if( voltage >= 1 )
+	{
+		;
+	}
+	if( voltage <= -1 )
+	{
+		;
+	};
+	return 0;
+};
+
+const get_sin = ( phase )=>
+{
+	return Math.sin( phase * 2 * Math.PI );
 };
 
 </script>
