@@ -294,9 +294,21 @@ let 音響文脈の型 = 既存の型を装飾
 
 			if( この実体.固定値源 == なし )
 			{
-				この実体.固定値源 = この実体.createConstantSource();
-				この実体.固定値源.offset.値( 1 );
-				この実体.固定値源.start();
+				if( この実体.createConstantSource )
+				{
+					この実体.固定値源 = この実体.createConstantSource( { offset: 1 } );
+					この実体.固定値源.start();
+				}
+				else
+				{
+					この実体.固定値源 = この実体.createOscillator();
+					//この実体.固定値源.type = "square";
+					この実体.固定値源.start();
+
+					const 現在時刻 = この実体.現在時刻();
+					この実体.固定値源.周波数().その時刻の値( 1, 現在時刻 + 0 );
+					この実体.固定値源.周波数().その時刻の値( 0, 現在時刻 + 0.25 );
+				}
 			}
 
 			let 制幅器 = この実体.制幅器を作成();
@@ -322,6 +334,12 @@ let 音響文脈の型 = 既存の型を装飾
 		{
 			値: "value"
 		}
+	},
+	function()
+	{
+		const この典型 = this;
+
+		この典型.自動値を破棄 = this.cancelAndHoldAtTime || this.cancelScheduledValues;
 	}
 );
 
