@@ -27,8 +27,8 @@ button { padding: 16px 24px; border-radius: 6px; }
 <body onload="window.main = new Main();">
 
 <div class="DIV1">
-	<button onclick="main.運転装置.起動( 't1' )">テスト 1</button>
-	<button onclick="main.運転装置.起動( 't2' )">テスト 2</button>
+	<button onclick="main.運転装置.起動( 'ec03', 'u1' )">テスト 1</button>
+	<button onclick="main.運転装置.起動( 'ap1_50', 'u1' )">テスト 2</button>
 	<button onclick="main.運転装置.停止()">停止</button>
 </div>
 
@@ -41,9 +41,9 @@ const version = "18.12.16 905 A";
 const Main = function()
 {
 	const 文脈 = new AudioContext();
-	const filter = 文脈.createBiquadFilter( { frequency: 2000, Q: 0.0 } );
-	//filter.connect( 文脈.destination );
-	const 電力音源 = new 電力音源の型( 文脈, 文脈.destination, 0.2, "ei_03" );
+	const 音質フィルタ = 文脈.createBiquadFilter( { frequency: 2000, Q: 0.0 } );
+	//音質フィルタ.connect( 文脈.destination );
+	const 電力音源 = new 電力音源の型( 文脈, 文脈.destination, 0.1 );
 	this.運転装置 = new 運転装置の型( 文脈, 電力音源 );
 
 	const dummy_el = document.getElementById( "dummy" );
@@ -51,21 +51,23 @@ const Main = function()
 	setInterval( ()=>{ dummy_el.textContent = ( new Date().getMilliseconds() ); }, 1000 / 15 );
 };
 
-const 運転装置の型 = function( 文脈, 音源 )
+const 運転装置の型 = function( 文脈, 動力音源 )
 {
-	//const モーター電力 = new ConstantSourceNode( 文脈, { offset: 0 } );
-	const モーター電力 = 文脈.createConstantSource( { offset: 0 } );
-	モーター電力.connect( 音源.power_in );
+	const モーター電力 = 文脈.createConstantSource();
+	モーター電力.offset.value = 0;
+	モーター電力.connect( 動力音源.power_in );
 	モーター電力.start();
 
-	this.起動 = function( setting_name )
+	this.起動 = function( 動力種名, 運転パターン名 )
 	{
 		文脈.resume();
 		let cur = 文脈.currentTime;
 
-		//モーター電力.offset.cancelAndHoldAtTime( cur );
+		動力音源.種類を設定( 動力種名 );
+
+		モーター電力.offset.cancelScheduledValues( cur );
 		モーター電力.offset.setValueAtTime( 0, cur  );
-		モーター電力.offset.linearRampToValueAtTime( 0.5, cur += 10  );
+		モーター電力.offset.linearRampToValueAtTime( 1, cur += 10  );
 		cur += 3;
 		モーター電力.offset.linearRampToValueAtTime( 0, cur += 2  );
 	};
@@ -74,74 +76,71 @@ const 運転装置の型 = function( 文脈, 音源 )
 	{
 		let cur = 文脈.currentTime;
 
-		//モーター電力.offset.cancelAndHoldAtTime( cur );
+		モーター電力.offset.cancelScheduledValues( cur );
 		モーター電力.offset.linearRampToValueAtTime( 0, cur += 0.20  );
 	};
 
 };
 
-const 電力音源の型 = function( 文脈, dest, volume, type )
+const 運転パターン集 =
 {
-	const ga_out = 文脈.createGain( { gain: volume } );
+	u1: [ [ 1, 20 ], [ 3 ], [ 0, 20 ] ],
+};
+
+const 電力音源の型 = function( 文脈, 出力先, 音量 )
+{
+	const ga_out = 文脈.createGain();
 	const sc_conv = 文脈.createScriptProcessor( 0, 1, 1 );
+	ga_out.gain.value = 音量;
 	const convs = {};
 
 	sc_conv.connect( ga_out );
 	
-	ga_out.connect( dest );
+	ga_out.connect( 出力先 );
 	this.power_in = sc_conv;
 
-	this.set_type = function( name )
+	// メソッド //
+
+	this.種類を設定 = function( 名称 )
 	{
-		const ctor = 電力変調器の型群[ name ] || 電力変調器の型群.ei_03;
-		const conv = convs[ name ] = convs[ name ] || new ctor();
-		sc_conv.onaudioprocess = ( ev ) => conv.audioprocess
-		(
-			ev.outputBuffer.getChannelData( 0 ),
-			ev.inputBuffer.getChannelData( 0 ),
-			文脈.sampleRate
-		);
+		const 設定 = 動力駆動設定群[ 名称 ];
+
+		駆動波形生成 =      設定 && 駆動波形生成関数群[ 設定[ 0 ] ]         || 駆動波形生成関数群.dpw;
+		キャリア周波数導出 = 設定 && キャリア周波数導出関数群[ 設定[ 1 ] ]   || キャリア周波数導出関数群.ec03;
 	};
+	
+	// 音源本体 //
 
-	this.set_type( type );
-};
-
-const 電力変調器の型群 = {};
-
-const 電力変調器の型 = function( キャリア周波数導出, 波形生成 )
-{
 	let キャリア位相 = 0;
+	let キャリア周波数導出 = キャリア周波数導出関数群.ec03;
+	let 駆動波形生成 = 駆動波形生成関数群.dpw;
 
-	this.audioprocess = function( 出力, 電力入力, サンプリング周波数 )
+	sc_conv.onaudioprocess = ( ev ) =>
 	{
+		const 出力 = ev.outputBuffer.getChannelData( 0 );
+		const 電力入力 = ev.inputBuffer.getChannelData( 0 );
+		const サンプリング周波数 = 文脈.sampleRate;
+
 		for( let i = 0; i < 出力.length; i ++ )
 		{
 			const 電力 = 電力入力[ i ];
 			const キャリア周波数 = キャリア周波数導出( 電力 );
-			出力[ i ] = 波形生成( 電力, キャリア位相, サンプリング周波数 / キャリア周波数 );
+			出力[ i ] = 駆動波形生成( 電力, キャリア位相, サンプリング周波数 / キャリア周波数 );
 			キャリア位相 = ( キャリア位相 += キャリア周波数 / サンプリング周波数 ) % 1;
 		}
 	};
+
 };
 
-電力変調器の型群.ei_03 = function()
+const 動力駆動設定群 =
 {
-	電力変調器の型.call( this, vtofs.eidan_pw, vtops.pw );	
+	ec03:    [ "dpw", "ec03" ],
+	ap1_50:  [ "aph1", "aph50" ],
 };
 
-const vtops =
+const キャリア周波数導出関数群 =
 {
-	pw: function( mod, carr_phase, div )
-	{
-		const carr = carr_phase < 0.5 ? carr_phase * 2 : 2 - carr_phase * 2;
-		const a = Math.max( 0, ( mod + carr ) - 1 ) * div / 2;
-		return Math.min( 1, a );
-	}
-};
-
-const vtofs =
-{
-	eidan_pw: function( pw )
+	ec03: function( pw )
 	{
 		const w = ( pw < 0.5 ? pw : 1 - pw );
 		if( w < 0.020 ) return 150;
@@ -149,124 +148,30 @@ const vtofs =
 		if( w < 0.060 ) return 600;
 		return 900;
 	},
-	eidan_pw_: function( pw )
+	aph50: function( pw )
 	{
-		const w = ( pw < 0.5 ? pw : 1 - pw );
-		if( w < 0.020 ) return 146.832 * 1;
-		if( w < 0.040 ) return 146.832 * 2;
-		if( w < 0.060 ) return 146.832 * 4;
-		return 146.832 * 6;
+		return 50;
 	},
 };
 
-const mftocfs =
+const 駆動波形生成関数群 =
 {
-	e231k: function( mf )
+	// 直流PWM //
+	dpw: function( モジュレータ, キャリア位相, サンプリングレート比 )
 	{
-		return 1050;
-	}
-};
+		const 三角波キャリア = キャリア位相 < 0.5 ? キャリア位相 * 2 : 2 - キャリア位相 * 2;
+		const a = Math.max( 0, ( モジュレータ + 三角波キャリア ) - 1 ) * サンプリングレート比 / 2;
+		return Math.min( 1, a );
+	},
 
-function eidan_freq( pw )
-{
-	const w = ( pw < 0.5 ? pw : 1 - pw );
-	if( w < 0.020 ) return 150;
-	if( w < 0.040 ) return 300;
-	if( w < 0.060 ) return 600;
-	return 900;
-}
-
-
-電力変調器の型群.vvvf_1 = function()
-{
-	const oversample = 1;
-	let modu_phase = 0;
-	let ac_phase = 0;
-	let ac_freq = 300;
-
-	this.audioprocess = function( out, inp, samplerate )
+	aph1: function( モジュレータ, キャリア位相, サンプリングレート比 )
 	{
-		const osrate = samplerate * oversample;
-		
-		for( let i = 0; i < out.length; i ++ )
-		{
-			const voltage = inp[ i ];
-			const modu_freq = voltage * 120;
+		const 正弦波 = Math.sin( キャリア位相 * Math.PI * 2 );
+		const c2 = ( キャリア位相 * 2 ) % 1;
+		return c2 < モジュレータ ? 正弦波 : 0;
+		//return Math.abs( c2 < モジュレータ ? 正弦波 : 0 );
+	},
 
-			const modu_wave = voltage * get_sin( modu_phase );
-			{
-				modu_phase += modu_freq / samplerate;
-				modu_phase %= 1;
-				if( modu_phase >= 1 ) modu_phase -= 1;
-			}
-
-			{
-				ac_phase += ac_freq / samplerate;
-				ac_phase %= 1;
-			}
-
-			{
-				const carr_phase = get_c_phase( voltage, ac_phase, modu_phase );
-				out[ i ] = get_pulse( modu_wave, carr_phase );
-			}
-		}
-	};
-
-	function get_pulse( modu_wave, carr_phase )
-	{
-		const tri_phase = - ( carr_phase * 4 - 2 );
-		const carr_wave =
-		(
-			tri_phase >= 0 ?
-				( tri_phase > 1 ? 2 - tri_phase : tri_phase ) :
-				( tri_phase > - 1 ? tri_phase : - 2 - tri_phase )
-		);
-		const a = modu_wave + carr_wave;
-		if( a >= 1 ) return 1;
-		if( a <= -1 ) return -1;
-		return 0;
-	};
-
-	function get_c_phase( voltage, async_carr_phase, modu_phase )
-	{
-		if( voltage < 0.2 ) return async_carr_phase;
-		if( voltage < 0.3 ) return ( modu_phase * 9 ) % 1;
-		if( voltage < 0.5 ) return ( modu_phase * 5 ) % 1;
-		if( voltage < 0.8 ) return ( modu_phase * 3 ) % 1;
-		return modu_phase;
-	};
-
-	function freq_conv( voltage )
-	{
-		const mod = voltage * 150;
-		if( mod < 7 )  return 300;
-		if( mod < 11 )  return mod * 27;
-		//if( mod < 15 )  return mod * 19;
-		if( mod < 23 )  return mod * 13;
-		if( mod < 33 )  return mod * 9;
-		if( mod < 60 )  return mod * 5;
-		if( mod < 80 )  return mod * 3;
-
-		return mod;
-	};
-};
-
-const vtop = function( voltage, plevel, sample_rate, freq )
-{
-	if( voltage >= 1 )
-	{
-		;
-	}
-	if( voltage <= -1 )
-	{
-		;
-	};
-	return 0;
-};
-
-const get_sin = ( phase )=>
-{
-	return Math.sin( phase * 2 * Math.PI );
 };
 
 </script>
