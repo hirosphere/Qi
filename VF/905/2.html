@@ -22,15 +22,21 @@ body
 
 button { padding: 16px 24px; border-radius: 6px; }
 
+#dummy { color: #fff; }
+
 </style>
 </head>
 <body onload="window.main = new Main();">
 
 <div class="DIV1">
-	<button onclick="main.運転装置.起動( 'ec03', 'u1' )">テスト 1</button>
-	<button onclick="main.運転装置.起動( 'ap1_50', 'u1' )">テスト 2</button>
+	<button onclick="main.運転装置.起動( 'ec03', 'u1' )">営団 03</button>
+	<button onclick="main.運転装置.起動( 'ap1_50', 'u1' )">交流位相50Hz</button>
+	<button onclick="main.運転装置.起動( 'vf3_1', 'u1' )">VVVF 3レベル</button>
 	<button onclick="main.運転装置.停止()">停止</button>
+
 </div>
+
+<canvas id="analyser" width="512" height="320" style="margin-left: 20px; border: 0px solid #ccc; width: 512px; height: 320px;"></canvas>
 
 <p id="dummy"></p>
 
@@ -45,6 +51,8 @@ const Main = function()
 	//音質フィルタ.connect( 文脈.destination );
 	const 電力音源 = new 電力音源の型( 文脈, 文脈.destination, 0.1 );
 	this.運転装置 = new 運転装置の型( 文脈, 電力音源 );
+
+	new グラフの型( document.getElementById( "analyser" ), 電力音源.出力, 文脈 );
 
 	const dummy_el = document.getElementById( "dummy" );
 	let dummy_ctr = 0;
@@ -67,9 +75,9 @@ const 運転装置の型 = function( 文脈, 動力音源 )
 
 		モーター電力.offset.cancelScheduledValues( cur );
 		モーター電力.offset.setValueAtTime( 0, cur  );
-		モーター電力.offset.linearRampToValueAtTime( 1, cur += 10  );
-		cur += 3;
-		モーター電力.offset.linearRampToValueAtTime( 0, cur += 2  );
+		モーター電力.offset.linearRampToValueAtTime( 1, cur += 16  );
+		モーター電力.offset.linearRampToValueAtTime( 1, cur += 3  );
+		モーター電力.offset.linearRampToValueAtTime( 0, cur += 16  );
 	};
 
 	this.停止 = function()
@@ -89,8 +97,9 @@ const 運転パターン集 =
 
 const 電力音源の型 = function( 文脈, 出力先, 音量 )
 {
-	const ga_out = 文脈.createGain();
+	const ga_out = this.出力 = 文脈.createGain();
 	const sc_conv = 文脈.createScriptProcessor( 0, 1, 1 );
+
 	ga_out.gain.value = 音量;
 	const convs = {};
 
@@ -99,19 +108,10 @@ const 電力音源の型 = function( 文脈, 出力先, 音量 )
 	ga_out.connect( 出力先 );
 	this.power_in = sc_conv;
 
-	// メソッド //
-
-	this.種類を設定 = function( 名称 )
-	{
-		const 設定 = 動力駆動設定群[ 名称 ];
-
-		駆動波形生成 =      設定 && 駆動波形生成関数群[ 設定[ 0 ] ]         || 駆動波形生成関数群.dpw;
-		キャリア周波数導出 = 設定 && キャリア周波数導出関数群[ 設定[ 1 ] ]   || キャリア周波数導出関数群.ec03;
-	};
-	
 	// 音源本体 //
 
 	let キャリア位相 = 0;
+	let モジュレータ位相 = 0;
 	let キャリア周波数導出 = キャリア周波数導出関数群.ec03;
 	let 駆動波形生成 = 駆動波形生成関数群.dpw;
 
@@ -130,12 +130,21 @@ const 電力音源の型 = function( 文脈, 出力先, 音量 )
 		}
 	};
 
+	this.種類を設定 = function( 名称 )
+	{
+		const 設定 = 動力駆動設定群[ 名称 ];
+
+		駆動波形生成 =      設定 && 駆動波形生成関数群[ 設定[ 0 ] ]         || 駆動波形生成関数群.dpw;
+		キャリア周波数導出 = 設定 && キャリア周波数導出関数群[ 設定[ 1 ] ]   || キャリア周波数導出関数群.ec03;
+	};
+	
 };
 
 const 動力駆動設定群 =
 {
 	ec03:    [ "dpw", "ec03" ],
 	ap1_50:  [ "aph1", "aph50" ],
+	vf3_1:   [ "vf2", "gto1", 120 ],
 };
 
 const キャリア周波数導出関数群 =
@@ -148,9 +157,20 @@ const キャリア周波数導出関数群 =
 		if( w < 0.060 ) return 600;
 		return 900;
 	},
+	
 	aph50: function( pw )
 	{
 		return 50;
+	},
+
+	gto1: function( 電力, キャリア周波数 )
+	{
+		const freq = pw * 120;
+		if( freq < 10 ) return 300;
+		if( freq < 20 ) return freq * 15;
+		if( freq < 30 ) return freq * 3;
+		//if( freq < 20 ) return freq * 15;
+		return freq;
 	},
 };
 
@@ -164,6 +184,7 @@ const 駆動波形生成関数群 =
 		return Math.min( 1, a );
 	},
 
+	// 正弦波位相制御 //
 	aph1: function( モジュレータ, キャリア位相, サンプリングレート比 )
 	{
 		const 正弦波 = Math.sin( キャリア位相 * Math.PI * 2 );
@@ -172,7 +193,73 @@ const 駆動波形生成関数群 =
 		//return Math.abs( c2 < モジュレータ ? 正弦波 : 0 );
 	},
 
+	// 交流PWM //
+	vf2: function( モジュレータ, キャリア位相, サンプリングレート比 )
+	{
+		const 負極か = モジュレータ < 0;
+		const 三角波キャリア = キャリア位相 < 0.5 ? キャリア位相 * 2 : 2 - キャリア位相 * 2;
+		const a = Math.max( 0, ( Math.abs( モジュレータ ) + 三角波キャリア ) - 1 ) * サンプリングレート比 / 2;
+		return  負極か ? - Math.min( 1, a ) : Math.min( 1, a );
+	},
+
 };
+
+const グラフの型 = function( canvas, 入力, 音響文脈 )
+{
+	const analyser = 音響文脈.createAnalyser();
+	//analyser.maxDecibels = -60;
+	//analyser.minDecibels = -80;
+	analyser.fftSize = 2048;
+	入力.connect( analyser );
+
+	const context = canvas.getContext( "2d" );
+
+	function clear()
+	{
+		context.fillStyle = "hsl( 225, 50%, 65% )";
+		context.fillRect( 0, 0, canvas.width, canvas.height );
+	}
+
+	function draw_grid( dx, dy )
+	{
+		clear();
+		context.beginPath();
+		context.lineWidth = 2;
+		context.strokeStyle = "hsl( 0, 0%, 100% )";
+		for( let i = 1; i < dy; i ++ )
+		{
+			const pos = canvas.height * i / dy;
+			draw_line( context, 0, pos, canvas.width, pos );
+		}
+		context.stroke();
+	}
+
+	const buffer = new Float32Array( 512 );
+
+	function update()
+	{
+		draw_grid( 4, 2 );
+		context.beginPath();
+		analyser.getFloatTimeDomainData( buffer );
+		context.moveTo( 0, canvas.height / 2 );
+		for( let i = 0; i < buffer.length; i ++ )
+		{
+			const y = canvas.height / 2 - ( buffer[ i ] ) * 9 * canvas.height / 2;
+			const x = i / buffer.length * canvas.width;
+			context.lineTo( x + 1, y );
+		}
+		context.stroke();
+	}
+
+	setInterval( update, 1000 / 25 );
+	update();
+};
+
+function draw_line( context, bx, by, ex, ey )
+{
+	context.moveTo( bx, by );
+	context.lineTo( ex, ey );
+}
 
 </script>
 </body>
