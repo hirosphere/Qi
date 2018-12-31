@@ -29,11 +29,11 @@ button { padding: 16px 24px; border-radius: 6px; }
 <body onload="window.main = new Main();">
 
 <div class="DIV1">
-	<button onclick="main.起動( 'u1', [], 'pwm', [] )">国鉄201系</button>
-	<button onclick="main.起動( 'u1', [], 'pwm', [] )">営団 7000</button>
-	<button onclick="main.起動( 'u1', [], 'pwm', [] )">営団 03</button>
-	<button onclick="main.起動( 'u1', [], 'aph', [ 50 ] )">交流位相50Hz</button>
-	<button onclick="main.起動( 'u1', [], 'aph', [ 60 ] )">交流位相60Hz</button>
+	<button onclick='main.起動( "u1", [], "pwm", [ "", 300 ] )'>国鉄201系</button>
+	<button onclick='main.起動( "u1", [], "pwm", [ "", 330 ] )'>営団 7000</button>
+	<button onclick='main.起動( "u1", [], "pwm", [ "ec03", 150 ] )'>営団 03</button>
+	<button onclick="main.起動( 'u1', [], 'aph', [ 1, 50 ] )">交流位相50Hz</button>
+	<button onclick="main.起動( 'u1', [], 'aph', [ 1, 60 ] )">交流位相60Hz</button>
 	<button onclick="main.起動( 'u1', [], 'vf2_1', [] )">VVVF 2レベル</button>
 	<button onclick="main.運転装置.停止()">停止</button>
 </div>
@@ -162,6 +162,7 @@ const 電力音源子の型群 = new function()
 		{
 			console.log( "接続", this.名称 );
 			制御器 = _制御器;
+			this.パラメータ = パラメータ;
 			モニター同期 = _モニター同期;
 			プロセッサ.connect( 出力ノード );
 			制御器.電力ノード.connect( プロセッサ );
@@ -216,6 +217,7 @@ const 電力音源子の型群 = new function()
 			for( let i = 0; i < 出力.length; i ++ )
 			{
 				const 電力 = 電力入力[ i ];
+				キャリア周波数 = キャリア周波数導出( 電力, [ [ 0.02, 150 ], [ 0.04, 300 ], [ 0.06, 600 ], [ 0.8, 900 ] ] );
 				const キャリアステップ = キャリア周波数 / サンプリング周波数;
 				出力[ i ] = 直流PWM( 電力 * ( 1 + キャリアステップ ), キャリア位相, サンプリング周波数 / キャリア周波数 );
 				キャリア位相 = ( キャリア位相 + キャリアステップ ) % 1;
@@ -223,6 +225,15 @@ const 電力音源子の型群 = new function()
 				if( ( モニター位相 += 50 / サンプリング周波数 ) >= 1 )  { モニター位相 -= 1;  this.モニター同期(); }
 			}
 		};
+
+		function キャリア周波数導出( 電力, 設定 )
+		{
+			for( let 項目 of 設定 )
+			{
+				if( 電力 < 項目[ 0 ] ) return 項目[ 1 ];
+			}
+			return 設定[ 設定.length - 1 ][ 1 ];
+		}
 
 		this.名称 = "PWM";
 	};
@@ -238,6 +249,8 @@ const 電力音源子の型群 = new function()
 
 		this.波形生成 = function( 出力, 電力入力, サンプリング周波数 )
 		{
+			電源波周波数 = this.パラメータ && this.パラメータ[ 1 ] || 50;
+
 			for( let i = 0; i < 出力.length; i ++ )
 			{
 				const 電力 = 電力入力[ i ];
@@ -324,7 +337,7 @@ const グラフの型 = function( canvas, 入力, 音響文脈 )
 
 	function clear()
 	{
-		context.fillStyle = "hsl( 225, 50%, 60% )";
+		context.fillStyle = "hsl( 225, 50%, 55% )";
 		context.fillRect( 0, 0, canvas.width, canvas.height );
 	}
 
@@ -355,6 +368,7 @@ const グラフの型 = function( canvas, 入力, 音響文脈 )
 		{
 			const y = cy - ( buffer[ i ] ) * cy;
 			const x = i / buffer.length * canvas.width;
+			context.lineTo( x + 0, y );
 			context.lineTo( x + 1, y );
 		}
 		context.lineTo( canvas.width, cy );
