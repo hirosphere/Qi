@@ -29,12 +29,13 @@ button { padding: 16px 24px; border-radius: 6px; }
 <body onload="window.main = new Main();">
 
 <div class="DIV1">
-	<button onclick='main.起動( "u1", [], "pwm", [ "", 300 ] )'>国鉄201系</button>
-	<button onclick='main.起動( "u1", [], "pwm", [ "", 330 ] )'>営団 7000</button>
-	<button onclick='main.起動( "u1", [], "pwm", [ "ec03", 150 ] )'>営団 03</button>
+	<button onclick='main.起動( "u1", [], "pwm", [ "t3", 300 ] )'>営団 03</button>
+	<button onclick='main.起動( "u1", [], "pwm", [ "t1", 330 ] )'>営団 7000</button>
+	<button onclick='main.起動( "u1", [], "pwm", [ "t1", 300 ] )'>国鉄201系</button>
+	<button onclick='main.起動( "u1", [], "pwm", [ "t2", 300 ] )'>国鉄201系 2</button>
 	<button onclick="main.起動( 'u1', [], 'aph', [ 1, 50 ] )">交流位相50Hz</button>
 	<button onclick="main.起動( 'u1', [], 'aph', [ 1, 60 ] )">交流位相60Hz</button>
-	<button onclick="main.起動( 'u1', [], 'vf2_1', [] )">VVVF 2レベル</button>
+	<button onclick="main.起動( 'u1', [], 'aph', [ 1, 440 ] )">交流位相440Hz</button>
 	<button onclick="main.運転装置.停止()">停止</button>
 </div>
 
@@ -160,17 +161,22 @@ const 電力音源子の型群 = new function()
 		
 		this.接続 = function( _制御器, 出力ノード, パラメータ, _モニター同期 )
 		{
-			console.log( "接続", this.名称 );
 			制御器 = _制御器;
 			this.パラメータ = パラメータ;
 			モニター同期 = _モニター同期;
+
 			プロセッサ.connect( 出力ノード );
 			制御器.電力ノード.connect( プロセッサ );
+
+			this.設定変更処理( this.パラメータ );
+		};
+
+		this.設定変更処理 = function( パラメータ )
+		{
 		};
 		
 		this.切断 = function()
 		{
-			console.log( "切断", this.名称 );
 			プロセッサ.disconnect();
 			制御器 && 制御器.電力ノード.disconnect( プロセッサ );
 			制御器 = モニター同期 = null;
@@ -183,41 +189,37 @@ const 電力音源子の型群 = new function()
 		
 	};
 	
-	//  //
-	
-	function pwm()
-	{
-		;
-	};
-	
-	function aph()
-	{
-		;
-	};
-	
-	function vf()
-	{
-		;
-	};
+	// 直流PWM //
 
-	//  //
-
+	const PWM基底の型 =
 	this.def =
 	this.pwm = function( 文脈 )
 	{
 		let キャリア位相 = 0;
-		let キャリア周波数 = 300;
-
 		let モニター位相 = 0;
+		let キャリア周波数テーブル = [ [ 0, 300 ] ];
 		
 		基底の型.call( this, 文脈 );
+
+		this.設定変更処理 = function( パラメータ )
+		{
+			キャリア周波数テーブル = [ [ 0, 300 ] ];
+			const 倍率テーブル = PWM周波数倍率テーブル[ パラメータ[ 0 ] ];
+			const 基本周波数 = パラメータ[ 1 ] || 150;
+
+			if( 倍率テーブル ) for( let i in 倍率テーブル )
+			{
+				const 項目 = 倍率テーブル[ i ];
+				キャリア周波数テーブル[ i ] = [ 項目[ 0 ], 項目[ 1 ] * 基本周波数 ];
+			}
+		};
 
 		this.波形生成 = function( 出力, 電力入力, サンプリング周波数 )
 		{
 			for( let i = 0; i < 出力.length; i ++ )
 			{
 				const 電力 = 電力入力[ i ];
-				キャリア周波数 = キャリア周波数導出( 電力, [ [ 0.02, 150 ], [ 0.04, 300 ], [ 0.06, 600 ], [ 0.8, 900 ] ] );
+				const キャリア周波数 = キャリア周波数導出( 電力, キャリア周波数テーブル );
 				const キャリアステップ = キャリア周波数 / サンプリング周波数;
 				出力[ i ] = 直流PWM( 電力 * ( 1 + キャリアステップ ), キャリア位相, サンプリング周波数 / キャリア周波数 );
 				キャリア位相 = ( キャリア位相 + キャリアステップ ) % 1;
@@ -228,15 +230,29 @@ const 電力音源子の型群 = new function()
 
 		function キャリア周波数導出( 電力, 設定 )
 		{
-			for( let 項目 of 設定 )
+			for( let i = 設定.length - 1; i >= 0; i -- )
 			{
-				if( 電力 < 項目[ 0 ] ) return 項目[ 1 ];
+				const 項目 = 設定[ i ];
+				if( 電力 > 項目[ 0 ] ) return 項目[ 1 ];
 			}
-			return 設定[ 設定.length - 1 ][ 1 ];
+			return 設定[ 0 ][ 1 ];
 		}
 
 		this.名称 = "PWM";
 	};
+
+	const PWM周波数倍率テーブル =
+	{
+		t1: [ [ 0, 1 ] ],
+		t2: [ [ 0, 0.5 ], [ 0.018, 1 ], [ 0.982, 0.5 ] ],
+		t3:
+		[
+			[ 0.00, 0.5 ], [ 0.02, 1 ], [ 0.04, 2 ], [ 0.06, 3 ],
+			[ 0.94, 2 ], [ 0.96, 1 ], [ 0.98, 0.5 ]
+		],
+	};
+
+	// 交流位相変調 //
 
 	this.aph = function( 文脈 )
 	{
@@ -267,6 +283,38 @@ const 電力音源子の型群 = new function()
 		this.名称 = "デフォルト";
 	};
 
+	// VVVF //
+
+	this.vvvf = function( 文脈 )
+	{
+		let 非同期キャリア位相 = 0;
+
+		let モニター位相 = 0;
+		
+		基底の型.call( this, 文脈 );
+
+		this.波形生成 = function( 出力, 電力入力, サンプリング周波数 )
+		{
+			for( let i = 0; i < 出力.length; i ++ )
+			{
+				const 電力 = 電力入力[ i ];
+				キャリア位相 = キャリア位相導出( 電力, [ [ 0.02, 150 ], [ 0.04, 300 ], [ 0.06, 600 ], [ 0.8, 900 ] ] );
+				const キャリアステップ = キャリア周波数 / サンプリング周波数;
+				出力[ i ] = 直流PWM( 電力 * ( 1 + キャリアステップ ), キャリア位相, サンプリング周波数 / キャリア周波数 );
+				キャリア位相 = ( キャリア位相 + キャリアステップ ) % 1;
+
+				if( ( モニター位相 += 50 / サンプリング周波数 ) >= 1 )  { モニター位相 -= 1;  this.モニター同期(); }
+			}
+		};
+
+		const キャリア位相導出 = function( 電力, モジュレータ周波数, モジュレータ位相, キャリア位相 )
+		{
+			;
+		};
+
+		this.名称 = "VVVF";
+	};
+
 	//  //
 
 	function 直流PWM( モジュレータ, キャリア位相, サンプリングレート比 )
@@ -275,54 +323,6 @@ const 電力音源子の型群 = new function()
 		const a = Math.max( 0, ( モジュレータ + 三角波キャリア ) - 1 ) * サンプリングレート比 / 2;
 		return Math.min( 1, a );
 	}
-
-};
-
-const キャリア周波数導出関数群 =
-{
-	ec03: function( pw )
-	{
-		const w = ( pw < 0.5 ? pw : 1 - pw );
-		if( w < 0.020 ) return 150;
-		if( w < 0.040 ) return 300;
-		if( w < 0.060 ) return 600;
-		return 900;
-	},
-	
-	aph50: function( pw )
-	{
-		return 50;
-	},
-
-	gto1: function( 電力, キャリア周波数 )
-	{
-		const freq = pw * 120;
-		if( freq < 10 ) return 300;
-		if( freq < 20 ) return freq * 15;
-		if( freq < 30 ) return freq * 3;
-		//if( freq < 20 ) return freq * 15;
-		return freq;
-	},
-};
-
-const 駆動波形生成関数群 =
-{
-	// 正弦波位相制御 //
-	aph1: function( モジュレータ, キャリア位相, サンプリングレート比 )
-	{
-		const 正弦波 = Math.sin( キャリア位相 * Math.PI * 2 );
-		const c2 = ( キャリア位相 * 2 ) % 1;
-		return c2 < モジュレータ ? 正弦波 : 0;
-	},
-
-	// 交流PWM //
-	vf2: function( モジュレータ, キャリア位相, サンプリングレート比 )
-	{
-		const 負極か = モジュレータ < 0;
-		const 三角波キャリア = キャリア位相 < 0.5 ? キャリア位相 * 2 : 2 - キャリア位相 * 2;
-		const a = Math.max( 0, ( Math.abs( モジュレータ ) + 三角波キャリア ) - 1 ) * サンプリングレート比 / 2;
-		return  負極か ? - Math.min( 1, a ) : Math.min( 1, a );
-	},
 
 };
 
@@ -337,7 +337,7 @@ const グラフの型 = function( canvas, 入力, 音響文脈 )
 
 	function clear()
 	{
-		context.fillStyle = "hsl( 225, 50%, 55% )";
+		context.fillStyle = "hsl( 225, 48%, 65% )";
 		context.fillRect( 0, 0, canvas.width, canvas.height );
 	}
 
