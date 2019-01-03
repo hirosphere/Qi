@@ -19,6 +19,10 @@ body
 }
 
 .DIV1 { padding: 20px; }
+.SEP { height: 10px; }
+.VBOX { padding: 9px 0; }
+.VLB { vertical-align: middle; }
+input[type="range"] { vertical-align: middle; }
 
 button { margin-bottom: 10px; padding: 16px 24px; border-radius: 6px; }
 
@@ -39,14 +43,15 @@ button { margin-bottom: 10px; padding: 16px 24px; border-radius: 6px; }
 	<button onclick="main.起動( 'u1', [], 'aph', [ 1, 60 ] )">交流位相60Hz</button>
 	<button onclick="main.起動( 'u1', [], 'aph', [ 1, 440 ] )">交流位相440Hz</button>
 	<button onclick="main.運転装置.停止()">停止</button>
-</div>
 
-<div class="DIV1">
-	<canvas id="analyser" width="512" height="320" style="margin-left: 20px; border: 12px solid hsl( 0, 0%, 20% ); width: 512px; height: 320px;"></canvas>
-</div>
 
-<div class="DIV1">
-	音量 <input type="range" id="volume" value="30"; style="width: 300px;"/>
+<div class="SEP"></div>
+
+	<canvas id="analyser" width="512" height="320" style= "border: 0px solid hsl( 0, 0%, 20% ); width: 512px; height: 320px;"></canvas>
+	
+	<div class="VBOX">
+		<span class="VLB">音量</span> <input type="range" id="volume" value="30"; style="width: 300px;"/>
+	</div>
 </div>
 
 <p id="dummy"></p>
@@ -78,10 +83,8 @@ const Main = function()
 	}
 
 	const 運転装置 = this.運転装置 = new 運転装置の型( 文脈 );
-	const 電力音源 = new 電力音源の型( 文脈, 運転装置, 入力ノード );
-	const 波形グラフ = new グラフの型( document.getElementById( "analyser" ), 入力ノード, 文脈 );
-
-	電力音源.モニター同期 = ()=> 波形グラフ.記録を更新();
+	const 波形グラフ = new グラフの型( document.getElementById( "analyser" ), 文脈.sampleRate, 50 );
+	const 電力音源 = new 電力音源の型( 文脈, 運転装置, 入力ノード, 波形グラフ );
 
 	const dummy_el = document.getElementById( "dummy" );
 	let dummy_ctr = 0;
@@ -110,9 +113,9 @@ const 運転装置の型 = function( 文脈 )
 
 		モーター電力.offset.cancelScheduledValues( cur );
 		モーター電力.offset.setValueAtTime( 0, cur  );
-		モーター電力.offset.linearRampToValueAtTime( 1, cur += 25  );
-		モーター電力.offset.linearRampToValueAtTime( 1, cur += 3  );
-		モーター電力.offset.linearRampToValueAtTime( 0, cur += 15  );
+		モーター電力.offset.linearRampToValueAtTime( 1, cur += 45  );
+		モーター電力.offset.linearRampToValueAtTime( 1, cur += 6  );
+		モーター電力.offset.linearRampToValueAtTime( 0, cur += 25  );
 	};
 
 	this.停止 = function()
@@ -125,7 +128,7 @@ const 運転装置の型 = function( 文脈 )
 
 };
 
-const 電力音源の型 = function( 文脈, 運転装置, 出力先ノード )
+const 電力音源の型 = function( 文脈, 運転装置, 出力先ノード, 波形グラフ )
 {
 	let 音源子 = null;
 	const 音源子群 = {};
@@ -144,7 +147,7 @@ const 電力音源の型 = function( 文脈, 運転装置, 出力先ノード )
 		
 		if( 音源子 ) 音源子.切断();
 		音源子 = temp;
-		音源子.接続( 運転装置, 出力先ノード, パラメータ, this.モニター同期 );
+		音源子.接続( 運転装置, 出力先ノード, パラメータ, 波形グラフ );
 	};
 };
 
@@ -155,7 +158,7 @@ const 電力音源子の型群 = new function()
 	const 基底の型 = function( 文脈 )
 	{
 		const プロセッサ = 文脈.createScriptProcessor( 0, 1, 1 );
-		let 制御器, モニター同期;
+		let 制御器;
 
 		プロセッサ.onaudioprocess = ( ev ) => this.波形生成
 		(
@@ -164,11 +167,11 @@ const 電力音源子の型群 = new function()
 			文脈.sampleRate
 		);
 		
-		this.接続 = function( _制御器, 出力ノード, パラメータ, _モニター同期 )
+		this.接続 = function( _制御器, 出力ノード, パラメータ, 波形グラフ )
 		{
 			制御器 = _制御器;
 			this.パラメータ = パラメータ;
-			モニター同期 = _モニター同期;
+			this.波形グラフ = 波形グラフ;
 
 			プロセッサ.connect( 出力ノード );
 			制御器.電力ノード.connect( プロセッサ );
@@ -184,12 +187,8 @@ const 電力音源子の型群 = new function()
 		{
 			プロセッサ.disconnect();
 			制御器 && 制御器.電力ノード.disconnect( プロセッサ );
-			制御器 = モニター同期 = null;
-		};
-
-		this.モニター同期 = function()
-		{
-			モニター同期 && モニター同期();
+			制御器 = null;
+			this.波形グラフ = null;
 		};
 		
 	};
@@ -229,7 +228,7 @@ const 電力音源子の型群 = new function()
 				出力[ i ] = 直流PWM( 電力 * ( 1 + キャリアステップ * 2 ), キャリア位相, サンプリング周波数 / キャリア周波数 );
 				キャリア位相 = ( キャリア位相 + キャリアステップ ) % 1;
 
-				if( ( モニター位相 += 50 / サンプリング周波数 ) >= 1 )  { モニター位相 -= 1;  this.モニター同期(); }
+				this.波形グラフ && this.波形グラフ.値を記録( 出力[ i ] );
 			}
 		};
 
@@ -280,7 +279,7 @@ const 電力音源子の型群 = new function()
 				出力[ i ] = ( 電力 > ph ? sin : 0 );
 				電源波位相 = ( 電源波位相 + 電源波周波数 / サンプリング周波数 ) % 1;
 
-				if( ( モニター位相 += 50 / サンプリング周波数 ) >= 1 )  { モニター位相 -= 1;  this.モニター同期(); }
+				this.波形グラフ && this.波形グラフ.値を記録( 出力[ i ] );
 			}
 		};
 
@@ -291,46 +290,106 @@ const 電力音源子の型群 = new function()
 
 	this.vvvf = function( 文脈 )
 	{
-		let 非同期キャリア位相 = 0;
+		const 更新レート = 100;
+
+		let モジュレータ周波数;
 		let モジュレータ位相 = 0;
 
-		let モニター位相 = 0;
-		
+		let 非同期キャリア周波数;
+		let 非同期キャリア位相 = 0;
+
+		let 同期キャリア周波数;
+		let 同期キャリアサンプル数;
+		let 同期キャリア位相;
+
+		let 同期モードか = false;
+
+		let upd = 0;
+
 		基底の型.call( this, 文脈 );
 
 		this.波形生成 = function( 出力バッファ, 電力入力バッファ, サンプリング周波数 )
 		{
-			const 非同期キャリア周波数 = this.パラメータ[ 1 ] || 1050;
-
 			for( let i = 0; i < 出力バッファ.length; i ++ )
 			{
 				const 電力 = 電力入力バッファ[ i ];
-				const モジュレータ = 電力 * Math.sin( Math.PI * 2 * モジュレータ位相 );
-				const モジュレータ周波数 = 電力 * 150;
 
-				const キャリア周波数 = 非同期キャリア周波数;
-				const キャリア位相 = キャリア位相導出( 電力, 非同期キャリア位相 );
-				const キャリアステップ = キャリア周波数 / サンプリング周波数;
+				if( upd -- == 0 )
+				{
+					upd = サンプリング周波数 / 更新レート;
+					
+					モジュレータ周波数 = 電力 * 80;
 
-				//出力バッファ[ i ] = モジュレータ;
-				出力バッファ[ i ] = 交流PWM( モジュレータ, キャリア位相, サンプリング周波数 / キャリア周波数 );
-				
+					if( モジュレータ周波数 >= 65 )
+					{
+						同期モードか = true;
+						同期キャリアサンプル数 = 2;
+						同期キャリア周波数 = モジュレータ周波数 * 同期キャリアサンプル数;
+					}
+					if( モジュレータ周波数 >= 60 )
+					{
+						同期モードか = true;
+						同期キャリアサンプル数 = 12;
+						同期キャリア周波数 = モジュレータ周波数 * 同期キャリアサンプル数;
+					}
+					else if( モジュレータ周波数 >= 50 )
+					{
+						同期モードか = false;
+						非同期キャリア周波数 = 700 + ( モジュレータ周波数 - 50 ) * 1100 / 10;
+					}
+					else if( モジュレータ周波数 >= 20 )
+					{
+						同期モードか = false;
+						非同期キャリア周波数 = 1050 - ( モジュレータ周波数 - 20 ) * 350 / 30;
+					}
+					else
+					{
+						同期モードか = false;
+						非同期キャリア周波数 = 1050;
+					}
+				}
+
+				{
+					const モジュレータ = 電力 * Math.sin( モジュレータ位相 * Math.PI * 2 );
+
+					出力バッファ[ i ] = 同期モードか ? 
+						交流PWM( モジュレータ, ( モジュレータ位相 * 同期キャリアサンプル数 ) % 1, サンプリング周波数 / 同期キャリア周波数 ) :
+						交流PWM( モジュレータ, 非同期キャリア位相, サンプリング周波数 / 非同期キャリア周波数 )
+					;
+				}
+
 				モジュレータ位相 += モジュレータ周波数 / サンプリング周波数;
 				if( モジュレータ位相 >= 1 )
 				{
 					モジュレータ位相 -= 1;
 				}
 
-				非同期キャリア位相 = ( 非同期キャリア位相 + キャリアステップ ) % 1;
+				非同期キャリア位相 = ( 非同期キャリア位相 + 非同期キャリア周波数 / サンプリング周波数 ) % 1;
 
-				if( ( モニター位相 += 50 / サンプリング周波数 ) >= 1 )  { モニター位相 -= 1;  this.モニター同期(); }
+
+				this.波形グラフ && this.波形グラフ.値を記録( 出力バッファ[ i ] );
 			}
 		};
 
-		const キャリア位相導出 = function( 電力, 非同期キャリア位相 )
+		const VVVFテーブル群 =
 		{
-			return 非同期キャリア位相;
+			"e231-1000":
+			[
+				[ 0, 1050, 0 ],
+				[ 20, 1050, - 350 / 30 ],
+				[ 50, 0, 700, 1100 / 10 ],
+				[ 60, 0, 1050 ],
+			]
 		};
+
+		function キャリア計算( 電力, モジュレータ位相, 非同期キャリア位相, サンプリング周波数 )
+		{
+			let 非同期キャリア周波数 = 1050;
+			let キャリア位相 = 非同期キャリア位相;
+			const モジュレータ周波数 = 電力 * 80;
+
+			return { キャリア位相: キャリア位相, キャリアステップ: 非同期キャリア周波数 / サンプリング周波数 };
+		}
 
 		this.名称 = "VVVF";
 	};
@@ -352,25 +411,17 @@ const 電力音源子の型群 = new function()
 		return Math.min( 1, a );
 	}
 
-	const 正弦波テーブル群 =
-	{
-		1: []
-	};
-
 };
 
-const グラフの型 = function( canvas, 入力, 音響文脈 )
+const グラフの型 = function( canvas, サンプリング周波数, 記録周期 )
 {
 	const framerate = 1;
-	const analyser = 音響文脈.createAnalyser();
-	
-	入力.connect( analyser );
-
 	const context = canvas.getContext( "2d" );
 
 	function clear()
 	{
 		context.fillStyle = "hsl( 225, 48%, 65% )";
+		context.fillStyle = "hsl( 92, 43%, 56% )";
 		context.fillRect( 0, 0, canvas.width, canvas.height );
 	}
 
@@ -389,7 +440,8 @@ const グラフの型 = function( canvas, 入力, 音響文脈 )
 		context.stroke();
 	}
 
-	const buffer = new Float32Array( Math.floor( 音響文脈.sampleRate / 50 ) );
+	const buffer = new Float32Array( サンプリング周波数 / 記録周期 );
+	let bindex = 0;
 
 	function update()
 	{
@@ -412,10 +464,15 @@ const グラフの型 = function( canvas, 入力, 音響文脈 )
 		requestAnimationFrame( update );
 	}
 
-	this.記録を更新 = function()
+	this.値を記録 = function( 値 )
 	{
-		analyser.getFloatTimeDomainData( buffer );
-		performance.now;
+		buffer[ bindex ++ ] = 値;
+		if( bindex >= buffer.length ) bindex = 0;
+	};
+
+	this.記録を同期 = function()
+	{
+		
 	};
 
 	update();
