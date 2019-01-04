@@ -13,9 +13,12 @@ let EQAudio = new function()
 		this.Wave = new Model.Value( null );
 		
 		this.Playing = new BoolValue( true );
+
 		this.Volume = new NumberValue( 1 );
 		this.Rate = new NumberValue( 30 );
-		this.Gain = new NumberValue( 1 );
+
+		this.Compressor = new NumberValue( 1 );
+		this.Distortion = new NumberValue( 0 );
 		
 		this.Begin = new Model.Value( "2014/04/14/ 12:28:0000" );
 		this.Length = new Model.Value( 300 );
@@ -36,8 +39,12 @@ let EQAudio = new function()
 
 		let hashOrder =
 		[
-			this.Rate, this.Playing, this.Volume, this.Gain,
-			this.NS_Volume, this.NS_Pan, this.EW_Volume, this.EW_Pan, this.UD_Volume, this.UD_Pan
+			this.Rate, this.Playing,
+			this.Volume, this.Compressor,
+			this.NS_Volume, this.NS_Pan,
+			this.EW_Volume, this.EW_Pan,
+			this.UD_Volume, this.UD_Pan,
+			this.Distortion
 		];
 
 		this.SetHash = function( hash )
@@ -68,7 +75,7 @@ let EQAudio = new function()
 		function()
 		{
 			this.GetHash = function() { return this.Value ? "1" : "0"; };
-			this.SetHash = function( value ) { this.Set( value == 1 ); };
+			this.SetHash = function( value ) { this.Set( isne( value ) ? this.DefaultValue : value == 1 ); };
 		}
 	);
 
@@ -78,9 +85,11 @@ let EQAudio = new function()
 		function()
 		{
 			this.GetHash = function() { return this.Value; };
-			this.SetHash = function( value ) { this.Set( value ); };
+			this.SetHash = function( value ) { this.Set( isne( value ) ? this.DefaultValue : value ); };
 		}
 	);
+
+	function isne( value ){ return value == undefined || value == ""; }
 
 	// View //
 
@@ -113,26 +122,60 @@ let EQAudio = new function()
 				this.UD_Volume = context.createGain();
 				this.UD_Pan = context.createStereoPanner();
 
+				this.Comp = context.createDynamicsCompressor();
+				{
+					this.Comp.ratio.value = 1.0;
+					this.Comp.knee = 0;
+					this.Comp.threshold.value = -80;
+				}
+				
+				this.Dist = context.createScriptProcessor( 0, 2, 2 );
+				{
+					this.Dist.onaudioprocess = ( ev )=>
+					{
+						const inp0 = ev.inputBuffer.getChannelData( 0 );
+						const out0 = ev.outputBuffer.getChannelData( 0 );
+						const inp1 = ev.inputBuffer.getChannelData( 1 );
+						const out1 = ev.outputBuffer.getChannelData( 1 );
+						
+						const gain = Math.pow( 10, this.model.Distortion.Get() / 10 );
+
+						for( let i = 0; i < inp0.length; i ++ )
+						{
+							out0[ i ] = Math.max( -1, Math.min( 1, inp0[ i ] * gain ) );
+							out1[ i ] = Math.max( -1, Math.min( 1, inp1[ i ] * gain ) );
+						}
+					}
+				}
+
 				this.Volume = context.createGain();
 
 				//  connects  //
 				
-				this.Splitter.connect( this.NS_Att, 0 );
-				this.NS_Att.connect( this.NS_Volume );
-				this.NS_Volume.connect( this.NS_Pan );
-				this.NS_Pan.connect( this.Volume );
+				{
+					//const d = this.Volume;
+					const d = this.Comp;
 				
-				this.Splitter.connect( this.EW_Att, 1 );
-				this.EW_Att.connect( this.EW_Volume );
-				this.EW_Volume.connect( this.EW_Pan );
-				this.EW_Pan.connect( this.Volume );
-				
-				this.Splitter.connect( this.UD_Att, 2 );
-				this.UD_Att.connect( this.UD_Volume );
-				this.UD_Volume.connect( this.UD_Pan );
-				this.UD_Pan.connect( this.Volume );
-				
-				this.Volume.connect( dest );
+					this.Splitter.connect( this.NS_Att, 0 );
+					this.NS_Att.connect( this.NS_Volume );
+					this.NS_Volume.connect( this.NS_Pan );
+					this.NS_Pan.connect( d );
+					
+					this.Splitter.connect( this.EW_Att, 1 );
+					this.EW_Att.connect( this.EW_Volume );
+					this.EW_Volume.connect( this.EW_Pan );
+					this.EW_Pan.connect( d );
+					
+					this.Splitter.connect( this.UD_Att, 2 );
+					this.UD_Att.connect( this.UD_Volume );
+					this.UD_Volume.connect( this.UD_Pan );
+					this.UD_Pan.connect( d );
+
+					this.Comp.connect( this.Dist );
+					this.Dist.connect( this.Volume );
+					
+					this.Volume.connect( dest );
+				}
 
 				//   //
 				
@@ -152,6 +195,9 @@ let EQAudio = new function()
 
 				this.model.Volume.AddView( paramView );
 				this.model.Rate.AddView( paramView );
+
+				this.model.Compressor.AddView( paramView );
+				this.model.Distortion.AddView( paramView );
 
 				this.model.NS_Volume.AddView( paramView );
 				this.model.NS_Pan.AddView( paramView );
@@ -191,8 +237,10 @@ let EQAudio = new function()
 				this.UD_Volume.gain.setTargetAtTime( this.model.UD_Volume.Get(), current, 0.01 );
 				this.UD_Pan.pan.setTargetAtTime( this.model.UD_Pan.Get(), current, 0.01 );
 
-				let volume = this.playing ? this.model.Volume.Get() : 0;
-				this.Volume.gain.setTargetAtTime( volume, current, 0.01 );
+				this.Comp.ratio.setTargetAtTime( this.model.Compressor.Get(), current, 0.01 );
+				
+				let volume = this.model.Volume.Get() * Math.sqrt( this.model.Compressor.Get() );
+				this.Volume.gain.setTargetAtTime( this.playing ? volume : 0, current, 0.01 );
 
 				if( this.Wave && this.bosc )
 				{

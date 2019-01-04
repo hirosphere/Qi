@@ -11,7 +11,7 @@ let AudioPane = class_def
 
 			this.e = q.div( null, {} );
 
-			this.BuildHoriz1( this, { Width: -1, Height: 75 }, model );
+			this.BuildHoriz1( this, { Width: -1, Height: 120 }, model );
 			let vert = new VertPane( this, { Rel: 10, Height: -1 } );
 			this.BuildHoriz2( vert, { Width: -1, Height: 75, Sep: 10 }, model );
 
@@ -22,13 +22,15 @@ let AudioPane = class_def
 		{
 			let horiz = new HorizPane( com, args );
 
-			new StateButton( horiz, { Width: 80, Height: -1, Value: model.Playing, Labels: { "false": "停止中", "true": "再生中" } } );
+			new StateButton( horiz, { Width: 120, Height: -1, Value: model.Playing, Labels: { "false": "停止中", "true": "再生中" } } );
 
 			{
-				let vert = new VertPane( horiz, { Width: 10, Rel: 10, Height: -1, Sep: 3 } );
+				let vert = new VertPane( horiz, { Width: 500, Rel: 0, Height: -1, Sep: 3 } );
 
-				SInp( vert, { Width: -1, Height: 25 }, "音量", model.Volume, [ 60, 60, 100], [ 0, 0, 8 ], [ 0, 1, 0.01 ] );
-				SInp( vert, { Width: -1, Height: 25 }, "倍速", model.Rate, [ 60, 60, 100 ], [ 0, 0, 8 ], [ 1, 800, 1 ] );
+				SInp( vert, { Width: -1, Height: 25 }, "音量", model.Volume, [ 160, 60, 100], [ 0, 0, 8 ], [ 0, 1, 0.01 ] );
+				SInp( vert, { Width: -1, Height: 25 }, "倍速", model.Rate, [ 160, 60, 100 ], [ 0, 0, 8 ], [ 1, 800, 1 ] );
+				SInp( vert, { Width: -1, Height: 25 }, "コンプレッサー", model.Compressor, [ 160, 60, 100 ], [ 0, 0, 8 ], [ 1, 8, 0.1 ] );
+				SInp( vert, { Width: -1, Height: 25 }, "ディストーション", model.Distortion, [ 160, 60, 100 ], [ 0, 0, 8 ], [ 0, 30, 1 ] );
 			
 				{
 					let horizC = new HorizPane( vert, { Width: -1, Height: 25, Sep: 2 } );

@@ -51,7 +51,7 @@ Model.Value = class_def
 		this.Initiate = function( initialvalue )
 		{
 			base.Initiate.call( this );
-			this.Value = initialvalue;
+			this.Value = this.DefaultValue = initialvalue;
 		};
 
 		this.GetValue = this.Get = function()

@@ -98,17 +98,32 @@ EQGraph.CanvasPane = class_def
 
 			context.fillRect( 0, 0, width - 0, height - 0 );
 
-			if( this.Wave == null )  return;
+			if( this.Wave )
+			{
+				draw_div( context, this.Wave.SampleTime, width, height );
 
-			let maxacc = this.Wave.MaxAcc;
-			let h = height / 3;
-			this.Wave && EQGraph.DrawWave( context, width, h, this.Wave.NS, maxacc, ss.NS );
-			context.translate( 0, h * 1 );
-			this.Wave && EQGraph.DrawWave( context, width, h, this.Wave.EW, maxacc, ss.EW );
-			context.translate( 0, h * 1 );
-			this.Wave && EQGraph.DrawWave( context, width, h, this.Wave.UD, maxacc, ss.UD );
+				let maxacc = this.Wave.MaxAcc;
+				let h = height / 3;
+				this.Wave && EQGraph.DrawWave( context, width, h, this.Wave.NS, maxacc, ss.NS );
+				context.translate( 0, h * 1 );
+				this.Wave && EQGraph.DrawWave( context, width, h, this.Wave.EW, maxacc, ss.EW );
+				context.translate( 0, h * 1 );
+				this.Wave && EQGraph.DrawWave( context, width, h, this.Wave.UD, maxacc, ss.UD );
+			}
 
 			context.restore();
 		};
+
+		function draw_div( context, time, width, height )
+		{
+			context.strokeStyle = "hsl( 0, 0%, 50% )";
+			for( let t = 0; t < time; t += 5 )
+			{
+				context.beginPath();
+				context.moveTo( t / time * width, 0 );
+				context.lineTo( t / time * width, height );
+				context.stroke();
+			}
+		}
 	}
 );
