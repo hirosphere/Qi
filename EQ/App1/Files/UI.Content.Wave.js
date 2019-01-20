@@ -80,7 +80,7 @@ Content.Wave = class_def
 			let ws = w && w.SiteInfo;
 			let n = this.Index;
 			let s = n && n.Site || {};
-			const map_url = `http://maps.google.co.jp/maps?&output=embed&q=loc:${ s.Lat },${ s.Lng }&z=7`;
+			const map_url = `https://maps.google.co.jp/maps?&output=embed&q=loc:${ s.Lat },${ s.Lng }&z=7`;
 			
 			const datestr = make_date_str( w.StartTimeStr );
 			const elevdep = ws.Elev + "m" + ( ws.Depth != null && `, ${ws.Depth}m` || "" ); 
