@@ -14,7 +14,7 @@
 <script src="./Files/UI.Input.js?dc=J"></script>
 <script src="./Files/UI.List.js?dc=J"></script>
 <script src="./Files/UI.Audio.js?dc=J"></script>
-<script src="./Files/UI.GMap.js?dc=J"></script>
+<script src="./Files/UI.Map.js?dc=J"></script>
 <script src="./Files/UI.Content.js?dc=J"></script>
 <script src="./Files/UI.Content.Wave.js?dc=J"></script>
 <script src="./Files/Index.js?dc=J"></script>
@@ -31,6 +31,8 @@ html,body
 	position: relative; overflow: hidden;
 }
 
+a { text-decoration: none; border-bottom: 1px dotted hsl( 45, 10%, 50% ); }
+a:link, a:visited { color: hsl( 0, 0%, 20% ); }
 
 button { font-size: 16px; }
 select { text-align: center; font-size: 16px; }
@@ -43,28 +45,6 @@ label { text-align: center; vertical-align: middle; }
 .side { background: #fff; border: 0px solid #666; }
 .content { background: #fff; border: 0px solid #666; }
 
-.list {  }
-
-.list .content
-{
-	overflow-x: hidden;
-	overflow-y: auto;
-	padding: 2px;
-}
-
-.list .item
-{
-	border-bottom: 1px dotted #999;
-	line-height: 3.0em;
-	padding: 0 5px;
-	white-space: nowrap;
-}
-
-.list .item.selected
-{
-	background: #222; color: #eee;
-}
-
 .PATH_ITEM { padding: 0 0.74em; vertical-align: middle; }
 .PATH_TERM { color: #aa9; font-size: 80%; vertical-align: middle;  }
 
@@ -75,6 +55,7 @@ label { text-align: center; vertical-align: middle; }
 	padding-left: 0.78ex;
 	border-bottom: 1px dotted #776;
 	white-space: nowrap;
+	font-size: 13px;
 }
 
 .COLL_LIST_ITEM.SELECTED { background: #111; color: #eee; }
@@ -82,7 +63,24 @@ label { text-align: center; vertical-align: middle; }
 .CONTENT_LIST { border: 1px solid #fa1; word-wrap: break-word; overflow: auto; }
 .CONTENT_LIST_ITEM { display: inline-block; padding: 0 2em; line-height: 70px;  }
 
-.WAVE_INFO_1 { font-size: 14px; font-family: "MS Gothic"; line-height: 27px; padding: 0 1ex; }
+.WAVE_INFO
+{
+	font-size: 15px; line-height: 15px; padding: 0 1ex; font-family: "arial";
+}
+.WAVE_INFO ._SITE
+{
+	font-size: 34px; line-height: 46px; padding: 7px 10px; vertical-align: middle;
+	font-family: "times"; 
+}
+.WAVE_INFO ._TEST { font-size: 10px; line-height: 10px; padding: 0 0ex; }
+
+.WAVE_INFO ._C1, .WAVE_INFO ._C2
+{
+	border-radius: 3px;
+	padding: 7px 0.9ex; vertical-align: middle; margin-right: 2px;
+}
+.WAVE_INFO ._C1 { background: hsl( 60, 6%, 88% );  }
+.WAVE_INFO ._C2 { background: hsl( 60, 6%, 95% ); }
 
 .WAVE_FILE_INFO { overflow: auto; }
 .WAVE_FILE_INFO table{ width: 750px; border-collapse: collapse; font-family: "MS UI Gothic" monospace; color: #333; }

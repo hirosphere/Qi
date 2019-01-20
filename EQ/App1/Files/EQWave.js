@@ -43,6 +43,7 @@ let EQWave = class_def
 		{
 			this.IsKiK = dec.IsKiK;
 			this.StartTimeStr = dec.StartTimeStr;
+			this.StartTimeDate = new Date( dec.StartTimeStr );
 			this.SamplingRate = dec.SamplingRate;
 			this.SampleTime = dec.SampleTime / 10;
 			this.SiteInfo = dec.SiteInfo,

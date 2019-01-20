@@ -12,7 +12,9 @@ let EQAudio = new function()
 	{
 		this.Wave = new Model.Value( null );
 		
-		this.Playing = new BoolValue( true );
+		this.Dummy = new BoolValue( false );
+
+		this.Playing = new BoolValue( false );
 
 		this.Volume = new NumberValue( 1 );
 		this.Rate = new NumberValue( 30 );
@@ -39,8 +41,10 @@ let EQAudio = new function()
 
 		let hashOrder =
 		[
-			this.Rate, this.Playing,
-			this.Volume, this.Compressor,
+			this.Rate,
+			this.Dummy,  // this.Playing,
+			this.Dummy,  // this.Volume,
+			this.Compressor,
 			this.NS_Volume, this.NS_Pan,
 			this.EW_Volume, this.EW_Pan,
 			this.UD_Volume, this.UD_Pan,
@@ -49,6 +53,8 @@ let EQAudio = new function()
 
 		this.SetHash = function( hash )
 		{
+			if( hash == null ) return;
+			
 			let values = hash.split( "," );
 			for( var i = 0; i < values.length && i < hashOrder.length; i ++ )
 			{

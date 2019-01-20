@@ -50,10 +50,10 @@ let AppPane = class_def
 			this.e = q.div( null, { "class": "APP" } );
 
 			{
-				let vert = new VertPane( this, { Width: 250, Rel: 1, Height: -1 } );
+				let vert = new VertPane( this, { Width: 200, Rel: 1, Height: -1 } );
 				
 				{
-					let horiz = new HorizPane( vert, { Width: -1, Height: 50 } );
+					let horiz = new HorizPane( vert, { Width: -1, Height: 40 } );
 					
 					this.pathsel = new PathSelectPane
 					(
@@ -66,7 +66,7 @@ let AppPane = class_def
 				{
 					let horiz = new HorizPane( vert, { Width: -1, Height: 50, Rel: 10 } );
 
-					let side = new SidePane( horiz, { Width: 250, Rel: 0.3, Height: -1,Doc: this.Doc } );
+					let side = new SidePane( horiz, { Width: 200, Rel: 0.3, Height: -1,Doc: this.Doc } );
 					let content = new PageSwitchPane
 					(
 						horiz, { Width: 150, Rel: 7, Height: -1, Doc: this.Doc, CssClass: "CONTENT_SWITCH" }

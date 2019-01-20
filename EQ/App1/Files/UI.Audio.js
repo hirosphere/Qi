@@ -49,7 +49,7 @@ let AudioPane = class_def
 			let horiz = new HorizPane( com, args );
 
 			{
-				let vert = new VertPane( horiz, { Width: 220, Rel: 5, Height: -1, Sep: 2 } );
+				let vert = new VertPane( horiz, { Width: 350, Rel: 5, Height: -1, Sep: 2 } );
 				
 				SInp( vert, { Width: -1, Height: 25 }, "NS音量", model.NS_Volume, [ 70, 60, 80 ], [ 0, 0, 8 ], [ 0, 1, 0.1 ] );
 				SInp( vert, { Width: -1, Height: 25 }, "EW音量", model.EW_Volume, [ 70, 60, 80 ], [ 0, 0, 8 ], [ 0, 1, 0.1 ] );
@@ -57,7 +57,7 @@ let AudioPane = class_def
 			}
 
 			{
-				let vert = new VertPane( horiz, { Width: 220, Rel: 5, Height: -1, Sep: 2 } );
+				let vert = new VertPane( horiz, { Width: 350, Rel: 5, Height: -1, Sep: 2 } );
 				vert.e.style.zIndex = 1;
 				
 				SInp( vert, { Width: -1, Height: 25 }, "NS定位", model.NS_Pan, [ 70, 60, 80 ], [ 0, 0, 8 ], [ -1, 1, 0.1 ] );
