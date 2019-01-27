@@ -35,7 +35,6 @@ button { margin-bottom: 10px; padding: 16px 24px; border-radius: 6px; }
 
 <script src="Prime905.js?2019-01-27-A"></script>
 <script src="Cell.js?2019-01-27-A"></script>
-<script src="URLHash.js?2019-01-27-A"></script>
 
 </head>
 
@@ -43,8 +42,11 @@ button { margin-bottom: 10px; padding: 16px 24px; border-radius: 6px; }
 
 <article style="margin-bottom: 60px;">
 	<div>
-		<button onclick="アプリケーション.操作1()">URLハッシュ取り込み</button>
-		<button onclick="アプリケーション.操作2()">URLハッシュ書き出し</button>
+		<button onclick="アプリケーション.ハッシュ取り込み()">URLハッシュ取り込み</button>
+		<button onclick="アプリケーション.ハッシュ書き出し()">URLハッシュ書き出し</button>
+		<button onclick="location.hash = ''">クリア</button>
+		<br/>
+		<textarea id="JSON" style="width: 500px; height: 300px;"></textarea>
 	</div>
 </article>
 
@@ -58,21 +60,31 @@ button { margin-bottom: 10px; padding: 16px 24px; border-radius: 6px; }
 
 const アプリケーション = new function()
 {
+	const json = この文書.Idで( "JSON" );
+
 	this.初期化 = function()
 	{
 		const 楽音モデル = 楽音モデルの型.作成();
-		this.Value = {Ti:"整数比の楽音",Fs:[330,440],EG:{A:100,D:1000,S:50,R:100}};
+		this.Value =
+		{
+			"表題":"山手線 外回り",
+			"停車駅":"池袋－大塚－巣鴨－駒込－田端－西日暮里－日暮里－鶯谷－上野－御徒町－秋葉原－神田－東京－有楽町－新橋－浜松町－田町－高輪ゲートウエイ－品川－大崎－五反田－目黒－恵比寿－渋谷－原宿－代々木－新宿－新大久保－高田馬場－目白－池袋",
+			Ti:"整数比の楽音",Fs:[330,440],EG:{A:100,D:1000,S:50,R:100}
+		};
+		json.value = JSON.stringify( this.Value, null, "\t" );
 	};
 
-	this.操作1 = function()
+	this.ハッシュ取り込み = function()
 	{
-		console.clear();
+		//console.clear();
 		this.Value = JSON.parse( decodeURI( location.hash.substr( 1 ) ) );
-		console.log( JSON.stringify( this.Value, null, "\t" ) );
+		//console.log( JSON.stringify( this.Value, null, "\t" ) );
+		json.value = JSON.stringify( this.Value, null, "\t" );
 	};
 
-	this.操作2 = function()
+	this.ハッシュ書き出し = function()
 	{
+		this.Value = JSON.parse( json.value );
 		location.hash = "#" + encodeURI( JSON.stringify( this.Value ) );
 	};
 
