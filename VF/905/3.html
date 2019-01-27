@@ -61,18 +61,19 @@ const アプリケーション = new function()
 	this.初期化 = function()
 	{
 		const 楽音モデル = 楽音モデルの型.作成();
+		this.Value = {Ti:"整数比の楽音",Fs:[330,440],EG:{A:100,D:1000,S:50,R:100}};
 	};
 
 	this.操作1 = function()
 	{
 		console.clear();
-		this.Value = URLハッシュ.値を得る( location.hash.substr( 1 ) );
+		this.Value = JSON.parse( decodeURI( location.hash.substr( 1 ) ) );
 		console.log( JSON.stringify( this.Value, null, "\t" ) );
 	};
 
 	this.操作2 = function()
 	{
-		location.hash = "#" + URLハッシュ.値を変換( this.Value );
+		location.hash = "#" + encodeURI( JSON.stringify( this.Value ) );
 	};
 
 	this.スクリプト実行 = function()
