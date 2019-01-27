@@ -25,12 +25,12 @@ let AudioPane = class_def
 			new StateButton( horiz, { Width: 120, Height: -1, Value: model.Playing, Labels: { "false": "停止中", "true": "再生中" } } );
 
 			{
-				let vert = new VertPane( horiz, { Width: 500, Rel: 0, Height: -1, Sep: 3 } );
+				let vert = new VertPane( horiz, { Width: 600, Rel: 0, Height: -1, Sep: 3 } );
 
-				SInp( vert, { Width: -1, Height: 25 }, "音量", model.Volume, [ 160, 60, 100], [ 0, 0, 8 ], [ 0, 1, 0.01 ] );
-				SInp( vert, { Width: -1, Height: 25 }, "倍速", model.Rate, [ 160, 60, 100 ], [ 0, 0, 8 ], [ 1, 800, 1 ] );
-				SInp( vert, { Width: -1, Height: 25 }, "コンプレッサー", model.Compressor, [ 160, 60, 100 ], [ 0, 0, 8 ], [ 1, 8, 0.1 ] );
-				SInp( vert, { Width: -1, Height: 25 }, "ディストーション", model.Distortion, [ 160, 60, 100 ], [ 0, 0, 8 ], [ 0, 30, 1 ] );
+				SInp( vert, { Width: -1, Height: 25 }, "音量", model.Volume, [ 130, 60, 100], [ 0, 0, 8 ], [ 0, 1, 0.01 ] );
+				SInp( vert, { Width: -1, Height: 25 }, "倍速", model.Rate, [ 130, 60, 200 ], [ 0, 0, 8 ], [ 1, 800, 1 ] );
+				SInp( vert, { Width: -1, Height: 25 }, "コンプレッサー", model.Compressor, [ 130, 60, 200 ], [ 0, 0, 8 ], [ 1, 8, 0.1 ] );
+				SInp( vert, { Width: -1, Height: 25 }, "オーバードライブ", model.Distortion, [ 130, 60, 200 ], [ 0, 0, 8 ], [ 0, 30, 1 ] );
 			
 				{
 					let horizC = new HorizPane( vert, { Width: -1, Height: 25, Sep: 2 } );

@@ -20,15 +20,15 @@ const 型を作成 = function( 典型装飾関数, 基底の型 )
 
 	典型装飾関数.call( 型.prototype, 基底の型 && 基底の型.prototype || なし );
 
-	if( 型.prototype.開始する == undefined )
+	if( 型.prototype.初期化 == undefined )
 	{
-		型.prototype.開始する = function(){};
+		型.prototype.初期化 = function(){};
 	}
 
 	型.実体を作成 = 型.作成 = function()
 	{
 		const 実体 = new 型();
-		型.prototype.開始する.apply( 実体, arguments );
+		型.prototype.初期化.apply( 実体, arguments );
 		return 実体;
 	};
 
@@ -40,7 +40,7 @@ const 拡張型を作成 = function( 基底の型, 典型装飾関数 )
 	return 型を作成( 典型装飾関数, 基底の型 );
 };
 
-let 既存の実体を装飾 = function( 実体, 内容, 装飾関数 )
+const 既存の実体を装飾 = function( 実体, 内容, 装飾関数 )
 {
 	装飾関数 && 装飾関数.call( 実体 );
 
@@ -48,7 +48,7 @@ let 既存の実体を装飾 = function( 実体, 内容, 装飾関数 )
 	{
 		for( let 名前 in 内容.フィールド )
 		{
-			let 元の名前 = 内容.フィールド[ 名前 ];
+			const 元の名前 = 内容.フィールド[ 名前 ];
 			実体[ 名前 ] = 実体[ 元の名前 ];
 		}
 	}
@@ -57,7 +57,7 @@ let 既存の実体を装飾 = function( 実体, 内容, 装飾関数 )
 	{
 		for( let 名前 in 内容.プロパティ )
 		{
-			let 元の名前 = 内容.プロパティ[ 名前 ];
+			const 元の名前 = 内容.プロパティ[ 名前 ];
 
 			実体[ 名前 ] = function( 値 )
 			{
@@ -71,7 +71,7 @@ let 既存の実体を装飾 = function( 実体, 内容, 装飾関数 )
 	{
 		for( let 名前 in 内容.イベント )
 		{
-			let 元の名前 = 内容.イベント[ 名前 ];
+			const 元の名前 = 内容.イベント[ 名前 ];
 
 			実体[ 名前 + "処理を追加" ] = function( 処理, オプション )
 			{
@@ -83,24 +83,22 @@ let 既存の実体を装飾 = function( 実体, 内容, 装飾関数 )
 	return 実体;
 };
 
-const 既存の型を装飾 = function( 既存の型, 内容, 典型装飾関数 )
+let 既存の型を装飾 = function( 既存の型, 内容, 典型装飾関数 )
 {
 	既存の実体を装飾( 既存の型.prototype, 内容, 典型装飾関数 );
 
 	既存の型.作成 = function()
 	{
-		const 実体 = new 既存の型();
+		let 実体 = new 既存の型();
 		return 実体;
 	};
 
 	return 既存の型;
 };
 
-//  基本型・実体装飾  //
-
 //  DOM, HTML, 利便  //
 
-const この世界 = 既存の実体を装飾
+let この世界 = 既存の実体を装飾
 (
 	window,
 	{
@@ -114,7 +112,7 @@ const この世界 = 既存の実体を装飾
 	}
 );
 
-const この文書 = 既存の実体を装飾
+let この文書 = 既存の実体を装飾
 (
 	document,
 	{
@@ -204,9 +202,9 @@ new function()
 		return 連番;
 	};
 
-	この世界.ローカルホストか = location.host.match( /localhost$/i ) != null;
 };
 
+let ローカルホストか = location.host.match( /localhost$/i ) != null;
 
 //  ブラウザオブジェクト  //
 

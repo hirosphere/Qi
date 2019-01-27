@@ -1,58 +1,5 @@
 
-let PathSelectPaneB = class_def
-(
-	Pane,
-	function()
-	{
-		this.Build = function( args )
-		{
-			this.e = q.select( null );
-
-			let self = this;
-			this.e.onchange = function()
-			{
-				let item = this.options[ this.selectedIndex ];
-				item && self.Selection.Set( item.Node );
-				console.log( item && item.Node.GetCaption() )
-			}
-
-			this.Selection = args.Selection;
-			args.Selection.AddView( this );
-			this.Select();
-		};
-
-		this.Select = function()
-		{
-			let cur = this.Selection.GetCurrent();
-			if( cur == null )  return;
-
-			let path = cur.GetPath();
-			let items = this.e.options;
-
-			for( var r = items.length - 1; r >= 0; r -- )
-			{
-				if( items[ r ].Node != path[ r ]  )  this.e.removeChild( items[ r ] );
-				else break;
-			}
-
-			for( var i = r + 1; i < path.length; i ++ )
-			{
-				CreateItem( this.e, path[ i ], i );
-				if( path[ i ] == cur )  this.e.selectedIndex = i;
-			}
-		};
-
-		function CreateItem( con, node, depth )
-		{
-			for( var spc = ""; spc.length < depth; spc += "-" );
-			let e = q.option( con, { text: `< ${ node.LongCap } >` } );
-			e.Node = node;
-			return e;
-		}
-	}
-);
-
-let PathSelectPane = class_def
+const PathSelectPane = class_def
 (
 	Pane,
 	function()

@@ -84,7 +84,6 @@ Content.Wave = class_def
 			
 			const datestr = make_date_str( w.StartTimeStr );
 			const elevdep = ws.Elev + "m" + ( ws.Depth != null && `, ${ws.Depth}m` || "" ); 
-			let info = `( , ${ w.SampleTime }秒 `;
 			this.Info_Site.href = map_url;
 			
 			q.text( this.Info_Site, `${ s.Code } ${ s.Name } ` );

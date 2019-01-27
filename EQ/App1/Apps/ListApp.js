@@ -19,18 +19,7 @@ let Main = new function()
 
 		window.addEventListener( "hashchange", function() { appPane.SetHash( location.hash ); } ,  false );
 	};
-
-	this.OnGMapInit = function()
-	{
-		this.GMapReady = true;
-		console.log( "GMapReady" );
-	};
 };
-
-function initMap()
-{
-	Main.OnGMapInit();
-}
 
 let AppPane = class_def
 (
@@ -83,16 +72,28 @@ let AppPane = class_def
 		this.CreateSaveTweet = function( com )
 		{
 			let self = this;
-			let horiz = new HorizPane( com, { Width: 180, Height: -1 } );
+			let horiz = new HorizPane( com, { Width: 270, Height: -1 } );
 			new Pane( horiz, { Rel: 10 } );
 			this.SaveButton = CreateButtonAnc( horiz, "確定", function() { self.CureHash(); } );
 			this.TreetButton = CreateButtonAnc( horiz, "ツイート", function() { self.Tweet(); } );
+			CreateSelect( horiz, [ [ "6" ], [ "7" ], [ "8" ], [ "9" ] ] )
 		};
 
 		function CreateButtonAnc( com, title, action )
 		{
 			let pane = new Pane( com, { Width: 90, Height: -1, edef: { type: "button", text: title } } );
 			pane.e.onclick = action;
+			return pane;
+		}
+
+		function CreateSelect( com, list )
+		{
+			let pane = new Pane( com, { Width: 90, Height: -1, edef: { type: "select" } } );
+			for( let item of list )
+			{
+				q.option( pane.e, { text: item[ 0 ] } );
+			}
+			//pane.e.onclick = action;
 			return pane;
 		}
 

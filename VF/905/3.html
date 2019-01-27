@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8"/>
-<title>TMS-3617</title>
+<title>ADSR</title>
 <style>
 *
 {
@@ -27,25 +27,97 @@ body
 .SEP { height: 10px; }
 .VBOX { padding: 9px 0; }
 .VLB { vertical-align: middle; }
-input[type="range"] { vertical-align: middle; }
-
 button { margin-bottom: 10px; padding: 16px 24px; border-radius: 6px; }
 
 #dummy { color: #fff; }
 
 </style>
-</head>
-<body onload="window.main = new Main();">
 
+<script src="Prime905.js?2019-01-27-A"></script>
+<script src="Cell.js?2019-01-27-A"></script>
+<script src="URLHash.js?2019-01-27-A"></script>
+
+</head>
+
+<body onload="アプリケーション.初期化()">
+
+<article style="margin-bottom: 60px;">
+	<div>
+		<button onclick="アプリケーション.操作1()">URLハッシュ取り込み</button>
+		<button onclick="アプリケーション.操作2()">URLハッシュ書き出し</button>
+	</div>
+</article>
+
+<article class="EVAL">
+	<button onclick="アプリケーション.スクリプト実行()">スクリプト実行</button><br/>
+	<textarea id="Eval_Code" style="width: 500px; height: 80px;"></textarea>
+	<textarea id="Eval_Output" style="width: 500px; height: 40px;"></textarea>
+</article>
 
 <script>
 
-const Main = function()
+const アプリケーション = new function()
 {
+	this.初期化 = function()
+	{
+		const 楽音モデル = 楽音モデルの型.作成();
+	};
+
+	this.操作1 = function()
+	{
+		console.clear();
+		this.Value = URLハッシュ.値を得る( location.hash.substr( 1 ) );
+		console.log( JSON.stringify( this.Value, null, "\t" ) );
+	};
+
+	this.操作2 = function()
+	{
+		location.hash = "#" + URLハッシュ.値を変換( this.Value );
+	};
+
+	this.スクリプト実行 = function()
+	{
+		const 出力 = この文書.Idで( "Eval_Output" );
+		try
+		{
+			出力.value = eval( この文書.Idで( "Eval_Code" ).value );
+		}
+		catch( 例外 )
+		{
+			出力.value = 例外.toString();
+		}
+	};
 };
 
+//  //
 
-// github.io 対策
+const 楽音モデルの型 = 拡張型を作成
+(
+	値セル群.オブジェクトの型,
+	function()
+	{
+		const プロトタイプ = this;
+
+		プロトタイプ.初期化 = function()
+		{
+			const これ = this;
+
+			これ.EG = EGモデルを作成();
+		};
+	}
+);
+
+const EGモデルを作成 = function()
+{
+	const オブジェクト = 値セル群.オブジェクトの型.作成();
+
+	オブジェクト.数値フィールドを追加( "アタック", "A", 0 );
+	オブジェクト.数値フィールドを追加( "ディケイ", "D", 1000 );
+	オブジェクト.数値フィールドを追加( "サステイン", "S", 70 );
+	オブジェクト.数値フィールドを追加( "リリース", "R", 30 );
+
+	return オブジェクト;
+}
 
 
 </script>
