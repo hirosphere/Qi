@@ -192,6 +192,16 @@ new function()
 		return Math.round( 値 * 乗除 ) / 乗除;
 	};
 
+	この世界.文字列からBase64に変換 = function( 文字列 )
+	{
+		return btoa( unescape( encodeURIComponent( 文字列 ) ) );
+	};
+
+	この世界.Base64から文字列に復元 = function( base64 )
+	{
+		return decodeURIComponent( escape( atob( base64 ) ) );
+	};
+
 	let 次の連番 = 1;
 
 	この世界.次の連番 = function( 実体 )

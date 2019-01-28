@@ -46,7 +46,13 @@ button { margin-bottom: 10px; padding: 16px 24px; border-radius: 6px; }
 		<button onclick="アプリケーション.ハッシュ書き出し()">URLハッシュ書き出し</button>
 		<button onclick="location.hash = ''">クリア</button>
 		<br/>
-		<textarea id="JSON" style="width: 500px; height: 300px;"></textarea>
+		<button onclick="アプリケーション.シンセ.発音()">発音</button>
+		<br/>
+		<textarea id="JSON" style="width: 260px; height: 280px;"></textarea>
+		<textarea id="UEnc" style="width: 120px; height: 280px;"></textarea>
+		<textarea id="B64" style="width: 120px; height: 280px;"></textarea>
+		<br/>
+		<p id="Info"></p>
 	</div>
 </article>
 
@@ -61,33 +67,68 @@ button { margin-bottom: 10px; padding: 16px 24px; border-radius: 6px; }
 const アプリケーション = new function()
 {
 	const json = この文書.Idで( "JSON" );
+	const uenc = この文書.Idで( "UEnc" );
+	const b64 = この文書.Idで( "B64" );
+	const info = この文書.Idで( "Info" );
+
+	const def_doc_value =
+	{
+		Ti:"ハッシュドキュメント",Fs:[330,440],EG:{A:100,D:1000,S:50,R:100}
+	};
+
+	この世界.onhashchange = ()=> this.ハッシュ取り込み();
+	json.oninput = () => this.テストビューを更新();
+	
 
 	this.初期化 = function()
 	{
-		const 楽音モデル = 楽音モデルの型.作成();
-		this.Value =
-		{
-			"表題":"山手線 外回り",
-			"停車駅":"池袋－大塚－巣鴨－駒込－田端－西日暮里－日暮里－鶯谷－上野－御徒町－秋葉原－神田－東京－有楽町－新橋－浜松町－田町－高輪ゲートウエイ－品川－大崎－五反田－目黒－恵比寿－渋谷－原宿－代々木－新宿－新大久保－高田馬場－目白－池袋",
-			Ti:"整数比の楽音",Fs:[330,440],EG:{A:100,D:1000,S:50,R:100}
-		};
-		json.value = JSON.stringify( this.Value, null, "\t" );
+		this.Value = {};
+		this.シンセ = new シンセの型();
+		this.ハッシュ取り込み();
 	};
 
+	// ドキュメント //
+	
 	this.ハッシュ取り込み = function()
 	{
-		//console.clear();
-		this.Value = JSON.parse( decodeURI( location.hash.substr( 1 ) ) );
-		//console.log( JSON.stringify( this.Value, null, "\t" ) );
-		json.value = JSON.stringify( this.Value, null, "\t" );
+		const new_doc_value = ( location.hash ? this.Value = JSON.parse( Base64から文字列に復元( location.hash.substr( 1 ) ) ) : null );
+		オブジェクトの内容を書き換え( this.Value, new_doc_value, def_doc_value );
+
+		this.ドキュメントを編集に反映();
+		this.シンセ.保存値を設定( this.Value );
 	};
 
 	this.ハッシュ書き出し = function()
 	{
-		this.Value = JSON.parse( json.value );
-		location.hash = "#" + encodeURI( JSON.stringify( this.Value ) );
+		this.編集をドキュメントに反映();
+		location.hash = "#" + 文字列からBase64に変換( JSON.stringify( this.Value ) );
+		info.文を設定( location.hash.length );
+		this.シンセ.保存値を設定( this.Value );
 	};
 
+	// 編集 //
+
+	this.ドキュメントを編集に反映 = function()
+	{
+		json.value = JSON.stringify( this.Value, null, "\t" );
+		this.テストビューを更新();
+	};
+
+	this.編集をドキュメントに反映 = function()
+	{
+		this.Value = JSON.parse( json.value );
+	};
+	
+	this.テストビューを更新 = function()
+	{
+		const json = JSON.stringify( this.Value ) || "";
+		uenc.value = encodeURI( json );
+		b64.value = 文字列からBase64に変換( json );
+		info.文を設定( `${ json.length } , ${ uenc.value.length } , ${ b64.value.length }` );
+	};
+
+	// テスト //
+	
 	this.スクリプト実行 = function()
 	{
 		const 出力 = この文書.Idで( "Eval_Output" );
@@ -104,32 +145,76 @@ const アプリケーション = new function()
 
 //  //
 
-const 楽音モデルの型 = 拡張型を作成
-(
-	値セル群.オブジェクトの型,
-	function()
-	{
-		const プロトタイプ = this;
-
-		プロトタイプ.初期化 = function()
-		{
-			const これ = this;
-
-			これ.EG = EGモデルを作成();
-		};
-	}
-);
-
-const EGモデルを作成 = function()
+const シンセの型 = function()
 {
-	const オブジェクト = 値セル群.オブジェクトの型.作成();
+	//
 
-	オブジェクト.数値フィールドを追加( "アタック", "A", 0 );
-	オブジェクト.数値フィールドを追加( "ディケイ", "D", 1000 );
-	オブジェクト.数値フィールドを追加( "サステイン", "S", 70 );
-	オブジェクト.数値フィールドを追加( "リリース", "R", 30 );
+	const def_param =
+	{
+		Fs: [ 330, 440 ],
+		EG: { A: 250, D: 250, S: 40, R: 250 }
+	};
 
-	return オブジェクト;
+	const param = {};
+
+	オブジェクトの内容を書き換え( param, null, def_param );
+	
+	//
+	const context = new AudioContext();
+	const ga_total = context.createGain();
+	ga_total.gain.value = 0.3;
+	ga_total.connect( context.destination );
+	const vo_1 = new ボイスの型( context, ga_total, param, 0 );
+
+	this.発音 = function()
+	{
+		vo_1.発音();
+	};
+
+	this.保存値を設定 = function( 値 )
+	{
+		オブジェクトの内容を書き換え( param, 値, def_param );
+	};
+
+	this.保存値を取得 = function()
+	{
+		;
+	};
+
+};
+
+const ボイスの型 = function( context, dest, param, ch )
+{
+	let osc;
+
+	this.発音 = function()
+	{
+		osc = context.createOscillator();
+
+		osc.frequency.value = param.Fs[ ch ];
+
+		osc.connect( dest );
+
+		const t = context.currentTime;
+		osc.start( t + 0 );
+		osc.stop( t + 1 );
+	};
+};
+
+function オブジェクトの内容を書き換え( dest, src, def )
+{
+	for( let index in def )
+	{
+		const value = ( src ? src[ index ] : def[ index ] );
+
+		if( value && value.constructor == Array )
+			オブジェクトの内容を書き換え( dest[ index ] = dest[ index ] || [], value, def[ index ] );
+		
+		else if( value && value.constructor == Object )
+			オブジェクトの内容を書き換え( dest[ index ] = dest[ index ] || {}, value, def[ index ] );
+		
+		else dest[ index ] = value;
+	}
 }
 
 
