@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>Sequence</title>
+<style>
+*
+{
+	margin: 0; padding: 0; color: #222;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+html
+{
+	background: hsl( 210, 80%, 90% );
+	background: hsl( 90, 50%, 75% );
+	padding: 0px 0px 0px 45px;
+}
+
+body
+{
+	width: 960px;
+	min-height: 200vh;
+	background: hsl( 210, 0%, 100% );
+	padding: 30px 30px;
+}
+
+button { margin-bottom: 10px; padding: 16px 24px; border-radius: 6px; }
+label, input { vertical-align: middle; }
+
+#JSON, #JSON_i, #Graph { vertical-align: top; }
+
+#Keyboard
+{
+	border: 2px solid #666;
+	height: 200px;
+	overflow: auto;
+}
+
+.KB_II
+{
+	position: absolute;
+	z-index: 0;
+	margin-top: 0px;
+	border: 1px solid hsl( 55, 0%, 60% );
+	border-left-width: 0px;
+	width: 45px;
+	height: 180px;
+	background: hsl( 55, 0%, 100% );
+}
+
+.KB_IB
+{
+	position: absolute;
+	z-index: 1;
+	margin-left: -22.5px;
+	width: 45px;
+	height: 100px;
+	background: hsl( 25, 0%, 60% );
+	border-right: 1px solid hsl( 55, 0%, 40% );
+}
+
+</style>
+
+<script src="Prime.js"></script>
+<script src="Cell.js"></script>
+<script src="URLHash.js"></script>
+<script src="4.Model.js"></script>
+<script src="Audio.js"></script>
+<script src="Keyboard.js"></script>
+
+</head>
+
+<body onload="アプリケーション = new アプリケーションの型()">
+
+<article style="margin-bottom: 60px;">
+	<div>
+		<button onclick="アプリケーション.ハッシュ取り込み()">ハッシュ取り込み</button>
+		<button onclick="アプリケーション.ハッシュ書き出し()">ハッシュ書き出し</button>
+		<button onclick="アプリケーション.停止()">停止</button>
+		<button onclick="アプリケーション.開始()">開始</button>
+		<input type="range" id="Volume" value="30" style="width: 280px; height: 40px;"/>
+		<div id="Keyboard"></div>
+		<textarea id="JSON" style="width: 320px; height: 260px;"></textarea>
+		<textarea id="Melody" style="width: 320px; height: 260px;">+2222233233222211
+		
+ABCDE F GHIJK L
+abcde f ghijk l
+</textarea>
+		<span id="Graph"></span>
+		<br/>
+		<textarea id="TV_Enc" style="width: 900px; height: 40px;"></textarea>
+		<textarea id="TV_Dec" style="width: 900px; height: 40px;"></textarea>
+		<textarea id="TV_JSON" style="width: 800px; height: 20px;"></textarea>
+		<br/>
+		<p id="Info"></p>
+	</div>
+</article>
+
+<article class="EVAL">
+	<button onclick="アプリケーション.スクリプト実行()">スクリプト実行</button><br/>
+	<textarea id="Eval_Code" style="width: 500px; height: 80px;"></textarea>
+	<textarea id="Eval_Output" style="width: 500px; height: 40px;"></textarea>
+</article>
+
+<script>
+
+const アプリケーションの型 = function()
+{
+	// 構築 //
+	
+	const json = この文書.Idで( "JSON" );
+	const melody = この文書.Idで( "Melody" );
+	const tv_json = この文書.Idで( "TV_JSON" );
+	const tv_enc = この文書.Idで( "TV_Enc" );
+	const tv_dec = この文書.Idで( "TV_Dec" );
+	const uenc = この文書.Idで( "UEnc" );
+	const info = この文書.Idで( "Info" );
+	const volume = この文書.Idで( "Volume" );
+
+	この世界.onhashchange = ()=> this.ハッシュ取り込み();
+	json.oninput = () => this.エディタをドキュメントに反映();
+	この文書.Idで( "Volume" ).入力処理を追加( 音量UIを反映 );
+
+	// ドキュメント //
+
+	const ドキュメント = モデル群.ドキュメントの型.実体を作成();
+
+	this.ハッシュ取り込み = function()
+	{
+		ドキュメント.ハッシュを与える( location.hash );
+		this.ドキュメントをエディタに反映();
+	};
+
+	this.ハッシュ書き出し = function()
+	{
+		location.hash = ドキュメント.ハッシュを得る();
+	};
+
+	this.テストビューを更新 = function()
+	{
+		tv_enc.value = ドキュメント.ハッシュを得る();
+		tv_dec.value = URLハッシュ.JSONに復元( tv_enc.value );
+		tv_json.value = "^^ " + JSON.stringify( JSONから値に( tv_dec.value, "(エラー)" ) );
+	};
+
+	this.ドキュメントをエディタに反映 = function()
+	{
+		json.value = JSON.stringify( ドキュメント.値を得る(), null, "\t" );
+		this.テストビューを更新();
+	};
+
+	this.エディタをドキュメントに反映 = function()
+	{
+		try { ドキュメント.値を与える( JSON.parse( json.value ) ); }
+		catch( err ) {}
+
+		this.テストビューを更新();
+	};
+
+	this.テスト = function( キー, 開始か )
+	{
+		音響文脈.状態() == "suspended" && 音響文脈.再開();
+
+		const t = 音響文脈.現在時刻();
+		開始か && 複楽器.予定を投函( { チャンネル: 0, キー: キー, 開始時刻: t + 0.01 } );
+	};
+
+
+	// オーディオ //
+
+	const 音響文脈 = new 音響文脈の型();
+	const 波形グラフ = new 波形グラフの型( この文書.Idで( "Graph" ), 音響文脈 );
+
+	const 複楽器 = new 複楽器の型
+	(
+		音響文脈,
+		音響文脈.出力先(),
+		[
+			new 単楽器の型( 音響文脈, 2, ドキュメント )
+		]
+	);
+
+	複楽器.前出力.接続( 波形グラフ.入力 );
+
+	new 鍵盤の型
+	(
+		// なし,
+		この文書.Idで( "Keyboard" ),
+		{
+			チャンネル: 0,
+			移調: 48,
+			イベント処理: ( イベント ) => 複楽器.予定を投函( イベント )
+		}
+	);
+
+	// 同期 //
+
+	function 音量UIを反映()
+	{
+		複楽器.音量を設定( volume.value );
+	}
+
+
+	// テスト //
+
+	melody.value = 複楽器.音量テーブルテスト();
+	
+	this.スクリプト実行 = function()
+	{
+		const 出力 = この文書.Idで( "Eval_Output" );
+		try
+		{
+			出力.value = eval( この文書.Idで( "Eval_Code" ).value );
+		}
+		catch( 例外 )
+		{
+			出力.value = 例外.toString();
+		}
+	};
+
+	音量UIを反映();
+	this.ハッシュ取り込み();
+};
+
+const 波形グラフの型 = function( 幹, 音響文脈 )
+{
+	const プロセッサ =  this.入力 = 音響文脈.プロセッサーを作成( 256, 1, 1 );
+	const キャンバス = Canvasを作成( 幹, { 属性: { width: 192, height: 128 } } );
+	const バッファー = new Uint8Array( 64 );
+	const 中心点 = キャンバス.height / 2;
+	const グラフ高さ = キャンバス.height / 2;
+
+	プロセッサ.接続( 音響文脈.出力先() );
+	
+	let 更新点 = 0;
+	let 最高値 = 0.0, 最低値 = -0.0;
+
+	const 画像文脈 = キャンバス.文脈を取得();
+	画像文脈.塗りつぶし色( "hsl( 0, 0%, 0% )" );
+	画像文脈.矩形塗りつぶし( 0, 0, キャンバス.width, キャンバス.height );
+
+	プロセッサ.onaudioprocess = function( ev )
+	{
+		const ch = ev.inputBuffer.getChannelData( 0 );
+		
+		for( let i = 0; i < ch.length; i ++ )
+		{
+			const v = ch[ i ];
+			最高値 = Math.max( v, 最高値 );
+			最低値 = Math.min( v, 最低値 );
+		}
+	};
+
+	function グラフを更新()
+	{
+
+		画像文脈.塗りつぶし色( "hsl( 180, 70%, 10% )" );
+		画像文脈.矩形塗りつぶし( 更新点, 0, 1, グラフ高さ * 2 );
+		
+		画像文脈.塗りつぶし色( "hsl( 185, 100%, 50% )" );
+		画像文脈.矩形塗りつぶし( 更新点, 中心点 - 最高値 * グラフ高さ, 1, ( 最高値 - 最低値 ) * グラフ高さ );
+
+		更新点 += 1;  if( 更新点 >= キャンバス.width )  更新点 = 0;
+		最高値 = 最低値 = 0;
+	}
+
+	間欠を設定( グラフを更新, 50 );
+};
+
+function オブジェクトの内容を書き換え( dest, src, def )
+{
+	for( let index in def )
+	{
+		const value = ( src ? src[ index ] : def[ index ] );
+
+		if( value && value.constructor == Array )
+			オブジェクトの内容を書き換え( dest[ index ] = dest[ index ] || [], value, def[ index ] );
+		
+		else if( value && value.constructor == Object )
+			オブジェクトの内容を書き換え( dest[ index ] = dest[ index ] || {}, value, def[ index ] );
+		
+		else dest[ index ] = value;
+	}
+}
+
+
+</script>
+</body>
+</html>

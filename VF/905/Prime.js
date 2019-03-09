@@ -170,7 +170,7 @@ new function()
 		[
 			"Div", "H1", "H2", "H3", "H4", "H5", "H6", "P",
 			"Article", "Header",
-			"Span",
+			"Span", "Img", "Canvas",
 			"Table", "TBody", "TH", "TR", "TD", 
 			"Form", "Input", "Button", "Select", "Option"
 		]
@@ -199,7 +199,8 @@ new function()
 
 	この世界.Base64から文字列に復元 = function( base64 )
 	{
-		return decodeURIComponent( escape( atob( base64 ) ) );
+		try{ return decodeURIComponent( escape( atob( base64 ) ) ); }
+		catch( err ) { console.log( base64 ); return ""; }
 	};
 
 	let 次の連番 = 1;
@@ -211,6 +212,12 @@ new function()
 		if( 実体 ) 実体.実行時連番 = 連番;
 		return 連番;
 	};
+
+	この世界.JSONから値に = function( json, エラー返り値 )
+	{
+		try { return JSON.parse( json ); }
+		catch( e ) { return エラー返り値; }
+	}
 
 };
 
@@ -228,6 +235,11 @@ let ローカルホストか = location.host.match( /localhost$/i ) != null;
 			マウスダウン: "mousedown",
 			マウスアップ: "mouseup",
 			マウスムーブ: "mousemove",
+
+			タッチスタート: "touchstart",
+			タッチムーブ: "touchmove",
+			タッチエンド: "touchend",
+			タッチキャンセル: "touchcancel",
 		}
 	},
 	function()
@@ -238,6 +250,72 @@ let ローカルホストか = location.host.match( /localhost$/i ) != null;
 		{
 			this.innerHTML = 文をHTMLに変換( 文 );
 		};
+
+		典型.マウスとタッチ処理を追加 = function( 開始処理, 移動処理, 終了処理, 中止処理 )
+		{
+			let タッチ中か = いいえ;
+
+			this.タッチスタート処理を追加
+			(
+				ev =>
+				{
+					タッチ中か = はい;
+					開始処理 && 開始処理( ev );
+				}
+			);
+			
+			this.タッチエンド処理を追加
+			(
+				ev =>
+				{
+					タッチ中か = いいえ;
+					終了処理 && 終了処理( ev );
+				}
+			);
+			
+			this.タッチキャンセル処理を追加
+			(
+				ev =>
+				{
+					タッチ中か = いいえ;
+					中止処理 && 中止処理( ev );
+				}
+			);
+
+			this.マウスダウン処理を追加( ev => ! タッチ中か && 開始処理 && 開始処理( ev ) );
+			this.マウスアップ処理を追加( ev => ! タッチ中か && 終了処理 && 終了処理( ev ) );
+		};
+	}
+);
+
+既存の型を装飾
+(
+	HTMLCanvasElement,
+	{
+		
+	},
+	function()
+	{
+		this.文脈を取得 = function()
+		{
+			return this.getContext( "2d" );
+		};
+	}
+);
+
+
+既存の型を装飾
+(
+	CanvasRenderingContext2D,
+	{
+		フィールド:
+		{
+			矩形塗りつぶし: "fillRect",
+		},
+		プロパティ:
+		{
+			塗りつぶし色: "fillStyle"
+		}
 	}
 );
 
@@ -275,20 +353,30 @@ let 音響文脈の型 = 既存の型を装飾
 	{
 		フィールド:
 		{
+			停止: "suspend",
+			再開: "resume",
+
 			オシレーターを作成: "createOscillator",
 			発振器を作成: "createOscillator",
+
 			フィルターを作成: "createBiquadFilter",
 			ゲインを作成: "createGain",
+
 			制幅器を作成: "createGain",
 			振幅を作成: "createGain",
-			倍音表を作成: "createPeriodicWave",
-			波形変形器を作成: "createWaveShaper",
+
+			"倍音表を作成": "createPeriodicWave",
+			"波形変形器を作成": "createWaveShaper",
+
+			"プロセッサーを作成": "createScriptProcessor",
+			"アナライザーを作成": "createAnalyser",
 		},
 		
 		プロパティ:
 		{
-			出力: "destination",
-			現在時刻: "currentTime"
+			出力先: "destination",
+			現在時刻: "currentTime",
+			状態: "state",
 		}
 	},
 
@@ -296,7 +384,7 @@ let 音響文脈の型 = 既存の型を装飾
 	{
 		let この典型 = this;
 
-		この典型.固定値を作成 = function( 初期値 )
+		この典型.値ゲインを作成 = function( 初期値 )
 		{
 			let この実体 = this;
 
@@ -347,6 +435,7 @@ let 音響文脈の型 = 既存の型を装飾
 	{
 		const この典型 = this;
 
+		この典型.予定を破棄 = 
 		この典型.自動値を破棄 = this.cancelAndHoldAtTime || this.cancelScheduledValues;
 	}
 );

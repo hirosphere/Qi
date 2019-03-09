@@ -33,8 +33,8 @@ button { margin-bottom: 10px; padding: 16px 24px; border-radius: 6px; }
 
 </style>
 
-<script src="Prime905.js?2019-01-27-A"></script>
-<script src="Cell.js?2019-01-27-A"></script>
+<script src="Prime.905.js?B"></script>
+<script src="Cell.js?B"></script>
 
 </head>
 
@@ -48,9 +48,12 @@ button { margin-bottom: 10px; padding: 16px 24px; border-radius: 6px; }
 		<br/>
 		<button onclick="アプリケーション.シンセ.発音()">発音</button>
 		<br/>
-		<textarea id="JSON" style="width: 260px; height: 280px;"></textarea>
-		<textarea id="UEnc" style="width: 120px; height: 280px;"></textarea>
-		<textarea id="B64" style="width: 120px; height: 280px;"></textarea>
+		<textarea id="JSON" style="width: 320px; height: 260px;"></textarea>
+		<textarea id="Melody" style="width: 320px; height: 260px;"></textarea>
+		<br/>
+		<textarea id="JSON_i" style="width: 800px; height: 20px;"></textarea>
+		<textarea id="B64" style="width: 800px; height: 20px;"></textarea>
+		<textarea id="UEnc" style="width: 800px; height: 20px;"></textarea>
 		<br/>
 		<p id="Info"></p>
 	</div>
@@ -67,8 +70,10 @@ button { margin-bottom: 10px; padding: 16px 24px; border-radius: 6px; }
 const アプリケーション = new function()
 {
 	const json = この文書.Idで( "JSON" );
-	const uenc = この文書.Idで( "UEnc" );
+	const melody = この文書.Idで( "Melody" );
+	const json_i = この文書.Idで( "JSON_i" );
 	const b64 = この文書.Idで( "B64" );
+	const uenc = この文書.Idで( "UEnc" );
 	const info = この文書.Idで( "Info" );
 
 	const def_doc_value =
@@ -122,9 +127,10 @@ const アプリケーション = new function()
 	this.テストビューを更新 = function()
 	{
 		const json = JSON.stringify( this.Value ) || "";
+		json_i.value = json;
 		uenc.value = encodeURI( json );
 		b64.value = 文字列からBase64に変換( json );
-		info.文を設定( `${ json.length } , ${ uenc.value.length } , ${ b64.value.length }` );
+		info.文を設定( `( JSON , Base64 , URLEncode )  ${ json.length } , ${ b64.value.length } , ${ uenc.value.length }` );
 	};
 
 	// テスト //
