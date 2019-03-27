@@ -33,7 +33,7 @@ label, input { vertical-align: middle; }
 #Keyboard
 {
 	border: 2px solid #666;
-	height: 200px;
+	height: 280px;
 	overflow: auto;
 }
 
@@ -44,8 +44,10 @@ label, input { vertical-align: middle; }
 	margin-top: 0px;
 	border: 1px solid hsl( 55, 0%, 60% );
 	border-left-width: 0px;
-	width: 45px;
-	height: 180px;
+	width: 55px;
+	height: 210px;
+	line-height: 344px;
+	text-align: center;
 	background: hsl( 55, 0%, 100% );
 }
 
@@ -53,11 +55,11 @@ label, input { vertical-align: middle; }
 {
 	position: absolute;
 	z-index: 1;
-	margin-left: -22.5px;
-	width: 45px;
-	height: 100px;
-	background: hsl( 25, 0%, 60% );
-	border-right: 1px solid hsl( 55, 0%, 40% );
+	margin-left: -27.5px;
+	width: 55px;
+	height: 110px;
+	background: hsl( 25, 0%, 20% );
+	border-right: 1px solid hsl( 55, 0%, 70% );
 }
 
 </style>
@@ -79,15 +81,11 @@ label, input { vertical-align: middle; }
 		<button onclick="アプリケーション.ハッシュ書き出し()">ハッシュ書き出し</button>
 		<button onclick="アプリケーション.停止()">停止</button>
 		<button onclick="アプリケーション.開始()">開始</button>
-		<input type="range" id="Volume" value="30" style="width: 280px; height: 40px;"/>
+		<input type="range" id="Volume" value="65" style="width: 280px; height: 40px;"/>
 		<div id="Keyboard"></div>
 		<textarea id="JSON" style="width: 320px; height: 260px;"></textarea>
-		<textarea id="Melody" style="width: 320px; height: 260px;">+2222233233222211
-		
-ABCDE F GHIJK L
-abcde f ghijk l
-</textarea>
 		<span id="Graph"></span>
+		<textarea id="Melody" style="width: 320px; height: 260px;"></textarea>
 		<br/>
 		<textarea id="TV_Enc" style="width: 900px; height: 40px;"></textarea>
 		<textarea id="TV_Dec" style="width: 900px; height: 40px;"></textarea>
@@ -183,16 +181,32 @@ const アプリケーションの型 = function()
 
 	複楽器.前出力.接続( 波形グラフ.入力 );
 
+	const シーケンサー = new シーケンサーの型( 音響文脈, 複楽器 );
+
+	const 鍵盤枠 = この文書.Idで( "Keyboard" );
 	new 鍵盤の型
 	(
-		// なし,
-		この文書.Idで( "Keyboard" ),
+		鍵盤枠,
 		{
 			チャンネル: 0,
 			移調: 48,
 			イベント処理: ( イベント ) => 複楽器.予定を投函( イベント )
 		}
 	);
+
+	鍵盤枠.scrollLeft = 鍵盤枠.scrollWidth / 2 - 鍵盤枠.offsetWidth / 2;
+
+	// 操作 //
+
+	this.開始 = function()
+	{
+		シーケンサー.開始();
+	};
+
+	this.停止 = function()
+	{
+		シーケンサー.停止();
+	};
 
 	// 同期 //
 
@@ -204,8 +218,6 @@ const アプリケーションの型 = function()
 
 	// テスト //
 
-	melody.value = 複楽器.音量テーブルテスト();
-	
 	this.スクリプト実行 = function()
 	{
 		const 出力 = この文書.Idで( "Eval_Output" );

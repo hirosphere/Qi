@@ -365,7 +365,7 @@ let 音響文脈の型 = 既存の型を装飾
 			制幅器を作成: "createGain",
 			振幅を作成: "createGain",
 
-			"倍音表を作成": "createPeriodicWave",
+			"倍音構成を作成": "createPeriodicWave",
 			"波形変形器を作成": "createWaveShaper",
 
 			"プロセッサーを作成": "createScriptProcessor",
@@ -421,10 +421,9 @@ let 音響文脈の型 = 既存の型を装飾
 	{
 		フィールド:
 		{
-			その時の値: "setValueAtTime",
 			その時刻の値: "setValueAtTime",
-			その時へ直線変化: "linearRampToValueAtTime",
-			その時刻へ直線変化: "linearRampToValueAtTime",
+			直線を設定: "linearRampToValueAtTime",
+			充放電を設定: "setTargetAtTime",
 		},
 		プロパティ:
 		{
@@ -461,6 +460,7 @@ let 音響文脈の型 = 既存の型を装飾
 			ゲイン: "gain",
 			振幅: "gain",
 			利得: "gain",
+			オフセット: "gain",
 		}
 	},
 	function()
@@ -486,6 +486,7 @@ let 音響文脈の型 = 既存の型を装飾
 		{
 			開始: "start",
 			終了: "stop",
+			倍音構成を与える: "setPeriodicWave",
 		},
 
 		プロパティ:
