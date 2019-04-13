@@ -14,15 +14,14 @@ html
 {
 	background: hsl( 210, 80%, 90% );
 	background: hsl( 90, 50%, 75% );
-	padding: 0px 0px 0px 45px;
+	padding: 0px 15px;
 }
 
 body
 {
-	width: 960px;
 	min-height: 200vh;
 	background: hsl( 210, 0%, 100% );
-	padding: 30px 30px;
+	padding: 3px 3px;
 }
 
 button { margin-bottom: 10px; padding: 16px 24px; border-radius: 6px; }
@@ -79,8 +78,8 @@ label, input { vertical-align: middle; }
 	<div>
 		<button onclick="アプリケーション.ハッシュ取り込み()">ハッシュ取り込み</button>
 		<button onclick="アプリケーション.ハッシュ書き出し()">ハッシュ書き出し</button>
-		<button onclick="アプリケーション.停止()">停止</button>
-		<button onclick="アプリケーション.開始()">開始</button>
+		<button onclick="アプリケーション.演奏機1.停止()">停止</button>
+		<button onclick="アプリケーション.演奏機1.開始()">開始</button>
 		<input type="range" id="Volume" value="65" style="width: 280px; height: 40px;"/>
 		<div id="Keyboard"></div>
 		<textarea id="JSON" style="width: 320px; height: 260px;"></textarea>
@@ -105,6 +104,8 @@ label, input { vertical-align: middle; }
 
 const アプリケーションの型 = function()
 {
+	const これ = this;
+
 	// 構築 //
 	
 	const json = この文書.Idで( "JSON" );
@@ -127,6 +128,7 @@ const アプリケーションの型 = function()
 	this.ハッシュ取り込み = function()
 	{
 		ドキュメント.ハッシュを与える( location.hash );
+		楽器組.設定更新();
 		this.ドキュメントをエディタに反映();
 	};
 
@@ -150,10 +152,14 @@ const アプリケーションの型 = function()
 
 	this.エディタをドキュメントに反映 = function()
 	{
-		try { ドキュメント.値を与える( JSON.parse( json.value ) ); }
-		catch( err ) {}
+		try
+		{
+			ドキュメント.値を与える( JSON.parse( json.value ) );
+			楽器組.設定更新();
+			this.テストビューを更新();
+		}
 
-		this.テストビューを更新();
+		catch( err ) {}
 	};
 
 	this.テスト = function( キー, 開始か )
@@ -161,7 +167,7 @@ const アプリケーションの型 = function()
 		音響文脈.状態() == "suspended" && 音響文脈.再開();
 
 		const t = 音響文脈.現在時刻();
-		開始か && 複楽器.予定を投函( { チャンネル: 0, キー: キー, 開始時刻: t + 0.01 } );
+		開始か && 楽器組.予定を投函( { チャンネル: 0, キー: キー, 開始時刻: t + 0.01 } );
 	};
 
 
@@ -170,18 +176,21 @@ const アプリケーションの型 = function()
 	const 音響文脈 = new 音響文脈の型();
 	const 波形グラフ = new 波形グラフの型( この文書.Idで( "Graph" ), 音響文脈 );
 
-	const 複楽器 = new 複楽器の型
+	const 楽器組 = new 楽器組の型
 	(
 		音響文脈,
 		音響文脈.出力先(),
 		[
 			new 単楽器の型( 音響文脈, 2, ドキュメント )
-		]
+		],
+		ドキュメント
 	);
 
-	複楽器.前出力.接続( 波形グラフ.入力 );
+	楽器組.前出力.接続( 波形グラフ.入力 );
 
-	const シーケンサー = new シーケンサーの型( 音響文脈, 複楽器 );
+	これ.演奏機1 = new 演奏機1の型( 楽器組 );
+
+	new 自動演奏ベースの型( 音響文脈, [ これ.演奏機1 ] );
 
 	const 鍵盤枠 = この文書.Idで( "Keyboard" );
 	new 鍵盤の型
@@ -190,29 +199,17 @@ const アプリケーションの型 = function()
 		{
 			チャンネル: 0,
 			移調: 48,
-			イベント処理: ( イベント ) => 複楽器.予定を投函( イベント )
+			イベント処理: ( イベント ) => 楽器組.予定を投函( イベント )
 		}
 	);
 
 	鍵盤枠.scrollLeft = 鍵盤枠.scrollWidth / 2 - 鍵盤枠.offsetWidth / 2;
 
-	// 操作 //
-
-	this.開始 = function()
-	{
-		シーケンサー.開始();
-	};
-
-	this.停止 = function()
-	{
-		シーケンサー.停止();
-	};
-
 	// 同期 //
 
 	function 音量UIを反映()
 	{
-		複楽器.音量を設定( volume.value );
+		楽器組.音量を設定( volume.value );
 	}
 
 
@@ -234,6 +231,19 @@ const アプリケーションの型 = function()
 	音量UIを反映();
 	this.ハッシュ取り込み();
 };
+
+function テストシーケンス( 楽器 )
+{
+	this.初期化 = function()
+	{
+		;
+	};
+
+	this.進捗 = function( 時間 )
+	{
+		;
+	};
+}
 
 const 波形グラフの型 = function( 幹, 音響文脈 )
 {

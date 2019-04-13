@@ -3,6 +3,7 @@ const URLハッシュ = new function()
 {
 	const これ = this;
 	const esc = "!";
+
 	let ハッシュ先頭符 = "#?";
 	let ハッシュ末尾符 = "_";
 
@@ -20,21 +21,19 @@ const URLハッシュ = new function()
 	//			英数文字と ~ # $ & ' ( ) * + - . / ; = ? @
 	//
 	//
+	//		(空文字列)					->		'
 	//		ABC123_~#$&'()*+-./;=?z		->		ABC123_~#$&'()*+-./;=?z
-	//		123ABC_~#$&'()*+-./;=?z		->		_123ABC_~#$&'()*+-./;=?z
-	//		_ABC123_~#$&'()*+-./;=?z	->		__ABC123_~#$&'()*+-./;=?z
-	//		=ABC123_~#$&'()*+-./;=?z	->		_=ABC123_~#$&'()*+-./;=?z
-	//	
-	//		ABC123_~#$&'()*+-./;=?		->		ABC123_~#$&'()*+-./;=?_
-	//		ABC123_~#$&'()*+-./;=?_		->		ABC123_~#$&'()*+-./;=?__
+	//		123ABC_~#$&'()*+-./;=?z		->		'123ABC_~#$&'()*+-./;=?z
+	//		'ABC123_~#$&'()*+-./;=?z	->		''ABC123_~#$&'()*+-./;=?z
+	//		=ABC123_~#$&'()*+-./;=?z	->		'=ABC123_~#$&'()*+-./;=?z	:	Base64先頭符と区別
 	//	
 	//	文字列 2  ( Base64 )
 	//	
+	//		先頭に = を付加して区別
+	//	
 	//	
 
-	// ~[-+0-9][-A-Za-z_0-9/]+				-	エスケープ文字列
-	// ~n ~u ~t ~f	-	null , undefined , true , false
-	// ~I			-	Infinity
+	// !n !t !f	-	null , undefined , true , false
 
 	// 変換 //
 
@@ -57,8 +56,6 @@ const URLハッシュ = new function()
 			return 文字列値を変換( 値 );
 		}
 		
-		if( 値 === Infinity ) return esc + "I";
-
 		if( 値.constructor == Number )
 		{
 			return encodeURI( 値 );
@@ -88,29 +85,29 @@ const URLハッシュ = new function()
 			}
 			return esc + "O" + rt.join( "," ) + esc + "o";
 		}
+		
+		return esc + "n";
 	};
 	
 		// 文字列変換 //
 	
 	const 文字列変換テーブル =
 	{
-		//"~": "%7e",
 		"!": "%21",
 		":": "%16",
-		",": "%2c",
+		",": "%2c"
 	};
 
 	function 文字列値を変換( 値 )
 	{
-		if( 値 == "" )  return "$"; 
+		if( 値 == "" )  return "'";
+
+		if( 値.match( "^[-0-9]" ) ) return "'" + 値;
 
 		const ue1 = encodeURI( 値 );
 		const ue2 = ue1.replace( /[:,!]/g, m => 文字列変換テーブル[ m ] );
-		const ue3 =
-			( ue2[ 0 ].match( /[-+.\d$=]/ ) && "_" || "" )		//	-	値の先頭が数値と被る場合は、先頭に _ を付加。
-			+ ue2
-			+ ( ! ue2.substr( -1 ).match( /[0-9A-Za-z]/ ) && "$" || "" )	//	-	値の末尾が英数文字以外の時は、末尾に _ を付加し、ツイッターでURLとして認識させる。
-		;
+		const ue3 = ( ue2[0] == "'" ? "'": "" ) + ue2;
+
 		const b64 = "=" + 文字列からBase64に変換( 値 );
 		return ue3.length < b64.length ? ue3 : b64;
 	};
@@ -131,9 +128,7 @@ const URLハッシュ = new function()
 		"a": "]",
 		"t": "true",
 		"f": "false",
-		"n": "null",
-		"u": "undefined",
-		"I": "Infinity",
+		"n": "null"
 	};
 
 	const 復元パターン = new RegExp
@@ -141,7 +136,7 @@ const URLハッシュ = new function()
 		[
 			"(" + esc + "(o|O|a|A|t|f|n|u|I))",
 
-			"(([-+]?\\d+)(\\.\\d+)?([Ee][-+]?\\d+)?)",		//  -  数値
+			"((-?\\d+)(\\.\\d+)?([Ee][-+]?\\d+)?)",		//  -  数値
 			
 			"([#$&'()*+./;=?@A-Za-z_%~][-#$&'()*+./;=?@0-9A-Za-z_%~]*)",	//  - 文字列
 
@@ -172,12 +167,16 @@ const URLハッシュ = new function()
 				return JSON.stringify( Base64から文字列に復元( 文字列.substr( 1 ) ) );
 			}
 
-			return JSON.stringify( decodeURI (
-				文字列.substr
+			return JSON.stringify
+			(
+				decodeURI
 				(
-					文字列[ 0 ] == "$" ? 1 : 0,
-					文字列[ - 1 ] == "$" ? - 2 : undefined,
-				) ) );
+					文字列.substr
+					(
+						文字列[ 0 ] == "'" ? 1 : 0,
+					)
+				)
+			);
 		}
 
 		return "";

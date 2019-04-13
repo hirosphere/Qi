@@ -88,7 +88,7 @@ const 鍵盤の型 = function( 幹, 設定 )
 			ev =>		// 終了処理 //
 			{
 				イベント抑止( ev );
-				if( 打鍵Id )  イベント処理( { 種類: "離鍵", 打鍵Id: 打鍵Id, チャンネル: チャンネル, キー: キー } );
+				if( 打鍵Id )  イベント処理( { 種類: "離鍵", 打鍵Id: 打鍵Id, チャンネル: チャンネル } );
 				打鍵Id = なし;
 			}
 		);
@@ -97,7 +97,7 @@ const 鍵盤の型 = function( 幹, 設定 )
 		{
 			try
 			{
-				ev.preventDefault();
+				if( ev.cancelable )  ev.preventDefault();
 				ev.stopPropagation();
 			}
 			catch( exp ) { console.log( exp ) }
