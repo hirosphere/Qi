@@ -18,7 +18,7 @@ const URLハッシュ = new function()
 	//		
 	//		・エスケープをしない文字
 	//		
-	//			英数文字と ~ # $ & ' ( ) * + - . / ; = ? @
+	//			英数文字と ~ # $ & ' ( ) * + - . / ; = ? @ _
 	//
 	//
 	//		(空文字列)					->		'
@@ -68,7 +68,7 @@ const URLハッシュ = new function()
 			{
 				rt.push( 変換( 値[ i ] ) );
 			}
-			return esc + "A" + rt.join( "," ) + esc + "a";
+			return esc + "a" + rt.join( "," ) + esc + "A";
 		}
 		
 		if( 値.constructor == Object )
@@ -83,7 +83,7 @@ const URLハッシュ = new function()
 					+ 変換( 値[ fn ] )
 				);
 			}
-			return esc + "O" + rt.join( "," ) + esc + "o";
+			return esc + "o" + rt.join( "," ) + esc + "O";
 		}
 		
 		return esc + "n";
@@ -102,11 +102,10 @@ const URLハッシュ = new function()
 	{
 		if( 値 == "" )  return "'";
 
-		if( 値.match( "^[-0-9]" ) ) return "'" + 値;
-
 		const ue1 = encodeURI( 値 );
 		const ue2 = ue1.replace( /[:,!]/g, m => 文字列変換テーブル[ m ] );
-		const ue3 = ( ue2[0] == "'" ? "'": "" ) + ue2;
+		const top = 値[ 0 ];
+		const ue3 = ( ( top == "'" || top.match( "[-0-9]" ) ) ? "'": "" ) + ue2;
 
 		const b64 = "=" + 文字列からBase64に変換( 値 );
 		return ue3.length < b64.length ? ue3 : b64;
@@ -122,10 +121,10 @@ const URLハッシュ = new function()
 
 	const 復元テーブル =
 	{
-		"O": "{",
-		"o": "}",
-		"A": "[",
-		"a": "]",
+		"o": "{",
+		"O": "}",
+		"a": "[",
+		"A": "]",
 		"t": "true",
 		"f": "false",
 		"n": "null"
@@ -134,11 +133,11 @@ const URLハッシュ = new function()
 	const 復元パターン = new RegExp
 	(
 		[
-			"(" + esc + "(o|O|a|A|t|f|n|u|I))",
+			"(" + esc + "(o|O|a|A|t|f|n|u))",		//  符号  //
 
-			"((-?\\d+)(\\.\\d+)?([Ee][-+]?\\d+)?)",		//  -  数値
+			"((-?\\d+)(\\.\\d+)?([Ee][-+]?\\d+)?)",		//  数値  //
 			
-			"([#$&'()*+./;=?@A-Za-z_%~][-#$&'()*+./;=?@0-9A-Za-z_%~]*)",	//  - 文字列
+			"([#$&'()*+./;=?@A-Za-z_%~][-#$&'()*+./;=?@0-9A-Za-z_%~]*)",	//  文字列  //
 
 			"(" + ハッシュ末尾符 + "$)"
 

@@ -6,31 +6,42 @@ const いいえ = false;
 const なし = null;
 const 未定義 = undefined;
 
+const なしを補完 = function( 値, 補完値 ) { return 値 == null ? 補完値 : 値 };
 const 未定義補完 = function( 値, 補完値 ) { return 値 === undefined ? 補完値 : 値 };
 const 補完 = 未定義補完;
 
 const 型を作成 = function( 典型装飾関数, 基底の型 )
 {
-	const 型 = function(){};
-
-	if( 基底の型 != undefined )
+	const 典型の型 = function(){};
 	{
-		型.prototype = new 基底の型();
+		典型の型.prototype.初期化 = function(){};
+
+		if( 基底の型 != undefined )
+		{
+			典型の型.prototype = new 基底の型.典型の型();
+		}
+
+		典型装飾関数.call( 典型の型.prototype, 基底の型 && 基底の型.prototype || なし );
+
 	}
 
-	典型装飾関数.call( 型.prototype, 基底の型 && 基底の型.prototype || なし );
-
-	if( 型.prototype.初期化 == undefined )
+	const 型 = function()
 	{
-		型.prototype.初期化 = function(){};
-	}
-
-	型.実体を作成 = 型.作成 = function()
-	{
-		const 実体 = new 型();
-		型.prototype.初期化.apply( 実体, arguments );
-		return 実体;
+		const これ = this;
+		これ.初期化.apply( これ, arguments );
 	};
+
+	{
+		型.典型の型 = 典型の型;
+		型.prototype = new 典型の型();
+
+		型.実体を作成 = 型.作成 = function()
+		{
+			const 実体 = new 型();
+			//型.prototype.初期化.apply( 実体, arguments );
+			return 実体;
+		};
+	}
 
 	return 型;
 };
@@ -172,7 +183,7 @@ new function()
 			"Article", "Header",
 			"Span", "Img", "Canvas",
 			"Table", "TBody", "TH", "TR", "TD", 
-			"Form", "Input", "Button", "Select", "Option"
+			"Form", "Input", "Button", "Select", "Option", "Textarea"
 		]
 	)
 	{
@@ -240,8 +251,14 @@ let ローカルホストか = location.host.match( /localhost$/i ) != null;
 			タッチムーブ: "touchmove",
 			タッチエンド: "touchend",
 			タッチキャンセル: "touchcancel",
+		},
+
+		フィールド:
+		{
+			支枝を追加: "appendChild"
 		}
 	},
+	
 	function()
 	{
 		let 典型 = this;
@@ -292,7 +309,11 @@ let ローカルホストか = location.host.match( /localhost$/i ) != null;
 (
 	HTMLCanvasElement,
 	{
-		
+		プロパティ:
+		{
+			幅: "width",
+			高さ: "height"
+		}
 	},
 	function()
 	{
@@ -310,11 +331,20 @@ let ローカルホストか = location.host.match( /localhost$/i ) != null;
 	{
 		フィールド:
 		{
-			矩形塗りつぶし: "fillRect",
+			矩形塗り: "fillRect",
+			塗り: "fill",
+			描き: "stroke",
+			経を開始: "beginPath",
+			経を終了: "closePath",
+			移動: "moveTo",
+			線: "lineTo",
+			円弧: "arc",
+			//経: "",
 		},
+		
 		プロパティ:
 		{
-			塗りつぶし色: "fillStyle"
+			塗り色: "fillStyle"
 		}
 	}
 );

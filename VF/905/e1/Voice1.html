@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<link rel="stylesheet" href="Common.css"/>
+<script src="../Prime.js"></script>
+</head>
+
+<body onload="アプリケーション = new アプリケーションの型( '123', 'abc' )">
+
+<script>
+
+const 設定 =
+{
+	表題: "Voice 1"
+};
+
+const アプリケーションの型 = 型を作成
+(
+	function()
+	{
+		const この典型 = this;
+
+		この典型.初期化 = function( a, b )
+		{
+			const これ = this;
+
+			const e = Divを作成( この文書.body );
+			H1を作成( e, { 文: 設定.表題 } );
+			Pを作成( e, { 文: `${a} ${b}` } );
+			この文書.表題( 設定.表題 );
+
+			{
+				const div = Divを作成( e );
+				new グラフの型( div, {} );
+			}
+		};
+
+		この典型.m = function()
+		{
+			const これ = this;
+		};
+	}
+);
+
+グラフの型 = 型を作成
+(
+	function()
+	{
+		const この典型 = this;
+
+		この典型.初期化 = function( 包枝, 設定 )
+		{
+			const これ = this;
+			
+			const 属性 =
+			{
+				width: なしを補完( 設定.幅, 320 ),
+				height: なしを補完( 設定.高さ, 240 ),
+			};
+
+			これ.画葉 = Canvasを作成( 包枝, { 属性: 属性 } );
+			これ.画面を初期化();
+		};
+
+		この典型.画面を初期化 = function()
+		{
+			const これ = this;
+			const 文脈 = これ.画葉.文脈を取得();
+			文脈.塗り色( "hsl( 180, 80%, 45% )" );
+			文脈.矩形塗り( 0, 0, これ.画葉.幅(), これ.画葉.高さ() );
+		};
+
+		この典型._m2 = function()
+		{
+			const これ = this;
+		};
+	}
+);
+
+
+
+</script>
+</body>
+</html>

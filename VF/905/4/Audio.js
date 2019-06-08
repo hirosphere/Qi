@@ -14,7 +14,7 @@ const 自動演奏ベースの型 = function( 音響文脈, 演奏機群 )
 		for( 演奏機 of 演奏機群 )  演奏機.コマ処理( コマ時間 );
 
 		前の時刻 = 現在時刻;
-		console.log( 現在時刻 );
+		// console.log( 現在時刻 );
 		時限を設定( コマ処理, コマ時間 * 1000 );
 	}
 
@@ -102,7 +102,7 @@ const 楽器組の型 = function( 文脈, 出力先, 楽器群, モデル )
 
 	this.設定更新 = function()
 	{
-		これ.波形 = new 波形の型( モデル.要素.波形.値(), 文脈 );
+		これ.波形 = new 波形の型( モデル.要素.Wave.値(), 文脈 );
 	};
 
 	this.予定を投函 = function( 予定 )
@@ -186,7 +186,8 @@ function 波形の型( 設定値, 文脈 )
 	if( ! これ.波形名 )
 	{
 		const テーブル = new 倍音テーブルの型( 設定値 );
-		これ.倍音構成 = 文脈.倍音構成を作成( テーブル.Real, テーブル.Imag );
+		try { これ.倍音構成 = 文脈.倍音構成を作成( テーブル.Real, テーブル.Imag ); }
+		catch( exp ) { console.log( exp ); }
 	}
 
 	this.オシレーターに設定 = function( オシレーター )
@@ -202,7 +203,7 @@ function 倍音テーブルの型( 設定 )
 	これ.Imag = new Float32Array( 1024 );
 	これ.Real = new Float32Array( 1024 );
 
-	if( 設定.constructor == String )
+	if( 設定 && 設定.constructor == String )
 	{
 		const 構成 = 設定.split( /\/|'/g );
 		const 音量 = ( 構成[ 0 ] || 0 ) / 100;
@@ -235,10 +236,7 @@ function 倍音テーブルの型( 設定 )
 			}
 		}
 
-		else
-		{
-			これ.Imag[ 1 ] = 音量;
-		}
+		else  これ.Imag[ 1 ] = 1;
 	}
 
 	else　if( 設定 && 設定.constructor == Array )
@@ -252,18 +250,23 @@ function 倍音テーブルの型( 設定 )
 			for( let i in これ.Imag )  これ.Imag[ i ] += 要素.Imag[ i ];
 		}
 	}
+
+	else
+	{
+		これ.Imag[ 1 ] = 1;
+	}
 }
 
 const 単声の型 = function( 文脈, モデル, 出力先, 音量, 波形 )
 {
 	const Mo = モデル.要素;
-	const EG = モデル.要素.EG1.要素;
+	const EG = モデル.要素.EG1;
 
-	const オシレーター1 = 文脈.オシレーターを作成();
-	const 音程ノード = 文脈.値ゲインを作成( 0 );
-	const エンベロープゲイン = 文脈.値ゲインを作成( 0 );
-	const 出力ゲイン = 文脈.ゲインを作成();
-	const 出力 = 出力ゲイン;
+	let オシレーター1 = 文脈.オシレーターを作成();
+	let 音程ノード = 文脈.値ゲインを作成( 0 );
+	let エンベロープゲイン = 文脈.値ゲインを作成( 0 );
+	let 出力ゲイン = 文脈.ゲインを作成();
+	let 出力 = 出力ゲイン;
 
 	オシレーター1.周波数().値( 440 );
 	波形.オシレーターに設定( オシレーター1 );
@@ -277,23 +280,24 @@ const 単声の型 = function( 文脈, モデル, 出力先, 音量, 波形 )
 
 	this.打鍵 = function( 予定 )
 	{
-		const t = 文脈.現在時刻() + 0.00;
-		オシレーター1.ピッチ().その時刻の値( ( 予定.キー - 69 + Mo.移調.値() ) * 100, t );
-		音程ノード.オフセット().その時刻の値( ( 予定.キー - 69 + Mo.移調.値() ) * 100, t );
+		const t = 文脈.現在時刻() + 0.01;
+		オシレーター1.ピッチ().その時刻の値( ( 予定.キー - 69 ) * 100, t );
+		音程ノード.オフセット().その時刻の値( ( 予定.キー - 69 ) * 100, t );
 
 		
-		const a = t + EG.A.値() / 1000;
-		const d = a + EG.D.値() / 1000;
+		const a = t + EG.A / 1000;
+		const d = a + EG.D / 1000;
 		
 		エンベロープゲイン.振幅().その時刻の値( 0, t );
-		エンベロープゲイン.振幅().充放電を設定( 音量 / 0.63, t, EG.A.値() / 1000 / 1 );
-		エンベロープゲイン.振幅().setTargetAtTime( 音量 * EG.S.値() / 100, a, EG.D.値() / 1000 / 1 );
+		console.log( 音量, EG, EG.A );
+		エンベロープゲイン.振幅().充放電を設定( 音量 / 0.63, t, EG.A / 1000 / 1 );
+		エンベロープゲイン.振幅().setTargetAtTime( 音量 * EG.S / 100, a, EG.D / 1000 / 1 );
 	};
 
 	this.離鍵 = function( 予定 )
 	{
-		const t = 文脈.現在時刻() + 0;
-		const rlen = EG.R.値() / 1000;
+		const t = 文脈.現在時刻() + 0.01;
+		const rlen = EG.R / 1000;
 		const rlen_exp = rlen * 0.9;
 		const rpt_lin = t + rlen_exp;
 		
@@ -301,7 +305,7 @@ const 単声の型 = function( 文脈, モデル, 出力先, 音量, 波形 )
 		エンベロープゲイン.振幅().充放電を設定( 0, t, rlen );
 		//エンベロープゲイン.振幅().setTargetAtTime( 0, , rpt_lin );
 
-		時限を設定( 後始末, EG.R.値() * 8 );
+		時限を設定( 後始末, EG.R * 8 );
 	};
 
 	function 後始末()
@@ -316,6 +320,12 @@ const 単声の型 = function( 文脈, モデル, 出力先, 音量, 波形 )
 		delete 音程ノード;
 		delete エンベロープゲイン;
 		delete 出力ゲイン;
+
+		オシレーター1 = undefined;
+		音程ノード = undefined;
+		エンベロープゲイン = undefined;
+		出力ゲイン = undefined;
+		出力 = undefined;
 	}
 };
 

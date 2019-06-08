@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8"/>
-<title>Sequence</title>
+<title>905/4 Seq</title>
 <style>
 *
 {
@@ -50,6 +50,11 @@ label, input { vertical-align: middle; }
 	background: hsl( 55, 0%, 100% );
 }
 
+.KB_II:active
+{
+	background: hsl( 55, 0%, 95% );
+}
+
 .KB_IB
 {
 	position: absolute;
@@ -57,18 +62,18 @@ label, input { vertical-align: middle; }
 	margin-left: -27.5px;
 	width: 55px;
 	height: 110px;
-	background: hsl( 25, 0%, 20% );
-	border-right: 1px solid hsl( 55, 0%, 70% );
+	background: hsl( 25, 1%, 40% );
+	border-right: 1px solid hsl( 55, 0%, 90% );
 }
 
 </style>
 
 <script src="Prime.js"></script>
-<script src="Cell.js"></script>
-<script src="URLHash.js"></script>
-<script src="4.Model.js"></script>
-<script src="Audio.js"></script>
-<script src="Keyboard.js"></script>
+<script src="4/Cell.js"></script>
+<script src="4/URLHash.js"></script>
+<script src="4/Model.js"></script>
+<script src="4/Audio.js"></script>
+<script src="4/Keyboard.js"></script>
 
 </head>
 
@@ -127,34 +132,39 @@ const アプリケーションの型 = function()
 
 	this.ハッシュ取り込み = function()
 	{
-		ドキュメント.ハッシュを与える( location.hash );
+		ドキュメント.永続値を設定( URLハッシュ.復元( location.hash ) );
 		楽器組.設定更新();
 		this.ドキュメントをエディタに反映();
 	};
 
 	this.ハッシュ書き出し = function()
 	{
-		location.hash = ドキュメント.ハッシュを得る();
+		location.hash = URLハッシュ.変換( ドキュメント.永続値を取得() );
 	};
 
-	this.テストビューを更新 = function()
+	this.テストビューを更新 = function( 値 )
 	{
-		tv_enc.value = ドキュメント.ハッシュを得る();
-		tv_dec.value = URLハッシュ.JSONに復元( tv_enc.value );
-		tv_json.value = "^^ " + JSON.stringify( JSONから値に( tv_dec.value, "(エラー)" ) );
+		const enc = URLハッシュ.変換( 値 );
+		const dec_json = URLハッシュ.JSONに復元( enc );
+		
+		tv_enc.value = enc.length + "文字--" + enc;
+		tv_dec.value = dec_json.length + "文字--" + dec_json;
+		tv_json.value = "復元の検証 " + JSON.stringify( JSONから値に( dec_json, "(エラー)" ) );
 	};
 
 	this.ドキュメントをエディタに反映 = function()
 	{
-		json.value = JSON.stringify( ドキュメント.値を得る(), null, "\t" );
-		this.テストビューを更新();
+		const 値 = ドキュメント.値を取得();
+		json.value = JSON.stringify( 値, null, "\t" );
+
+		this.テストビューを更新( 値 );
 	};
 
 	this.エディタをドキュメントに反映 = function()
 	{
 		try
 		{
-			ドキュメント.値を与える( JSON.parse( json.value ) );
+			ドキュメント.値を設定( JSON.parse( json.value ) );
 			楽器組.設定更新();
 			this.テストビューを更新();
 		}
@@ -259,8 +269,8 @@ const 波形グラフの型 = function( 幹, 音響文脈 )
 	let 最高値 = 0.0, 最低値 = -0.0;
 
 	const 画像文脈 = キャンバス.文脈を取得();
-	画像文脈.塗りつぶし色( "hsl( 0, 0%, 0% )" );
-	画像文脈.矩形塗りつぶし( 0, 0, キャンバス.width, キャンバス.height );
+	画像文脈.塗り色( "hsl( 0, 0%, 0% )" );
+	画像文脈.矩形塗り( 0, 0, キャンバス.width, キャンバス.height );
 
 	プロセッサ.onaudioprocess = function( ev )
 	{
@@ -277,11 +287,11 @@ const 波形グラフの型 = function( 幹, 音響文脈 )
 	function グラフを更新()
 	{
 
-		画像文脈.塗りつぶし色( "hsl( 180, 70%, 10% )" );
-		画像文脈.矩形塗りつぶし( 更新点, 0, 1, グラフ高さ * 2 );
+		画像文脈.塗り色( "hsl( 180, 70%, 10% )" );
+		画像文脈.矩形塗り( 更新点, 0, 1, グラフ高さ * 2 );
 		
-		画像文脈.塗りつぶし色( "hsl( 185, 100%, 50% )" );
-		画像文脈.矩形塗りつぶし( 更新点, 中心点 - 最高値 * グラフ高さ, 1, ( 最高値 - 最低値 ) * グラフ高さ );
+		画像文脈.塗り色( "hsl( 185, 100%, 50% )" );
+		画像文脈.矩形塗り( 更新点, 中心点 - 最高値 * グラフ高さ, 1, ( 最高値 - 最低値 ) * グラフ高さ );
 
 		更新点 += 1;  if( 更新点 >= キャンバス.width )  更新点 = 0;
 		最高値 = 最低値 = 0;

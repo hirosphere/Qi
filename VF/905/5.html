@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>905/5 Cell2</title>
+<style>
+*
+{
+	margin: 0; padding: 0; color: #222;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+html
+{
+	background: hsl( 210, 80%, 90% );
+	background: hsl( 90, 50%, 75% );
+	padding: 0px 3px;
+}
+
+body
+{
+	min-height: 200vh;
+	background: hsl( 210, 0%, 100% );
+	padding: 3px 3px;
+}
+
+button { margin-bottom: 10px; padding: 16px 24px; border-radius: 6px; }
+label, input { vertical-align: middle; }
+
+.Monitor .JSON
+{
+	width: 550px; height: 300px; color: hsl( 208, 65%, 55% ); background: hsl( 25, 0%, 8% );
+}
+
+#Keyboard
+{
+	border: 2px solid #666;
+	height: 280px;
+	overflow: auto;
+}
+
+.KB_II
+{
+	position: absolute;
+	z-index: 0;
+	margin-top: 0px;
+	border: 1px solid hsl( 55, 0%, 60% );
+	border-left-width: 0px;
+	width: 55px;
+	height: 210px;
+	line-height: 344px;
+	text-align: center;
+	background: hsl( 55, 0%, 100% );
+}
+
+.KB_IB
+{
+	position: absolute;
+	z-index: 1;
+	margin-left: -27.5px;
+	width: 55px;
+	height: 110px;
+	background: hsl( 25, 0%, 20% );
+	border-right: 1px solid hsl( 55, 0%, 70% );
+}
+
+</style>
+
+<script src="Prime.js"></script>
+<script src="5/Cell.js"></script>
+<script src="4/URLHash.js"></script>
+<script src="5/Model.js"></script>
+<script src="5/Audio.js"></script>
+<script src="5/UI.js"></script>
+<script src="4/Keyboard.js"></script>
+
+</head>
+
+<body onload="アプリケーション = new アプリケーションの型()">
+
+<script>
+
+const アプリケーションの型 = function()
+{
+	const これ = this;
+
+	// 構築 //
+
+	これ.初期化 = function()
+	{
+		これ.ドキュメント = ドキュメント型.実体を作成();
+		//これ.ドキュメント = 値セル組.実値型.実体を作成( [100,{A:1,D:300}] );
+		これ.主枝 = Divを作成( document.body, { 文: "App" } );
+		これ.モニター =  UI.モニター型.実体を作成( これ.主枝, これ.ドキュメント );
+		これ.モニター.更新();
+	};
+
+	// 操作 //
+
+	これ.ハッシュ取り込み = function()
+	{
+		;
+	};
+
+	これ.ハッシュ書き出し = function()
+	{
+		;
+	};
+
+
+	これ.初期化();
+};
+
+const 波形グラフの型 = function( 幹, 音響文脈 )
+{
+	const プロセッサ =  this.入力 = 音響文脈.プロセッサーを作成( 256, 1, 1 );
+	const キャンバス = Canvasを作成( 幹, { 属性: { width: 192, height: 128 } } );
+	const バッファー = new Uint8Array( 64 );
+	const 中心点 = キャンバス.height / 2;
+	const グラフ高さ = キャンバス.height / 2;
+
+	プロセッサ.接続( 音響文脈.出力先() );
+	
+	let 更新点 = 0;
+	let 最高値 = 0.0, 最低値 = -0.0;
+
+	const 画像文脈 = キャンバス.文脈を取得();
+	画像文脈.塗りつぶし色( "hsl( 0, 0%, 0% )" );
+	画像文脈.矩形塗りつぶし( 0, 0, キャンバス.width, キャンバス.height );
+
+	プロセッサ.onaudioprocess = function( ev )
+	{
+		const ch = ev.inputBuffer.getChannelData( 0 );
+		
+		for( let i = 0; i < ch.length; i ++ )
+		{
+			const v = ch[ i ];
+			最高値 = Math.max( v, 最高値 );
+			最低値 = Math.min( v, 最低値 );
+		}
+	};
+
+	function グラフを更新()
+	{
+
+		画像文脈.塗りつぶし色( "hsl( 180, 70%, 10% )" );
+		画像文脈.矩形塗りつぶし( 更新点, 0, 1, グラフ高さ * 2 );
+		
+		画像文脈.塗りつぶし色( "hsl( 185, 100%, 50% )" );
+		画像文脈.矩形塗りつぶし( 更新点, 中心点 - 最高値 * グラフ高さ, 1, ( 最高値 - 最低値 ) * グラフ高さ );
+
+		更新点 += 1;  if( 更新点 >= キャンバス.width )  更新点 = 0;
+		最高値 = 最低値 = 0;
+	}
+
+	間欠を設定( グラフを更新, 50 );
+};
+
+</script>
+</body>
+</html>

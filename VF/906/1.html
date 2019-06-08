@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>JR 1</title>
+<link rel="stylesheet" href="Common.css"/>
+<style>
+
+.Pad
+{
+	padding: 50px;
+	text-align: center;
+}
+
+.Button
+{
+	display: inline-block;
+	width: 300px; height: 280px;
+	border: 1px solid hsl( 0, 0%, 30% );
+}
+
+</style>
+</head>
+
+<body onload="アプリケーション = new アプリケーション型()">
+
+<script>
+
+const アプリケーション型 = function()
+{
+	const この実体 = this;
+
+	この実体.初期化 = function()
+	{
+		const 音響文脈 = new AudioContext();
+		const 音源 = new 音源1型( 音響文脈, 音響文脈.destination );
+		new 発車ベル版型( document.body, 音源 );
+	};
+
+	この実体.初期化();
+};
+
+const 発車ベル版型 = function( 幹エレメント, 音源 )
+{
+	const この実体 = this;
+
+	この実体.初期化 = function()
+	{
+		const 主エレメント = エレメントを作成( "div", 幹エレメント, { クラス: "Pad" } );
+		const ボタン = ボタンを作成( "鳴動", 主エレメント, 音源 );
+	};
+
+	function ボタンを作成( ラベル, 幹エレメント, 音源 )
+	{
+		const ボタン = エレメントを作成( "span", 幹エレメント, { 文: "鳴動", クラス: "Button" } );
+
+		ボタン.addEventListener
+		(
+			"touchstart",
+			( ev ) =>
+			{
+				console.log( "touchstart" );
+				ev.preventDefault();
+				// ev.stopPropagation();
+				音源.指令を投函( { 種類: "打鍵" } );
+			}
+		);
+
+		ボタン.addEventListener
+		(
+			"touchcancel",
+			( ev ) =>
+			{
+				// ev.preventDefault();
+				// ev.stopPropagation();
+				console.log( "touchcancel" );
+				音源.指令を投函( { 種類: "離健" } );
+			}
+		);
+
+		ボタン.addEventListener
+		(
+			"touchend",
+			( ev ) =>
+			{
+				// ev.preventDefault();
+				// ev.stopPropagation();
+				console.log( "touchend" );
+				音源.指令を投函( { 種類: "離健" } );
+			}
+		);
+
+		ボタン.addEventListener
+		(
+			"mousedown",
+			( ev ) =>
+			{
+				// ev.preventDefault();
+				// ev.stopPropagation();
+				console.log( "mousedown" );
+			}
+		);
+
+		ボタン.addEventListener
+		(
+			"click",
+			( ev ) =>
+			{
+				// ev.preventDefault();
+				// ev.stopPropagation();
+				console.log( "click" );
+			}
+		);
+
+		ボタン.addEventListener
+		(
+			"contextmenu",
+			( ev ) =>
+			{
+				//ev.preventDefault();
+				// ev.stopPropagation();
+				console.log( "contextmenu" );
+			}
+		);
+
+		return ボタン;
+	}
+
+	この実体.初期化();
+};
+
+// 音響 //
+
+const 音源1型 = function( 音響文脈, 送り先 )
+{
+	const この実体 = this;
+
+	この実体.初期化 = function( 音響文脈 )
+	{
+		この実体.音響文脈 = 音響文脈;
+
+		// ノード生成 //
+
+		この実体.音声発振 = この実体.音響文脈.createOscillator();
+		この実体.音声制幅 = この実体.音響文脈.createGain();
+
+		この実体.変調発振 = この実体.音響文脈.createOscillator();
+		この実体.変調制幅 = この実体.音響文脈.createGain();
+
+		// 値の設定 //
+
+		この実体.音声発振.frequency.value = 440;
+		この実体.音声発振.detune.value = ( 0 * 1200 + 5 * 100 );
+		この実体.音声発振.type = "square";
+		この実体.音声制幅.gain.value = 0.0;
+		
+		この実体.変調発振.frequency.value = 10;
+		この実体.変調発振.type = "square";
+		この実体.変調制幅.gain.value = 200 * 1.06;
+		
+		
+		// 接続 //
+
+		この実体.音声発振.connect( この実体.音声制幅 );
+		この実体.音声制幅.connect( 送り先 );
+
+		この実体.変調発振.connect( この実体.変調制幅 );
+		この実体.変調制幅.connect( この実体.音声発振.detune );
+
+		//  //
+
+		この実体.音声発振.start();
+		この実体.変調発振.start();
+	};
+
+	この実体.指令を投函 = function( 指令 )
+	{
+		switch( 指令.種類 )
+		{
+			case "打鍵":  この実体.打鍵( 指令 );  break;
+			case "離健":  この実体.離健( 指令 );  break;
+		}
+	};
+
+	この実体.打鍵 = function( 指令 )
+	{
+		if( この実体.音響文脈.state == "suspended" )
+		{
+			この実体.音響文脈.resume();
+		}
+
+		const 音量 = 0.14;
+		const 開始時刻 = この実体.音響文脈.currentTime + 0.001;
+		const 減衰時刻 = 開始時刻 + 1;
+		この実体.音声制幅.gain.setTargetAtTime( 音量 / 0.63, 開始時刻, 0.001 );
+	};
+
+	この実体.離健 = function( 指令 )
+	{
+		const 開始時刻 = この実体.音響文脈.currentTime + 0.001;
+		この実体.音声制幅.gain.setTargetAtTime( 0, 開始時刻, 0.001 );
+	};
+
+	この実体.初期化( 音響文脈 );
+};
+
+
+// 汎用 //
+
+const はい = true;
+const いいえ = false;
+const 虚 = undefined;
+const 無 = null;
+
+function エレメントを作成( 型名, 幹エレメント, 設定 )
+{
+	const エレメント = document.createElement( 型名 );
+	if( 設定 )
+	{
+		if( 設定.クラス != null ) エレメント.className = 設定.クラス;
+		if( 設定.文 != null ) エレメント.innerHTML = 設定.文;
+	}
+	if( 幹エレメント ) 幹エレメント.appendChild( エレメント );
+	return エレメント;
+};
+
+</script>
+</body>
+</html>

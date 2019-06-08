@@ -1,0 +1,22 @@
+*
+{
+	margin: 0; padding: 0; color: #222;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+html
+{
+	background: hsl( 210, 80%, 90% );
+	background: hsl( 90, 50%, 75% );
+	padding: 0px 3px;
+}
+
+body
+{
+	min-height: 200vh;
+	background: hsl( 210, 0%, 100% );
+	padding: 3px 3px;
+}
+
+button { margin-bottom: 10px; padding: 16px 24px; border-radius: 6px; }
+label, input { vertical-align: middle; }

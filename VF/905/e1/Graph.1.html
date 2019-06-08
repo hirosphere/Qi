@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<link rel="stylesheet" href="Common.css"/>
+<script src="../Prime.js"></script>
+</head>
+
+<body onload="アプリケーション = new アプリケーションの型( '123', 'abc' )">
+
+<script>
+
+const 設定 =
+{
+	表題: "Graph 1"
+};
+
+const アプリケーションの型 = 型を作成
+(
+	function()
+	{
+		const この典型 = this;
+
+		この典型.初期化 = function( a, b )
+		{
+			const これ = this;
+			const この実体 = this;
+
+			const e = Divを作成( この文書.body );
+			H1を作成( e, { 文: 設定.表題 } );
+			Pを作成( e, { 文: `${a} ${b}` } );
+			この文書.表題( 設定.表題 );
+
+			{
+				const div = Divを作成( e );
+				new グラフの型( div, {} );
+			}
+
+			{
+				const 文脈 = new 音響文脈の型();
+				この実体.音源1 = new テスト音源の型
+				(
+					文脈, 文脈.出力先(),
+					220, 60.0 / 1, "sine", 800
+				);
+
+				この実体.音源2 = new テスト音源の型
+				(
+					文脈, 文脈.出力先(),
+					331, 60.1 / 1, "sine", 800
+				);
+			}
+
+			e.マウスとタッチ処理を追加
+			(
+				なし,
+				なし,	
+				( ev ) =>
+				{
+					この実体.音源1.開始();
+					この実体.音源2.開始();
+				}
+			);
+		};
+
+		この典型.m = function()
+		{
+			const これ = this;
+		};
+	}
+);
+
+グラフの型 = 型を作成
+(
+	function()
+	{
+		const この典型 = this;
+
+		この典型.初期化 = function( 包枝, 設定 )
+		{
+			const これ = this;
+			
+			const 属性 =
+			{
+				width: なしを補完( 設定.幅, 320 ),
+				height: なしを補完( 設定.高さ, 240 ),
+			};
+
+			これ.画葉 = Canvasを作成( 包枝, { 属性: 属性 } );
+			これ.画面を初期化();
+		};
+
+		この典型.画面を初期化 = function()
+		{
+			const これ = this;
+			const 文脈 = これ.画葉.文脈を取得();
+			文脈.塗り色( "hsl( 180, 80%, 45% )" );
+			文脈.矩形塗り( 0, 0, これ.画葉.幅(), これ.画葉.高さ() );
+		};
+
+		この典型._m2 = function()
+		{
+			const これ = this;
+		};
+	}
+);
+
+const テスト音源の型 = function( 文脈, 出力先, o1f, o2f, o2w, o2a )
+{
+	const osc1 = 文脈.発振器を作成();
+	const att1 = 文脈.制幅器を作成();
+
+	const osc2 = 文脈.発振器を作成();
+	const att2 = 文脈.制幅器を作成();
+
+	osc1.周波数().値( o1f );
+	osc1.波形( "sine" );
+	att1.振幅().値( 0.1 );
+
+	osc2.周波数().値( o2f );
+	osc2.波形( o2w );
+	att2.振幅().値( o2a );
+
+	osc1.接続( att1 );
+	att1.接続( 出力先 );
+	
+	osc2.接続( att2 );
+	att2.接続( osc1.ピッチ() );
+	
+	let init = true;
+	const t = 文脈.現在時刻() + 0.01;
+
+	this.開始 = function()
+	{
+		console.log( 文脈.状態() );
+		//文脈.状態( "resume" );
+		if( init )
+		{
+			const t = 文脈.現在時刻() + 0.01;
+			att1.振幅().値( 0.1 );
+			osc1.開始( t );
+			osc2.開始( t );
+
+			init = false;
+		}
+		console.log( 文脈.状態() );
+	};
+};
+
+
+
+</script>
+</body>
+</html>
