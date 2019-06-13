@@ -56,16 +56,19 @@ const 発車ベル版型 = function( 幹エレメント, 音源 )
 	function ボタンを作成( ラベル, 幹エレメント, 音源 )
 	{
 		const ボタン = エレメントを作成( "span", 幹エレメント, { 文: "鳴動", クラス: "Button" } );
+		let 動作中 = いいえ;
 
 		ボタン.addEventListener
 		(
 			"touchstart",
 			( ev ) =>
 			{
-				console.log( "touchstart" );
-				ev.preventDefault();
-				// ev.stopPropagation();
-				音源.指令を投函( { 種類: "打鍵" } );
+				if( ! 動作中 )
+				{
+					動作中 = はい;
+					ev.preventDefault();
+					音源.指令を投函( { 種類: "打鍵" } );
+				}
 			}
 		);
 
@@ -74,10 +77,12 @@ const 発車ベル版型 = function( 幹エレメント, 音源 )
 			"touchcancel",
 			( ev ) =>
 			{
-				// ev.preventDefault();
-				// ev.stopPropagation();
 				console.log( "touchcancel" );
-				音源.指令を投函( { 種類: "離健" } );
+				if( 動作中 )
+				{
+					動作中 = いいえ;
+					音源.指令を投函( { 種類: "離健" } );
+				}
 			}
 		);
 
@@ -86,10 +91,13 @@ const 発車ベル版型 = function( 幹エレメント, 音源 )
 			"touchend",
 			( ev ) =>
 			{
-				// ev.preventDefault();
-				// ev.stopPropagation();
 				console.log( "touchend" );
-				音源.指令を投函( { 種類: "離健" } );
+
+				if( 動作中 )
+				{
+					動作中 = いいえ;
+					音源.指令を投函( { 種類: "離健" } );
+				}
 			}
 		);
 
@@ -98,20 +106,28 @@ const 発車ベル版型 = function( 幹エレメント, 音源 )
 			"mousedown",
 			( ev ) =>
 			{
-				// ev.preventDefault();
-				// ev.stopPropagation();
 				console.log( "mousedown" );
+
+				if( ! 動作中 )
+				{
+					動作中 = はい;
+					音源.指令を投函( { 種類: "打鍵" } );
+				}
 			}
 		);
 
 		ボタン.addEventListener
 		(
-			"click",
+			"mouseup",
 			( ev ) =>
 			{
-				// ev.preventDefault();
-				// ev.stopPropagation();
-				console.log( "click" );
+				console.log( "mouseup" );
+				
+				if( 動作中 )
+				{
+					動作中 = いいえ;
+					音源.指令を投函( { 種類: "離健" } );
+				}
 			}
 		);
 
