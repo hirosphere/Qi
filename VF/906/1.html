@@ -15,14 +15,14 @@
 .Button
 {
 	display: inline-block;
-	width: 300px; height: 280px;
+	width: 100px; height: 100px;
 	border: 1px solid hsl( 0, 0%, 30% );
 }
 
 </style>
 </head>
 
-<body onload="アプリケーション = new アプリケーション型()">
+<body onload="const アプリケーション = new アプリケーション型()">
 
 <script>
 
@@ -33,8 +33,11 @@ const アプリケーション型 = function()
 	この実体.初期化 = function()
 	{
 		const 音響文脈 = new AudioContext();
-		const 音源 = new 音源1型( 音響文脈, 音響文脈.destination );
-		new 発車ベル版型( document.body, 音源 );
+		const 残響器 = new 残響1型( 音響文脈, 音響文脈.destination );
+		const 音源1 = new 音源1型( 音響文脈, 残響器.入力, 2, 10 );
+		const 音源2 = new 音源1型( 音響文脈, 残響器.入力, 7, 13.333 );
+		new 発車ベル版型( document.body, 音源1 );
+		new 発車ベル版型( document.body, 音源2 );
 	};
 
 	この実体.初期化();
@@ -131,7 +134,7 @@ const 発車ベル版型 = function( 幹エレメント, 音源 )
 
 // 音響 //
 
-const 音源1型 = function( 音響文脈, 送り先 )
+const 音源1型 = function( 音響文脈, 送り先, 音程, 変調速度 )
 {
 	const この実体 = this;
 
@@ -144,19 +147,24 @@ const 音源1型 = function( 音響文脈, 送り先 )
 		この実体.音声発振 = この実体.音響文脈.createOscillator();
 		この実体.音声制幅 = この実体.音響文脈.createGain();
 
+		この実体.音声2発振 = この実体.音響文脈.createOscillator();
+
 		この実体.変調発振 = この実体.音響文脈.createOscillator();
 		この実体.変調制幅 = この実体.音響文脈.createGain();
 
 		// 値の設定 //
 
 		この実体.音声発振.frequency.value = 440;
-		この実体.音声発振.detune.value = ( 0 * 1200 + 5 * 100 );
+		この実体.音声発振.detune.value = ( 0 * 1200 + ( 音程 + 3 ) * 100 );
 		この実体.音声発振.type = "square";
 		この実体.音声制幅.gain.value = 0.0;
 		
-		この実体.変調発振.frequency.value = 10;
+		この実体.音声2発振.detune.value = ( 0 * 1200 + 7 * 100 );
+		この実体.音声2発振.type = "square";
+		
+		この実体.変調発振.frequency.value = 変調速度;
 		この実体.変調発振.type = "square";
-		この実体.変調制幅.gain.value = 200 * 1.06;
+		この実体.変調制幅.gain.value = 200 * 1.1822;
 		
 		
 		// 接続 //
@@ -164,12 +172,15 @@ const 音源1型 = function( 音響文脈, 送り先 )
 		この実体.音声発振.connect( この実体.音声制幅 );
 		この実体.音声制幅.connect( 送り先 );
 
+		// この実体.音声2発振.connect( この実体.音声制幅 );
+
 		この実体.変調発振.connect( この実体.変調制幅 );
 		この実体.変調制幅.connect( この実体.音声発振.detune );
 
 		//  //
 
 		この実体.音声発振.start();
+		この実体.音声2発振.start();
 		この実体.変調発振.start();
 	};
 
@@ -191,7 +202,6 @@ const 音源1型 = function( 音響文脈, 送り先 )
 
 		const 音量 = 0.14;
 		const 開始時刻 = この実体.音響文脈.currentTime + 0.001;
-		const 減衰時刻 = 開始時刻 + 1;
 		この実体.音声制幅.gain.setTargetAtTime( 音量 / 0.63, 開始時刻, 0.001 );
 	};
 
@@ -204,6 +214,53 @@ const 音源1型 = function( 音響文脈, 送り先 )
 	この実体.初期化( 音響文脈 );
 };
 
+const 残響1型 = function( 音響文脈, 送り先 )
+{
+	const この実体 = this;	
+	const 入力制幅 = 音響文脈.createGain();
+	const 遅延器1 = 音響文脈.createDelay();
+	const 帰還制幅11 = 音響文脈.createGain();
+	const 帰還制幅12 = 音響文脈.createGain();
+	const 遅延器2 = 音響文脈.createDelay();
+	const 帰還制幅21 = 音響文脈.createGain();
+	const 帰還制幅22 = 音響文脈.createGain();
+	const 混合器 = 音響文脈.createChannelMerger();
+	const 残響制幅 = 音響文脈.createGain();
+	const 原音制幅 = 音響文脈.createGain();
+	const 出力制幅 = 音響文脈.createGain();
+	
+	遅延器1.delayTime.value = 0.037;
+	遅延器2.delayTime.value = 0.027;
+	原音制幅.gain.value = 1.0;
+	残響制幅.gain.value = 0.06;
+	帰還制幅11.gain.value = 0.00;
+	帰還制幅12.gain.value = 0.20;
+	帰還制幅22.gain.value = 0.00;
+	帰還制幅21.gain.value = 0.20;
+
+	入力制幅.connect( 原音制幅 );
+	入力制幅.connect( 遅延器1 );
+	入力制幅.connect( 遅延器2 );
+
+	遅延器1.connect( 帰還制幅11 );
+	遅延器1.connect( 帰還制幅12 );
+	遅延器1.connect( 混合器, 0, 0 );
+	帰還制幅11.connect( 遅延器1 );
+	帰還制幅12.connect( 遅延器2 );
+
+	遅延器2.connect( 帰還制幅21 );
+	遅延器2.connect( 帰還制幅22 );
+	遅延器2.connect( 混合器, 0, 1 );
+	帰還制幅22.connect( 遅延器2 );
+	帰還制幅21.connect( 遅延器1 );
+	
+	混合器.connect( 残響制幅 );
+	残響制幅.connect( 出力制幅 );
+	原音制幅.connect( 出力制幅 );
+	出力制幅.connect( 送り先 );
+
+	この実体.入力 = 入力制幅;
+};
 
 // 汎用 //
 
