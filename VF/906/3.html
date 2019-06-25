@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8"/>
-<title>JR 1</title>
+<title>横断歩道 1</title>
 <link rel="stylesheet" href="Common.css"/>
 <style>
 
@@ -27,6 +27,12 @@
 
 <script>
 
+const 旋律 =
+[
+	[ 64, 96 ], [ 64, 48 ], [ 62, 48 ], [ 64, 48 ], [ 64, 24 ], [ 62, 24 ], [ 59, 96 ]
+];
+
+
 const アプリケーション型 = function()
 {
 	const この実体 = this;
@@ -36,119 +42,57 @@ const アプリケーション型 = function()
 		const 音響文脈 = new AudioContext();
 		const 残響器 = new 残響1型( 音響文脈, 音響文脈.destination );
 		const 音源1 = new 音源1型( 音響文脈, 残響器.入力, 2, 10 );
-		const 音源2 = new 音源1型( 音響文脈, 残響器.入力, 7, 13.333 );
-		const 音源3 = new 音源1型( 音響文脈, 残響器.入力, 9, 15 );
-		const 音源4 = new 音源1型( 音響文脈, 残響器.入力, 11, 17 );
+		const 演奏機 = new 演奏機型( 音源1 );
 		
 		{
 			const 主エレメント = エレメントを作成( "div", document.body, { クラス: "Pad" } );
-			new 発車ベル版型( 主エレメント, 音源1 );
-			new 発車ベル版型( 主エレメント, 音源2 );
-			new 発車ベル版型( 主エレメント, 音源3 );
-			new 発車ベル版型( 主エレメント, 音源4 );
+			new 操作盤1型( 主エレメント, 演奏機 );
 		}
 	};
 
 	この実体.初期化();
 };
 
-const 発車ベル版型 = function( 幹エレメント, 音源 )
+const 操作盤1型 = function( 幹エレメント, 演奏機 )
 {
 	const この実体 = this;
 
 	この実体.初期化 = function()
 	{
-		const ボタン = ボタンを作成( "鳴動", 幹エレメント, 音源 );
+		const ボタン = ボタンを作成( "鳴動", 幹エレメント, 演奏機 );
 	};
 
-	function ボタンを作成( ラベル, 幹エレメント, 音源 )
+	function ボタンを作成( ラベル, 幹エレメント, 演奏機 )
 	{
 		const ボタン = エレメントを作成( "span", 幹エレメント, { 文: "鳴動", クラス: "Button" } );
-		let 動作中 = いいえ;
+		let 演奏中 = いいえ;
+
+		function 操作処理()
+		{
+			if( 演奏中 == いいえ )
+			{
+				演奏中 = はい;
+				演奏機.指令を投函( { 種類: "開始" } );
+			}
+			else
+			{
+				演奏中 = いいえ;
+				演奏機.指令を投函( { 種類: "中断" } );
+			}
+		}
 
 		ボタン.addEventListener
 		(
 			"touchstart",
 			( ev ) =>
 			{
-				if( ! 動作中 ){
-					動作中 = はい;
-					if( ev.cancelable ){
-						ev.preventDefault();
-					}
-					else console.log( "キャンセル不可" );
-					音源.指令を投函( { 種類: "打鍵" } );
-				}
+				if( ev.cancelable )  ev.preventDefault();
+				else console.log( "キャンセル不可" );
+				操作処理();
 			}
 		);
 
-		ボタン.addEventListener
-		(
-			"touchcancel",
-			( ev ) =>
-			{
-				console.log( "touchcancel" );
-				if( 動作中 )
-				{
-					動作中 = いいえ;
-					音源.指令を投函( { 種類: "離健" } );
-				}
-			}
-		);
-
-		ボタン.addEventListener
-		(
-			"touchend",
-			( ev ) =>
-			{
-				if( 動作中 )
-				{
-					動作中 = いいえ;
-					音源.指令を投函( { 種類: "離健" } );
-				}
-			}
-		);
-
-		ボタン.addEventListener
-		(
-			"mousedown",
-			( ev ) =>
-			{
-				console.log( "mousedown" );
-
-				if( ! 動作中 )
-				{
-					動作中 = はい;
-					音源.指令を投函( { 種類: "打鍵" } );
-				}
-			}
-		);
-
-		ボタン.addEventListener
-		(
-			"mouseup",
-			( ev ) =>
-			{
-				console.log( "mouseup" );
-				
-				if( 動作中 )
-				{
-					動作中 = いいえ;
-					音源.指令を投函( { 種類: "離健" } );
-				}
-			}
-		);
-
-		ボタン.addEventListener
-		(
-			"contextmenu",
-			( ev ) =>
-			{
-				//ev.preventDefault();
-				// ev.stopPropagation();
-				console.log( "contextmenu" );
-			}
-		);
+		ボタン.addEventListener( "mousedown", ( ev ) => 操作処理() );
 
 		return ボタン;
 	}
@@ -157,6 +101,50 @@ const 発車ベル版型 = function( 幹エレメント, 音源 )
 };
 
 // 音響 //
+
+const 演奏機型 = function( 音源 )
+{
+	const この実体 = this;
+
+	この実体.テンポ = 120;
+
+	let 演奏中 = いいえ;
+
+	//  //
+
+	この実体.指令を投函 = function( 指令 )
+	{
+		switch( 指令.種類 )
+		{
+			case "開始":
+				音源.指令を投函( { 種類: "押鍵" } );
+				break;
+				
+			case "中断":
+				音源.指令を投函( { 種類: "離鍵" } );
+				break;
+		}
+	};
+
+	const 秒間クロック数 = 20;
+	const 全音符ビート数 = 192;
+
+	let テンポカウンタ = 0;
+	
+	function クロック処理()
+	{
+		;
+	}
+
+	let 音符長カウンタ = 0;
+
+	function ビート処理()
+	{
+		;
+	}
+
+	setInterval( クロック処理, 1000 / 20 );
+};
 
 const 音源1型 = function( 音響文脈, 送り先, 音程, 変調速度 )
 {
@@ -188,7 +176,7 @@ const 音源1型 = function( 音響文脈, 送り先, 音程, 変調速度 )
 		
 		この実体.変調発振.frequency.value = 変調速度;
 		この実体.変調発振.type = "square";
-		この実体.変調制幅.gain.value = 200 * 1.1822;
+		//この実体.変調制幅.gain.value = 200 * 1.1822;
 		
 		
 		// 接続 //
@@ -212,8 +200,8 @@ const 音源1型 = function( 音響文脈, 送り先, 音程, 変調速度 )
 	{
 		switch( 指令.種類 )
 		{
-			case "打鍵":  この実体.打鍵( 指令 );  break;
-			case "離健":  この実体.離健( 指令 );  break;
+			case "押鍵":  この実体.打鍵( 指令 );  break;
+			case "離鍵":  この実体.離健( 指令 );  break;
 		}
 	};
 
@@ -236,13 +224,6 @@ const 音源1型 = function( 音響文脈, 送り先, 音程, 変調速度 )
 	};
 
 	この実体.初期化( 音響文脈 );
-};
-
-const 変調器1型 = function( 音響文脈, 周波数 )
-{
-	const この実体 = this;
-
-	;
 };
 
 const 残響1型 = function( 音響文脈, 送り先 )

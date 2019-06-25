@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8"/>
-<title>JR 1</title>
+<title>PW 整数倍</title>
 <link rel="stylesheet" href="Common.css"/>
 <style>
 
@@ -35,17 +35,10 @@ const アプリケーション型 = function()
 	{
 		const 音響文脈 = new AudioContext();
 		const 残響器 = new 残響1型( 音響文脈, 音響文脈.destination );
-		const 音源1 = new 音源1型( 音響文脈, 残響器.入力, 2, 10 );
-		const 音源2 = new 音源1型( 音響文脈, 残響器.入力, 7, 13.333 );
-		const 音源3 = new 音源1型( 音響文脈, 残響器.入力, 9, 15 );
-		const 音源4 = new 音源1型( 音響文脈, 残響器.入力, 11, 17 );
-		
+		const 音源1 = new 音源1型( 音響文脈, 残響器.入力, 69, 3, 1 / 24 );
 		{
 			const 主エレメント = エレメントを作成( "div", document.body, { クラス: "Pad" } );
 			new 発車ベル版型( 主エレメント, 音源1 );
-			new 発車ベル版型( 主エレメント, 音源2 );
-			new 発車ベル版型( 主エレメント, 音源3 );
-			new 発車ベル版型( 主エレメント, 音源4 );
 		}
 	};
 
@@ -139,17 +132,6 @@ const 発車ベル版型 = function( 幹エレメント, 音源 )
 			}
 		);
 
-		ボタン.addEventListener
-		(
-			"contextmenu",
-			( ev ) =>
-			{
-				//ev.preventDefault();
-				// ev.stopPropagation();
-				console.log( "contextmenu" );
-			}
-		);
-
 		return ボタン;
 	}
 
@@ -158,7 +140,7 @@ const 発車ベル版型 = function( 幹エレメント, 音源 )
 
 // 音響 //
 
-const 音源1型 = function( 音響文脈, 送り先, 音程, 変調速度 )
+const 音源1型 = function( 音響文脈, 送り先, 基本音程, 変調幅, 変調速度 )
 {
 	const この実体 = this;
 
@@ -171,40 +153,49 @@ const 音源1型 = function( 音響文脈, 送り先, 音程, 変調速度 )
 		この実体.音声発振 = この実体.音響文脈.createOscillator();
 		この実体.音声制幅 = この実体.音響文脈.createGain();
 
-		この実体.音声2発振 = この実体.音響文脈.createOscillator();
-
 		この実体.変調発振 = この実体.音響文脈.createOscillator();
 		この実体.変調制幅 = この実体.音響文脈.createGain();
 
+		この実体.変形器 = この実体.音響文脈.createScriptProcessor( 0, 2, 1 );
+
 		// 値の設定 //
 
-		この実体.音声発振.frequency.value = 440;
-		この実体.音声発振.detune.value = ( 0 * 1200 + ( 音程 + 3 ) * 100 );
-		この実体.音声発振.type = "square";
+		この実体.音声発振.frequency.value = 55;
+		この実体.音声発振.detune.value = ( ( 基本音程 - 69 ) * 100 );
+		この実体.音声発振.type = "sawtooth";
 		この実体.音声制幅.gain.value = 0.0;
 		
-		この実体.音声2発振.detune.value = ( 0 * 1200 + 7 * 100 );
-		この実体.音声2発振.type = "square";
-		
 		この実体.変調発振.frequency.value = 変調速度;
-		この実体.変調発振.type = "square";
-		この実体.変調制幅.gain.value = 200 * 1.1822;
+		この実体.変調発振.type = "triangle";
+		この実体.変調制幅.gain.value = 変調幅;
+
+		この実体.変形器.onaudioprocess = ( ev ) =>
+		{
+			const carr = ev.inputBuffer.getChannelData( 0 );
+			const mod = ev.inputBuffer.getChannelData( 1 );
+			const output = ev.outputBuffer.getChannelData( 0 );
+			
+			for( let i = 0; i < output.length; i ++ )
+			{
+				const ph = ( ( carr[ i ] * mod[ i ] ) % 1 + 1 ) / 2;
+				output[ i ] = Math.sin( ph * Math.PI );
+			}
+		};
 		
 		
 		// 接続 //
 
-		この実体.音声発振.connect( この実体.音声制幅 );
+		この実体.音声発振.connect( この実体.変形器 );
+		//この実体.音声発振.connect( この実体.音声制幅 );
+		この実体.変形器.connect( この実体.音声制幅 );
 		この実体.音声制幅.connect( 送り先 );
 
-		// この実体.音声2発振.connect( この実体.音声制幅 );
-
 		この実体.変調発振.connect( この実体.変調制幅 );
-		この実体.変調制幅.connect( この実体.音声発振.detune );
+		この実体.変調制幅.connect( この実体.変形器 );
 
 		//  //
 
 		この実体.音声発振.start();
-		この実体.音声2発振.start();
 		この実体.変調発振.start();
 	};
 
@@ -238,20 +229,10 @@ const 音源1型 = function( 音響文脈, 送り先, 音程, 変調速度 )
 	この実体.初期化( 音響文脈 );
 };
 
-const 変調器1型 = function( 音響文脈, 周波数 )
-{
-	const この実体 = this;
-
-	;
-};
-
 const 残響1型 = function( 音響文脈, 送り先 )
 {
-	const この実体 = this;
-	
+	const この実体 = this;	
 	const 入力制幅 = 音響文脈.createGain();
-	const 変調1発振 = 音響文脈.createOscillator();
-	const 変調1制幅 = 音響文脈.createGain();
 	const 濾過器1 = 音響文脈.createBiquadFilter();
 	const 遅延器1 = 音響文脈.createDelay();
 	const 帰還制幅11 = 音響文脈.createGain();
@@ -264,26 +245,20 @@ const 残響1型 = function( 音響文脈, 送り先 )
 	const 原音制幅 = 音響文脈.createGain();
 	const 出力制幅 = 音響文脈.createGain();
 	
-	変調1発振.frequency.value = 1 / 5;
-	変調1制幅.gain.value = 100;
 	濾過器1.type = "bandpass";
-	濾過器1.frequency.value = 1870;
+	濾過器1.frequency.value = 6300;
 	濾過器1.Q.value = 0.7;
-	遅延器1.delayTime.value = 0.157;
-	遅延器2.delayTime.value = 0.137;
+	遅延器1.delayTime.value = 0.107;
+	遅延器2.delayTime.value = 0.157;
 	原音制幅.gain.value = 1.0;
 	残響制幅.gain.value = 0.20;
-	帰還制幅11.gain.value = 0.00;
-	帰還制幅12.gain.value = 0.08;
-	帰還制幅22.gain.value = 0.00;
-	帰還制幅21.gain.value = 0.08;
+	帰還制幅11.gain.value = 0.10;
+	帰還制幅12.gain.value = 0.20;
+	帰還制幅22.gain.value = 0.10;
+	帰還制幅21.gain.value = 0.20;
 
 	入力制幅.connect( 原音制幅 );
 	入力制幅.connect( 濾過器1 );
-	
-	変調1発振.connect( 変調1制幅 );
-	変調1制幅.connect( 濾過器1.detune );
-
 	濾過器1.connect( 遅延器1 );
 	濾過器1.connect( 遅延器2 );
 
@@ -303,8 +278,6 @@ const 残響1型 = function( 音響文脈, 送り先 )
 	残響制幅.connect( 出力制幅 );
 	原音制幅.connect( 出力制幅 );
 	出力制幅.connect( 送り先 );
-
-	変調1発振.start();
 
 	この実体.入力 = 入力制幅;
 };
