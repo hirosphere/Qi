@@ -35,6 +35,7 @@ const アプリケーション型 = function()
 	{
 		const 音響文脈 = new AudioContext();
 		const 残響器 = new 残響1型( 音響文脈, 音響文脈.destination );
+		const 音源B4 = new 音源1型( 音響文脈, 残響器.入力, 1, 9.44 );
 		const 音源1 = new 音源1型( 音響文脈, 残響器.入力, 2, 10 );
 		const 音源2 = new 音源1型( 音響文脈, 残響器.入力, 7, 13.333 );
 		const 音源3 = new 音源1型( 音響文脈, 残響器.入力, 9, 15 );
@@ -42,6 +43,7 @@ const アプリケーション型 = function()
 		
 		{
 			const 主エレメント = エレメントを作成( "div", document.body, { クラス: "Pad" } );
+			new 発車ベル版型( 主エレメント, 音源B4 );
 			new 発車ベル版型( 主エレメント, 音源1 );
 			new 発車ベル版型( 主エレメント, 音源2 );
 			new 発車ベル版型( 主エレメント, 音源3 );
