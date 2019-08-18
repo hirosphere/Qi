@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8"/>
+<title>Tone.js 1</title>
+<style>
+body { padding: 50px; }
+button { padding: 15px; }
+.Separation { height: 20px; }
+</style>
+
+<script src="Tone.js"></script>
+
+</head>
+<body>
+
+		<div class="Division">
+				<span id="ToneCurrentTime"></span>
+		</div>
+			
+		<div class="Separation"></div>
+			
+		<div class="Division">
+			<button onclick='アプリケーション.再生と停止()'>再生/停止</button>
+			Tempo <input type="range" style="width: 200px" min="10" max="300" value="120" oninput='アプリケーション.テンポを設定( this.value )'/>
+			</div>
+			
+		<div class="Separation"></div>
+									
+		<div class="Division">
+			<button onclick='アプリケーション.操作1( ["440", "660"] )'>発音</button>
+			<button onclick='アプリケーション.操作1( ["C5", "E4"] )'>C</button>
+			<button onclick='アプリケーション.操作1( ["A#4", "D4"] )'>B♭</button>
+			<button onclick='アプリケーション.操作1( ["G4", "A#4"] )'>Gm</button>
+			<button onclick='アプリケーション.操作1( ["A4", "C#4"] )'>A</button>
+			<button onclick='アプリケーション.操作1( ["A4", "C5"] )'>Am</button>
+			<button onclick='アプリケーション.操作1( ["G4", "B4"] )'>G</button>
+			<button onclick='アプリケーション.操作1( ["F4", "A4"] )'>F</button>
+			<button onclick='アプリケーション.操作1( ["E4", "G#4"] )'>E</button>
+		</div>
+			
+<script>
+
+const 曲集 = {};
+
+曲集.グリーンスリーブス =
+{
+	メロディー: "A3 4n C4 4n"
+};
+
+const アプリケーション = new function()
+{
+	const この実体 = this;
+
+	const 設定 =
+	{
+		volume: -6,
+		envelope: { attack: 0.002, decay: 12, sustain: 0, release: 0.002 },
+		oscillator:
+		{
+			type: "fmsquare"
+		}
+	};
+
+	const シンセ = new Tone.PolySynth();
+	シンセ.set( 設定 );
+
+	シンセ.toMaster();
+
+	// シーケンス //
+
+	const ループ1 = new Tone.Loop
+	(
+		( 時刻 ) =>
+		{
+			シンセ.triggerAttackRelease( [ "C5" ], "4n", 時刻 );
+		},
+		"4n"
+	);
+
+	const パート1 = new Tone.Part
+	(
+		( 時刻, 値 ) =>
+		{
+			シンセ.triggerAttackRelease( 値.note, "2n", 時刻 );
+		},
+		[
+			{ time: "0:0:0", note: [ "Eb3", "G4" ] },
+			{ time: "0:2:0", note: [ "C4", "G#4" ] },
+			{ time: "1:0:0", note: [ "Eb3", "A#4" ] },
+			{ time: "1:2:0", note: [ "C4", "G#4" ] },
+		],
+	);
+	パート1.loop = true;
+	パート1.loopEnd = "2m";
+
+	// ループ1.start( 0 );
+	パート1.start( 0 );
+
+
+	// ユーザーからの操作 //
+
+	この実体.操作1 = function( 和音 )
+	{
+		シンセ.triggerAttackRelease( 和音, "2n");
+	};
+
+	この実体.再生と停止 = () =>
+	{
+		Tone.Transport.toggle();
+	};
+
+	この実体.テンポを設定 = ( テンポ ) =>
+	{
+		Tone.Transport.bpm.value = テンポ;
+	};
+
+	//  //
+
+	function 表示を更新()
+	{
+		requestAnimationFrame( 表示を更新 );
+		document.getElementById( "ToneCurrentTime" ).textContent =
+		[
+			"時刻 " + Tone.Transport.seconds.toFixed( 2 ),
+			"テンポ " + Tone.Transport.bpm.value.toFixed( 0 )
+		]
+		  .join( ", " );
+	};
+
+	表示を更新();
+};
+
+const 楽器に旋律を設定 = ( 楽器, 旋律 ) =>
+{
+	const f = ( 時刻, 音符 ) =>
+	{
+		楽器.triggerAttackRelease( 音符, 時刻 );
+	};
+
+	new Tone.Sequence( f, 旋律 );
+};
+
+</script>
+
+</body>
+</html>
