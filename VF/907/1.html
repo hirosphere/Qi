@@ -5,65 +5,231 @@
 <meta charset="utf-8"/>
 <title>Tone.js 1</title>
 <style>
-body { padding: 50px; }
-button { padding: 15px; }
+body { padding: 20px 46px; }
+button { height: 4em; padding: 0 15px; }
+textarea { font-family: Consolas, monospace }
 .Separation { height: 20px; }
 </style>
 
+<script src="Prime.js"></script>
+<script src="../../Lib/URON.js"></script>
+<script src="Model.js"></script>
 <script src="Tone.js"></script>
 
 </head>
 <body>
 
-		<div class="Division">
-				<span id="ToneCurrentTime"></span>
-		</div>
+	<div class="Division">
+				
+		<span id="ToneCurrentTime"></span>
+	
+	</div>
+
+	<div class="Division">
+		
+		音量 <input type="range" style="width: 300px" min="-24" max="0" value="0" oninput='アプリケーション.音量を設定( this.value )'/>	
+		調性 <input type="input" style="width: 100px" value="0" onchange='アプリケーション.調性を設定( this.value - 0 )'/>	
+
+	</div>
+
+	<div class="Division">
+
+		<button onclick='アプリケーション.再生と停止()'>再生/停止</button>
+		脈拍 <input type="input" style="width: 100px" value="120" onchange='アプリケーション.テンポを設定( this.value )'/>
+	
+	</div>
+		
+	<div class="Separation"></div>
+
+	<div class="Division">
+		<button onclick='アプリケーション.操作1( ["440", "660"] )'>発音</button>
+		<button onclick='アプリケーション.操作1( ["C5", "E4"] )'>C</button>
+		<button onclick='アプリケーション.操作1( ["A#4", "D4"] )'>B♭</button>
+		<button onclick='アプリケーション.操作1( ["G4", "A#4"] )'>Gm</button>
+		<button onclick='アプリケーション.操作1( ["A4", "C#4"] )'>A</button>
+		<button onclick='アプリケーション.操作1( ["A4", "C5"] )'>Am</button>
+		<button onclick='アプリケーション.操作1( ["G4", "B4"] )'>G</button>
+		<button onclick='アプリケーション.操作1( ["F4", "A4"] )'>F</button>
+		<button onclick='アプリケーション.操作1( ["E4", "G#4"] )'>E</button>
+	</div>
+		
+	<div class="Separation"></div>
 			
-		<div class="Separation"></div>
+	<div class="Separation"></div>
 			
-		<div class="Division">
-			<button onclick='アプリケーション.再生と停止()'>再生/停止</button>
-			Tempo <input type="range" style="width: 200px" min="10" max="300" value="120" oninput='アプリケーション.テンポを設定( this.value )'/>
-			</div>
+	<div class="Division">
+
+		<textarea id="JSONEdit" style="width: 600px; height: 150px;"></textarea>
+
+	</div>
+		
+	<div class="Separation"></div>
 			
-		<div class="Separation"></div>
-									
-		<div class="Division">
-			<button onclick='アプリケーション.操作1( ["440", "660"] )'>発音</button>
-			<button onclick='アプリケーション.操作1( ["C5", "E4"] )'>C</button>
-			<button onclick='アプリケーション.操作1( ["A#4", "D4"] )'>B♭</button>
-			<button onclick='アプリケーション.操作1( ["G4", "A#4"] )'>Gm</button>
-			<button onclick='アプリケーション.操作1( ["A4", "C#4"] )'>A</button>
-			<button onclick='アプリケーション.操作1( ["A4", "C5"] )'>Am</button>
-			<button onclick='アプリケーション.操作1( ["G4", "B4"] )'>G</button>
-			<button onclick='アプリケーション.操作1( ["F4", "A4"] )'>F</button>
-			<button onclick='アプリケーション.操作1( ["E4", "G#4"] )'>E</button>
-		</div>
-			
+	<div class="Division">
+
+		<textarea id="NoteQuest1" style="width: 400px; height: 200px;"></textarea>
+		<textarea id="NoteQuest2" style="width: 300px; height: 100px;">h 384
+i 192  n 128
+j 96  o 64
+l 48  p 32
+m 24  q 16
+</textarea>
+
+	</div>
+								
+	<div class="Division">
+
+		<textarea id="EvalCode" style="width: 200px; height: 100px;"></textarea>
+		<button onclick="アプリケーション.コードを実行()">実行</button>
+		<textarea id="EvalResult" style="width: 200px; height: 100px;"></textarea>
+
+	</div>
+		
 <script>
+
+const 旋律組 = new function()
+{
+	const gr =
+	[
+		"ai aChDiCEijF.jCEi Dbhbgigeijajbgi Cahaeiaeijg.jaei bg.hg.eieh",
+		"ai aChDiCEijF.jCEi Dbhbgigeijajbgi Caijbjaeig.eijf.jg.ei aeh ai aeh"
+	]
+	.join( "\n" );
+
+	const moldau =
+	[
+		"ej aci bej Cai Dbj ECi ECj ECij  Faij Fai Fbj EChj ",
+		"ECj Dbij Dbi Dbj Cai Dbj Caij  bg.ij bg.i bg.j aehj",
+	]
+	.join( "\n\n" );
+
+	const rys =
+	[
+		"Cl al el al Cl rl bl rl  Cl al el al Cl rl bl rl",
+		"Cl rl Cqbqq Cl Dl rl Cl rl  bl rl bqCqbq al gl rl el rl",
+		"al fl cl fl al rl gl rl  al fl cl fl al rl gl rl",
+		"al fl cl fl al rl gl rl  al rl rl rl bqCqbq CqbqCq rl rl ",
+
+		"Cl al el al Cl rl bl rl Cl  al el al Cl rl bl rl",
+		"Cl rl Cqbqq Cl Dl rl Cl rl  bl rl bqCqbq al gl rl al rl",
+		"El rl EqFqq El Dl rl DqEqq Dl  Cl rl CqDqCq bl al bl Cl Dl",
+		"El rl EqFqq El Dl DqEqDq Cl bl  al rl rl rl bl bqCqbq Cl bl"
+	]
+	.join( "\n" );
+
+	const m = rys;
+
+
+	//  //
+
+	const regex =
+	[
+		"()"
+	]
+	.join( "|" ) + "g";
+
+	const keys =
+	{
+		"c": -12, "c#": -11, "d": -10, "d#": -9, "e": -8, "f": -7,
+		"f#": -6,"g": -5, "g#": -4, "a": -3, "a#": -2, "b": -1,
+		"C": 0, "C#": 1, "D": 2, "D#": 3, "E": 4, "F": 5,
+		"F#": 6, "G": 7, "G#": 8, "A": 9, "A#": 10, "B": 11, 
+	};
+
+	const lens = { h: 384, i: 192, j: 96, l: 48, m: 24, n: 128, o: 64, p: 32, q: 16 };
+
+	const getlen = ( lenstr ) =>
+	{
+		let len = 0;
+		lenstr.replace
+		(
+			/([h-jl-q])/g,
+			( all, a ) =>
+			{
+				if( a ) len += lens[ a ];
+			}
+		);
+		return len;
+	};
+
+	const MelodyToSequence = ( melody ) =>
+	{
+		const seq = [];
+		let time = 0;
+		let note = [];
+		const fn = ( all, key, lenstr ) =>
+		{
+			if( key )
+			{
+				key = key.replace( ".", "#" );
+				const k = Tone.Midi( keys[ key ] ) + 60;
+				note.push( Tone.Midi( k ).toNote() );
+			}
+
+			if( lenstr )
+			{
+				let len = getlen( lenstr );
+				const item = { time: time + "i", len: len + "i", note: note };
+				seq.push( item );
+				// console.log( time, note.join( " " ) );
+				note = [];
+				time += len;
+			}
+		};
+
+		melody.replace( /([a-gA-G][\.#]?)|([h-jl-q]+)/g, fn );
+		seq.時間 = time;
+		return seq;
+	};
+
+	const seq = MelodyToSequence( m );
+	document.getElementById( "NoteQuest1" ).value = m;
+
+	this.パートを作成 = function( 楽器 )
+	{
+		const part = new Tone.Part
+		(
+			( 時刻, 値 ) => 楽器.triggerAttackRelease( 値.note, 値.len, 時刻 ),
+			seq
+		);
+		part.loop = true;
+		part.loopEnd = seq.時間 + "i";
+		part.start( 0 );
+		return part;
+	};
+};
 
 const 曲集 = {};
 
 曲集.グリーンスリーブス =
 {
-	メロディー: "A3 4n C4 4n"
+	1: "-A+CDEFE qhqq.oqhqq.eq"
 };
 
+const 楽器に旋律を設定 = ( 楽器, 曲, パート名 ) =>
+{
+	return 旋律組.パートを作成( 楽器 );
+};
 const アプリケーション = new function()
 {
 	const この実体 = this;
 
 	const 設定 =
 	{
-		volume: -6,
-		envelope: { attack: 0.002, decay: 12, sustain: 0, release: 0.002 },
+		volume: -0,
+		envelope: { attack: 0.01, decay: 0.2, sustain: 0.0, release: 0.5 },
 		oscillator:
 		{
-			type: "fmsquare"
-		}
+			type: "sine"
+
+		},
+		harmonicity: 1.11,
+		detune: 0,
+		modulation: { type: "square" },
+		modulationEnvelope: { attack: 0.001, decay: 0.03, sustain: 0.0, release: 0.7 },
 	};
 
-	const シンセ = new Tone.PolySynth();
+	const シンセ = new Tone.PolySynth( 4, Tone.Synth );
 	シンセ.set( 設定 );
 
 	シンセ.toMaster();
@@ -89,31 +255,49 @@ const アプリケーション = new function()
 			{ time: "0:0:0", note: [ "Eb3", "G4" ] },
 			{ time: "0:2:0", note: [ "C4", "G#4" ] },
 			{ time: "1:0:0", note: [ "Eb3", "A#4" ] },
-			{ time: "1:2:0", note: [ "C4", "G#4" ] },
+			{ time: "1:2:0", note: [ "C4", "C5" ] },
 		],
 	);
 	パート1.loop = true;
 	パート1.loopEnd = "2m";
 
 	// ループ1.start( 0 );
-	パート1.start( 0 );
+	//パート1.start( 0 );
+
+	楽器に旋律を設定( シンセ, 曲集.グリーンスリーブス, "M" );
 
 
 	// ユーザーからの操作 //
-
-	この実体.操作1 = function( 和音 )
-	{
-		シンセ.triggerAttackRelease( 和音, "2n");
-	};
 
 	この実体.再生と停止 = () =>
 	{
 		Tone.Transport.toggle();
 	};
 
+	この実体.操作1 = function( 和音 )
+	{
+		シンセ.triggerAttackRelease( 和音, "2n");
+	};
+
+	この実体.調性を設定 = ( 値 ) =>
+	{
+		シンセ.set( "detune", 値 * 100 );
+	};
+
+	この実体.音量を設定 = ( 値 ) =>
+	{
+		シンセ.set( "volume", 値 );
+	};
+
 	この実体.テンポを設定 = ( テンポ ) =>
 	{
 		Tone.Transport.bpm.value = テンポ;
+	};
+
+	この実体.コードを実行 = () =>
+	{
+		try { document.getElementById( "EvalResult" ).value = eval( document.getElementById( "EvalCode" ).value ); }
+		catch( 例外 ) { document.getElementById( "EvalResult" ).value = 例外.message; }
 	};
 
 	//  //
@@ -124,22 +308,13 @@ const アプリケーション = new function()
 		document.getElementById( "ToneCurrentTime" ).textContent =
 		[
 			"時刻 " + Tone.Transport.seconds.toFixed( 2 ),
-			"テンポ " + Tone.Transport.bpm.value.toFixed( 0 )
+			"脈拍 " + Tone.Transport.bpm.value.toFixed( 0 ),
+			"調性 " + シンセ.detune.value,
 		]
 		  .join( ", " );
 	};
 
 	表示を更新();
-};
-
-const 楽器に旋律を設定 = ( 楽器, 旋律 ) =>
-{
-	const f = ( 時刻, 音符 ) =>
-	{
-		楽器.triggerAttackRelease( 音符, 時刻 );
-	};
-
-	new Tone.Sequence( f, 旋律 );
 };
 
 </script>

@@ -1,0 +1,25 @@
+{
+	"Songs":
+	[
+		{
+			"Title": "Behind The Mask",
+			"Tempo": 108,
+			"Key": -4,
+			"Seq":
+			{
+				"Main": [],
+				"B1": "ajajAjrj,ajajAjaj"
+			}
+		},
+		{
+			"Title": "Solid State Survivor",
+			"Tempo": 144,
+			"Key": 2
+		},
+		{
+			"Title": "Technopolis",
+			"Tempo": 120,
+			"Key": -2
+		}
+	]
+}
