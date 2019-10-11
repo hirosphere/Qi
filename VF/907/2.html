@@ -3,16 +3,23 @@
 <head>
 
 <meta charset="utf-8"/>
-<title>Tone.js 2</title>
+<title></title>
 <style>
+
 body { padding: 20px 46px; font-family: Consolas; font-size: 18px; }
+butotn, textarea { vertical-align: top; }
 button { height: 4em; padding: 0 15px; }
 textarea { font-family: Consolas, monospace }
+a { color: hsl( 95, 69%, 40% ) }
+
 .Separation { height: 20px; }
+.AppFrame { height: 300px; overflow: auto; background: hsl( 0, 2%, 98% ); }
+.Monitor { display: none; border: 1px solid hsl( 95, 69%, 40% ); }
 </style>
 
 <script src="Prime.js"></script>
-<script src="../../Lib/URON2.js"></script>
+<script src="../../Lib/URON3.js"></script>
+<script src="../../Lib/UStore.js"></script>
 <script src="Audio.js"></script>
 <script src="Graph.js"></script>
 <script src="Model.js"></script>
@@ -21,13 +28,13 @@ textarea { font-family: Consolas, monospace }
 <script src="Melody.1.js"></script>
 
 </head>
-<body onload="new アプリケーション型()">
+<body onload="メイン()">
 
 <script>
 
-const アプリケーション型 = function()
+const メイン = function()
 {
-	new テスト1型( document.body );
+	new アプリケーション型( document.body );
 };
 
 </script>
