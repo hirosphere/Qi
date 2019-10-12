@@ -7,7 +7,7 @@ const アプリケーション型 = function( 幹 )
 	//const doc1 = new モデル群.楽器型();
 	//const data = doc1.保存値を取得();
 
-	const value = { Type: "G1", "Title":"Tricorol", Color: [ 120, 50, 90 ], Width: 500, Height: 200 };
+	const value = { Type: "G1", "Title":"HSLカラー", Color: [ 120, 50, 90 ], Width: 500, Height: 200 };
 	const 永続値 = new URON永続値型();
 	if( 永続値.値を取得() == null ) 永続値.値を設定( value );
 
@@ -39,7 +39,7 @@ const JSON編集型 = function( 幹, 永続値 )
 	
 	{
 		const con = Pを作成( div );
-		es.a = Aを作成( con, { 文: "リンク", 属性: { target: "_blank" } } );
+		es.a = Aを作成( con, { 文: "別ページで開く", 属性: { target: "_blank" } } );
 	}
 
 	const 永続値を反映 = () =>
@@ -118,6 +118,7 @@ const アプリ型群 = {}
 	const この実体 = this;
 
 	const 枝 = Divを作成( 幹, {  } );
+	const タイトル = Pを作成( 枝, { 文: "タイトル" } );
 	const 表示 = Divを作成( 枝, { スタイル: { width: "40px", height: "40px", background: "hsl( 90, 50%, 60% )" } } );
 
 	const 初期値 =
@@ -147,6 +148,7 @@ const アプリ型群 = {}
 
 	const 更新 = () =>
 	{
+		タイトル.文を設定( 属性.Title != null ? 属性.Title : "" );
 		表示.style.background = HTML色値に変換( 属性.Color );
 		表示.style.width = 属性.Width + "px";
 		表示.style.height = 属性.Height + "px";
