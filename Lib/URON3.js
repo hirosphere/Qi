@@ -133,7 +133,7 @@ const URON = new function()
 		//return uron;
 		const base64 = "=" + Base64に変換( 値 );
 
-		return ( uron.length <= ( base64.length * 1.3 ) ? uron : base64 );
+		return ( uron.length <= ( base64.length * 1.0 ) ? uron : base64 );
 	};
 
 	文字列.文字を変換 = ( 全, 先頭覆号, 不変換, 単覆号, その他 ) =>
@@ -330,10 +330,3 @@ const URON = new function()
 	};
 };
 
-
-// ツール //
-
-{
-	const a = "[],():" + "\t\r\n \"" + "#%&<>" + "`{|}";
-	const b = "[],():" + "abcdg" + "hijkl" + "mopq"
-}

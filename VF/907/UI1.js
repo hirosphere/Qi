@@ -7,17 +7,63 @@ const アプリケーション型 = function( 幹 )
 	//const doc1 = new モデル群.楽器型();
 	//const data = doc1.保存値を取得();
 
-	const value = { Type: "G1", "Title":"HSLカラー", Color: [ 120, 50, 90 ], Width: 500, Height: 200 };
 	const 永続値 = new URON永続値型();
-	if( 永続値.値を取得() == null ) 永続値.値を設定( value );
 
-	new アプリケーションフレーム型( 枝, 永続値 );
+	const フレーム = new アプリケーションフレーム型( 枝, 永続値 );
 	new JSON編集型( 枝, 永続値 );
 	
 	{
-		//const div = Divを作成( 枝, {} );
-		//new グラフ型( div, { 幅: 500, 高さ: 300, 背景色: "hsl( 210, 77%, 84% )" } );
+		const div = Divを作成( 枝 );
+
+		Buttonを作成( div, { 文: "URLに反映", 属性: { onclick: () => 永続値.URLに書き出し( いいえ ) } } );
+		Buttonを作成( div, { 文: "URLに記憶", 属性: { onclick: () => 永続値.URLに書き出し( はい ) } } );
 	}
+
+	const value = { Type: "G1", "Title":"HSLカラー", Color: [ 93, 50, 47 ], Width: 770, Height: 100 };
+	永続値.URLを取り込み( value );
+};
+
+const アプリケーションフレーム型 = function( 幹, 永続値 )
+{
+	const この実体 = this;
+
+	const アプリプール = {};
+	let 表示中のアプリ = null;
+
+	const 枝 = Divを作成( 幹, { クラス: "AppFrame" } );
+
+	この実体.保存値を設定 = ( 保存値 ) =>
+	{
+		const type = 保存値 && 保存値.Type && 保存値.Type || "G1";
+		const 型 = アプリ型群[ type ] || アプリ型群[ "G1" ];
+		const アプリ = アプリプール[ type ] = アプリプール[ type ] || new 型( 枝 );
+
+		if( アプリ != 表示中のアプリ )
+		{
+			if( 表示中のアプリ )  表示中のアプリ.表示を設定( false );
+			表示中のアプリ = アプリ;
+			if( 表示中のアプリ )  表示中のアプリ.表示を設定( true );
+		}
+
+		表示中のアプリ.保存値を設定( 保存値 );
+	};
+
+	この実体.保存値を取得 = () =>
+	{
+		return 表示中のアプリ.保存値を取得();
+	};
+
+	//    //
+
+	const URL変更処理 = ( 書き出しか ) =>
+	{
+		document.title = ( 表示中のアプリ && 表示中のアプリ.タイトルを取得() || "URON" );
+	};
+
+	永続値.値リスナーを登録 (  () => この実体.保存値を設定( 永続値.値を取得() )  );
+	永続値.URLリスナーを登録 ( URL変更処理 );
+
+
 };
 
 const JSON編集型 = function( 幹, 永続値 )
@@ -29,8 +75,6 @@ const JSON編集型 = function( 幹, 永続値 )
 	
 	es.json1 = Textareaを作成( div, { スタイル: { width: "700px", height: "50px", display: "block" } } );
 	
-	Buttonを作成( div, { 文: "記憶", 属性: { onclick: () => 永続値.記憶() } } );
-
 	es.uron = Textareaを作成( div, { クラス: "Monitor", スタイル: { width: "700px", height: "50px" } } );
 	es.link = Textareaを作成( div, { クラス: "Monitor", スタイル: { width: "700px", height: "50px" } } );
 	es.json2 = Textareaを作成( div, { クラス: "Monitor", スタイル: { width: "700px", height: "50px" } } );
@@ -73,45 +117,19 @@ const JSON編集型 = function( 幹, 永続値 )
 		if( ev.keyCode == 13 ) {  編集内容を永続値に設定() ; return false; }
 	};
 
-	永続値.変更処理を登録( 永続値を反映 );
+	永続値.値リスナーを登録( 永続値を反映 );
 };
 
-const アプリケーションフレーム型 = function( 幹, 永続値 )
-{
-	const この実体 = this;
+const アプリ型群 = {};
 
-	const アプリプール = {};
-	let 表示中のアプリ = null;
-
-	const 枝 = Divを作成( 幹, { クラス: "AppFrame" } );
-
-	この実体.保存値を設定 = ( 保存値 ) =>
+モデル群.型を作成
+(
+	"G1",
 	{
-		const type = 保存値 && 保存値.Type && 保存値.Type || "G1";
-		const 型 = アプリ型群[ type ] || アプリ型群[ "G1" ];
-		const アプリ = アプリプール[ type ] = アプリプール[ type ] || new 型( 枝 );
-
-		if( アプリ != 表示中のアプリ )
-		{
-			if( 表示中のアプリ )  表示中のアプリ.表示を設定( false );
-			表示中のアプリ = アプリ;
-			if( 表示中のアプリ )  表示中のアプリ.表示を設定( true );
-		}
-
-		表示中のアプリ.保存値を設定( 保存値 );
-		document.title = 表示中のアプリ.タイトルを取得();
-	};
-
-	この実体.保存値を取得 = () =>
-	{
-		return 表示中のアプリ.保存値を取得();
-	};
-
-	永続値.変更処理を登録( () => この実体.保存値を設定( 永続値.値を取得() ) );
-	
-};
-
-const アプリ型群 = {}
+		省略値: { Color: [ 90, 45, 45 ], Area: [ 10, 10, 300, 300 ] },
+		要素定義: { Title: [ "String" ], Color: "HSL", Area: "Area" }
+	}
+);
 
 アプリ型群.G1 = function( 幹 )
 {
