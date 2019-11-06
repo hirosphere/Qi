@@ -72,14 +72,15 @@ const JSON編集型 = function( 幹, 永続値 )
 
 	const div = Divを作成( 幹, {} );
 	const es = {};
+	let jsonエラーか = いいえ;
 	
 	es.json1 = Textareaを作成( div, { スタイル: { width: "700px", height: "50px", display: "block" } } );
 	
-	es.uron = Textareaを作成( div, { クラス: "Monitor", スタイル: { width: "700px", height: "50px" } } );
-	es.link = Textareaを作成( div, { クラス: "Monitor", スタイル: { width: "700px", height: "50px" } } );
-	es.json2 = Textareaを作成( div, { クラス: "Monitor", スタイル: { width: "700px", height: "50px" } } );
-	es.json3 = Textareaを作成( div, { クラス: "Monitor", スタイル: { width: "700px", height: "50px" } } );
-	es.mon1 = Textareaを作成( div, { クラス: "Monitor", スタイル: { width: "700px", height: "100px" } } );
+	es.uron = Textareaを作成( div, { クラス: "MONITOR", スタイル: { width: "700px", height: "50px" } } );
+	es.link = Textareaを作成( div, { クラス: "MONITOR", スタイル: { width: "700px", height: "50px" } } );
+	es.json2 = Textareaを作成( div, { クラス: "MONITOR", スタイル: { width: "700px", height: "50px" } } );
+	es.json3 = Textareaを作成( div, { クラス: "MONITOR", スタイル: { width: "700px", height: "50px" } } );
+	es.mon1 = Textareaを作成( div, { クラス: "MONITOR", スタイル: { width: "700px", height: "100px" } } );
 	
 	{
 		const con = Pを作成( div );
@@ -94,11 +95,10 @@ const JSON編集型 = function( 幹, 永続値 )
 	
 	const 編集内容を永続値に設定 = () =>
 	{
-		try
-		{
-			永続値.値を設定( JSON.parse( es.json1.value ) );
-		}
-		catch {}
+		try  {  永続値.値を設定( JSON.parse( es.json1.value ) );  jsonエラーか = いいえ;  }
+		catch {  jsonエラーか = はい;  }
+		console.log( "JSONエラー ", jsonエラーか );
+		jsonエラーか ?  es.json1.classList.add( "JSON_ERROR" ) : es.json1.classList.remove( "JSON_ERROR" );
 	};
 	
 	const モニタを更新 = () =>
@@ -119,17 +119,6 @@ const JSON編集型 = function( 幹, 永続値 )
 
 	永続値.値リスナーを登録( 永続値を反映 );
 };
-
-const アプリ型群 = {};
-
-モデル群.型を作成
-(
-	"G1",
-	{
-		省略値: { Color: [ 90, 45, 45 ], Area: [ 10, 10, 300, 300 ] },
-		要素定義: { Title: [ "String" ], Color: "HSL", Area: "Area" }
-	}
-);
 
 アプリ型群.G1 = function( 幹 )
 {
