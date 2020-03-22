@@ -8,31 +8,32 @@ Copyright 2017 JellyWare Inc. All Rights Reserved.
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="BlueJelly">
     <meta name="viewport" content="width=640, maximum-scale=1.0, user-scalable=yes">
-    <title>BlueJelly</title>
+    <title>Rail 091</title>
     <link href="https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="style.css">
     <script type="text/javascript" src="bluejelly.js"></script>
-    <script type="text/javascript" src="uuid.js"></script>
   </head>
 
 <body>
 <div class="container">
     <div class="title margin">
         <p id="title">BlueJelly Sample</p>
-        <p id="subtitle">Readでデータ読み込み</p>
+        <p id="subtitle">Writeでデータ書き込み</p>
     </div>
 
     <div class="contents margin">
+        <input id="write_value" class="button" value="Hello!, Zdrav!, WebBlueTooth API" size="1">
+        <button id="write" class="button">Write</button>
         <button id="read" class="button">Read</button>
         <hr>
         <div id="device_name"> </div>
         <div id="uuid_name"> </div>
-        <div id="data_text"> </div>
         <div id="status"> </div>
+        <div id="data_text"> </div>
 
     </div>
     <div class="footer margin">
-        For more information, see <a href="http://jellyware.jp/kurage" target="_blank">jellyware.jp</a> and <a href="https://github.com/electricbaka/bluejelly" target="_blank">GitHub</a> !
+                For more information, see <a href="http://jellyware.jp/kurage" target="_blank">jellyware.jp</a> and <a href="https://github.com/electricbaka/bluejelly" target="_blank">GitHub</a> !
     </div>
 </div>
 <script>
@@ -48,7 +49,9 @@ var ble = new BlueJelly();
 //--------------------------------------------------
 window.onload = function () {
   //UUIDの設定
-  ble.setUUID("UUID1", "713d0000-503e-4c75-ba94-3148f18d941e", "713d0002-503e-4c75-ba94-3148f18d941e");  //BLEnano SimpleControl rx_uuid
+  //ble.setUUID("UUID1", "713d0000-503e-4c75-ba94-3148f18d941e", "713d0002-503e-4c75-ba94-3148f18d941e");  //BLEnano SimpleControl rx_uuid
+  //ble.setUUID("UUID2", "713d0000-503e-4c75-ba94-3148f18d941e", "713d0003-503e-4c75-ba94-3148f18d941e");  //BLEnano SimpleControl tx_uuid
+  ble.setUUID("UUID2", "0311681e-cc5a-4aa9-9121-e6a88919fb5d", "bd3019b6-fc92-4fc9-9031-a5540cbb636e" );  //BLEnano SimpleControl rx_uuid
 }
 
 
@@ -69,6 +72,14 @@ ble.onConnectGATT = function (uuid) {
 
   document.getElementById('uuid_name').innerHTML = uuid;
   document.getElementById('status').innerHTML = "connected GATT!";
+}
+
+//--------------------------------------------------
+//Write後の処理
+//--------------------------------------------------
+ble.onWrite = function(uuid){
+  document.getElementById('uuid_name').innerHTML = uuid;
+  document.getElementById('status').innerHTML = "written data"
 }
 
 
@@ -93,8 +104,30 @@ ble.onRead = function (data, uuid){
 //-------------------------------------------------
 //ボタンが押された時のイベント登録
 //--------------------------------------------------
+
+function write()
+{
+  const ar = [];
+  for( let ch of document.getElementById('write_value').value )  ar.push( ch.charCodeAt( 0 ) );  
+  ble.write('UUID2', ar );
+}
+
+document.getElementById('write').addEventListener ('click', ()=> write() );
+
+document.getElementById('write_value').addEventListener
+( 'keydown',
+  ( ev ) =>
+  {
+    if( ev.keyCode == 13 )
+    {
+      write();
+      return false;
+    }
+  }
+);
+
 document.getElementById('read').addEventListener('click', function() {
-      ble.read('UUID1');
+      ble.read('UUID2');
 });
 
 

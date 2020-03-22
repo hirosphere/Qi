@@ -1,0 +1,104 @@
+
+
+*KATO Nゲージ スケールスピードと回転数
+
+車輪径 5mm 車輪周 15.71mm
+
+{
+	const f = ( v, u ) => ( Math.floor( v * 10 ) / 10 ) + u;
+	const 車輪径 = 5 * Math.PI;
+	let rs = [];
+	for( let 時速 = 5; 時速 <= 360; 時速 += 5 )
+	{
+		const 秒速 = 時速 / 3.6;
+		const 秒速2 = 秒速 / 150 * 1000;
+		const 車輪回転 = 秒速2 / 車輪径;
+		const ln =
+		[
+			時速 + "km/h",
+			f( 秒速, "m/s" ),
+			f( 秒速2, "mm/s" ), f( 車輪回転, "Hz" ),
+			f( 車輪回転 * 10, "Hz" ),
+			f( 車輪回転 * 10 * 9, "Hz" ),
+			f( 車輪回転 * 10 * 9 * 4, "Hz" )
+		]
+		.join( "\t" );
+		rs.push( ln );
+	}
+	rs.join( "\n" );
+}
+
+時速	秒速	1/150秒速	車輪回転数	モーター回転数	x9ステップ	x36ステップ
+
+5km/h	1.3m/s	9.2mm/s	0.5Hz	5.8Hz	53Hz	212.2Hz
+10km/h	2.7m/s	18.5mm/s	1.1Hz	11.7Hz	106.1Hz	424.4Hz
+15km/h	4.1m/s	27.7mm/s	1.7Hz	17.6Hz	159.1Hz	636.6Hz
+20km/h	5.5m/s	37mm/s	2.3Hz	23.5Hz	212.2Hz	848.8Hz
+25km/h	6.9m/s	46.2mm/s	2.9Hz	29.4Hz	265.2Hz	1061Hz
+30km/h	8.3m/s	55.5mm/s	3.5Hz	35.3Hz	318.3Hz	1273.2Hz
+35km/h	9.7m/s	64.8mm/s	4.1Hz	41.2Hz	371.3Hz	1485.4Hz
+40km/h	11.1m/s	74mm/s	4.7Hz	47.1Hz	424.4Hz	1697.6Hz
+45km/h	12.5m/s	83.3mm/s	5.3Hz	53Hz	477.4Hz	1909.8Hz
+50km/h	13.8m/s	92.5mm/s	5.8Hz	58.9Hz	530.5Hz	2122Hz
+55km/h	15.2m/s	101.8mm/s	6.4Hz	64.8Hz	583.5Hz	2334.2Hz
+60km/h	16.6m/s	111.1mm/s	7Hz	70.7Hz	636.6Hz	2546.4Hz
+65km/h	18m/s	120.3mm/s	7.6Hz	76.6Hz	689.6Hz	2758.6Hz
+70km/h	19.4m/s	129.6mm/s	8.2Hz	82.5Hz	742.7Hz	2970.8Hz
+75km/h	20.8m/s	138.8mm/s	8.8Hz	88.4Hz	795.7Hz	3183Hz
+80km/h	22.2m/s	148.1mm/s	9.4Hz	94.3Hz	848.8Hz	3395.3Hz
+85km/h	23.6m/s	157.4mm/s	10Hz	100.2Hz	901.8Hz	3607.5Hz
+90km/h	25m/s	166.6mm/s	10.6Hz	106.1Hz	954.9Hz	3819.7Hz
+95km/h	26.3m/s	175.9mm/s	11.1Hz	111.9Hz	1007.9Hz	4031.9Hz
+100km/h	27.7m/s	185.1mm/s	11.7Hz	117.8Hz	1061Hz	4244.1Hz
+105km/h	29.1m/s	194.4mm/s	12.3Hz	123.7Hz	1114Hz	4456.3Hz
+110km/h	30.5m/s	203.7mm/s	12.9Hz	129.6Hz	1167.1Hz	4668.5Hz
+115km/h	31.9m/s	212.9mm/s	13.5Hz	135.5Hz	1220.1Hz	4880.7Hz
+120km/h	33.3m/s	222.2mm/s	14.1Hz	141.4Hz	1273.2Hz	5092.9Hz
+125km/h	34.7m/s	231.4mm/s	14.7Hz	147.3Hz	1326.2Hz	5305.1Hz
+130km/h	36.1m/s	240.7mm/s	15.3Hz	153.2Hz	1379.3Hz	5517.3Hz
+135km/h	37.5m/s	250mm/s	15.9Hz	159.1Hz	1432.3Hz	5729.5Hz
+140km/h	38.8m/s	259.2mm/s	16.5Hz	165Hz	1485.4Hz	5941.7Hz
+145km/h	40.2m/s	268.5mm/s	17Hz	170.9Hz	1538.4Hz	6153.9Hz
+150km/h	41.6m/s	277.7mm/s	17.6Hz	176.8Hz	1591.5Hz	6366.1Hz
+155km/h	43m/s	287mm/s	18.2Hz	182.7Hz	1644.6Hz	6578.4Hz
+160km/h	44.4m/s	296.2mm/s	18.8Hz	188.6Hz	1697.6Hz	6790.6Hz
+165km/h	45.8m/s	305.5mm/s	19.4Hz	194.5Hz	1750.7Hz	7002.8Hz
+170km/h	47.2m/s	314.8mm/s	20Hz	200.4Hz	1803.7Hz	7215Hz
+175km/h	48.6m/s	324mm/s	20.6Hz	206.3Hz	1856.8Hz	7427.2Hz
+180km/h	50m/s	333.3mm/s	21.2Hz	212.2Hz	1909.8Hz	7639.4Hz
+185km/h	51.3m/s	342.5mm/s	21.8Hz	218.1Hz	1962.9Hz	7851.6Hz
+190km/h	52.7m/s	351.8mm/s	22.3Hz	223.9Hz	2015.9Hz	8063.8Hz
+195km/h	54.1m/s	361.1mm/s	22.9Hz	229.8Hz	2069Hz	8276Hz
+200km/h	55.5m/s	370.3mm/s	23.5Hz	235.7Hz	2122Hz	8488.2Hz
+205km/h	56.9m/s	379.6mm/s	24.1Hz	241.6Hz	2175.1Hz	8700.4Hz
+210km/h	58.3m/s	388.8mm/s	24.7Hz	247.5Hz	2228.1Hz	8912.6Hz
+215km/h	59.7m/s	398.1mm/s	25.3Hz	253.4Hz	2281.2Hz	9124.8Hz
+220km/h	61.1m/s	407.4mm/s	25.9Hz	259.3Hz	2334.2Hz	9337Hz
+225km/h	62.5m/s	416.6mm/s	26.5Hz	265.2Hz	2387.3Hz	9549.2Hz
+230km/h	63.8m/s	425.9mm/s	27.1Hz	271.1Hz	2440.3Hz	9761.5Hz
+235km/h	65.2m/s	435.1mm/s	27.7Hz	277Hz	2493.4Hz	9973.7Hz
+240km/h	66.6m/s	444.4mm/s	28.2Hz	282.9Hz	2546.4Hz	10185.9Hz
+245km/h	68m/s	453.7mm/s	28.8Hz	288.8Hz	2599.5Hz	10398.1Hz
+250km/h	69.4m/s	462.9mm/s	29.4Hz	294.7Hz	2652.5Hz	10610.3Hz
+255km/h	70.8m/s	472.2mm/s	30Hz	300.6Hz	2705.6Hz	10822.5Hz
+260km/h	72.2m/s	481.4mm/s	30.6Hz	306.5Hz	2758.6Hz	11034.7Hz
+265km/h	73.6m/s	490.7mm/s	31.2Hz	312.4Hz	2811.7Hz	11246.9Hz
+270km/h	75m/s	500mm/s	31.8Hz	318.3Hz	2864.7Hz	11459.1Hz
+275km/h	76.3m/s	509.2mm/s	32.4Hz	324.2Hz	2917.8Hz	11671.3Hz
+280km/h	77.7m/s	518.5mm/s	33Hz	330Hz	2970.8Hz	11883.5Hz
+285km/h	79.1m/s	527.7mm/s	33.5Hz	335.9Hz	3023.9Hz	12095.7Hz
+290km/h	80.5m/s	537mm/s	34.1Hz	341.8Hz	3076.9Hz	12307.9Hz
+295km/h	81.9m/s	546.2mm/s	34.7Hz	347.7Hz	3130Hz	12520.1Hz
+300km/h	83.3m/s	555.5mm/s	35.3Hz	353.6Hz	3183Hz	12732.3Hz
+305km/h	84.7m/s	564.8mm/s	35.9Hz	359.5Hz	3236.1Hz	12944.6Hz
+310km/h	86.1m/s	574mm/s	36.5Hz	365.4Hz	3289.2Hz	13156.8Hz
+315km/h	87.5m/s	583.3mm/s	37.1Hz	371.3Hz	3342.2Hz	13369Hz
+320km/h	88.8m/s	592.5mm/s	37.7Hz	377.2Hz	3395.3Hz	13581.2Hz
+325km/h	90.2m/s	601.8mm/s	38.3Hz	383.1Hz	3448.3Hz	13793.4Hz
+330km/h	91.6m/s	611.1mm/s	38.9Hz	389Hz	3501.4Hz	14005.6Hz
+335km/h	93m/s	620.3mm/s	39.4Hz	394.9Hz	3554.4Hz	14217.8Hz
+340km/h	94.4m/s	629.6mm/s	40Hz	400.8Hz	3607.5Hz	14430Hz
+345km/h	95.8m/s	638.8mm/s	40.6Hz	406.7Hz	3660.5Hz	14642.2Hz
+350km/h	97.2m/s	648.1mm/s	41.2Hz	412.6Hz	3713.6Hz	14854.4Hz
+355km/h	98.6m/s	657.4mm/s	41.8Hz	418.5Hz	3766.6Hz	15066.6Hz
+360km/h	100m/s	666.6mm/s	42.4Hz	424.4Hz	3819.7Hz	15278.8Hz

@@ -289,7 +289,7 @@ const 単声の型 = function( 文脈, モデル, 出力先, 音量, 波形 )
 		const d = a + EG.D / 1000;
 		
 		エンベロープゲイン.振幅().その時刻の値( 0, t );
-		console.log( 音量, EG, EG.A );
+		//console.log( 音量, EG, EG.A );
 		エンベロープゲイン.振幅().充放電を設定( 音量 / 0.63, t, EG.A / 1000 / 1 );
 		エンベロープゲイン.振幅().setTargetAtTime( 音量 * EG.S / 100, a, EG.D / 1000 / 1 );
 	};

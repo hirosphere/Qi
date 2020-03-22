@@ -38,7 +38,7 @@ const 型を作成 = function( 典型装飾関数, 基底の型 )
 		型.実体を作成 = 型.作成 = function()
 		{
 			const 実体 = new 型();
-			//型.prototype.初期化.apply( 実体, arguments );
+			型.prototype.初期化.apply( 実体, arguments );
 			return 実体;
 		};
 	}

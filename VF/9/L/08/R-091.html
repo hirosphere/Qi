@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>R-091</title>
+<style>
+
+body { background: hsl( 27, 10%, 95% ); padding: 40px 80px; }
+
+button { padding: 13px 2.5ex; vertical-align: middle; text-align: center; font-size: 16px; }
+
+input { padding: 0.2ex 1ex; vertical-align: middle; text-align: center; font-size: 36px; }
+
+.DIV_1 { padding: 1em; }
+
+.DEVICE_NAME { line-height: 60px; font-size: 50px; color: hsl( 0, 0%, 50% ); }
+
+</style>
+<script src="BLE.js"></script>
+</head>
+<body onload="new App()">
+
+<div class="DEVICE_NAME">
+	<span id="Device_Name">--</span>
+</div>
+	
+<div class="DIV_1">
+	<button id="Read_Button">読み出し</button>
+	<input id="Read_Value"  style="width: 12em;" />
+</div>
+	
+<div class="DIV_1">
+	<button id="Write_Button">書き込み</button>
+	<input id="Write_Value"  style="width: 12em;" value="5" />
+</div>
+
+<div class="DIV_1">
+	<button id="Auto_Button">自動</button>
+	<button id="Reset_Button">切断</button>
+</div>
+
+<script>
+
+function App()
+{
+	const dn = document.getElementById( "Device_Name" );
+	const wv = document.getElementById( "Write_Value" );
+
+	const bt_rail = new BLE_Service
+	(
+		"0311681e-cc5a-4aa9-9121-e6a88919fb5d",	  //  service uuid  //
+		"bd3019b6-fc92-4fc9-9031-a5540cbb636e"    //  characteristic uuid  //
+	);
+
+	bt_rail.OnScan = ( name ) => dn.innerText = name ;
+	bt_rail.OnDisconnect = () => dn.innerText = "" ;
+	
+	bt_rail.OnRead = ( data ) =>
+	{
+		document.getElementById( "Read_Value" ).value = data.getUint32( 0, true );
+	};
+
+	document.getElementById( "Read_Button" ).onclick = () => bt_rail.Read();
+
+	document.getElementById( "Write_Button" ).onclick = () => bt_rail.Write_String( wv.value );
+	wv.onkeydown = ( ev ) =>
+	{
+		if ( ev.keyCode == 13 )  bt_rail.Write_String( wv.value );
+	};
+
+	document.getElementById( "Auto_Button" ).onclick = () => sig.ToggleEnable();
+	document.getElementById( "Reset_Button" ).onclick = () => bt_rail.Reset();
+
+	const sig = new AutoSig( bt_rail );
+}
+
+function AutoSig( rail )
+{
+	let state = 5, run = false;
+
+	this.ToggleEnable = function()
+	{
+		run = ! run;
+	};
+
+	const oninterval = () =>
+	{
+		if( ! run ) return;
+
+		if( ++ state > 5 )  state = 1;
+		update();
+	};
+
+	const update = () =>
+	{
+		rail.Write( [ state ] );
+	};
+
+	update();
+	setInterval( oninterval, 1000 );
+}
+
+</script>
+
+</body>
+</html
