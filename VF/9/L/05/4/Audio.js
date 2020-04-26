@@ -200,16 +200,16 @@ function 波形の型( 設定値, 文脈 )
 function 倍音テーブルの型( 設定 )
 {
 	const これ = this;
-	これ.Imag = new Float32Array( 1024 );
-	これ.Real = new Float32Array( 1024 );
+	これ.Imag = new Float32Array( 256 );
+	これ.Real = new Float32Array( 256 );
 
 	if( 設定 && 設定.constructor == String )
 	{
 		const 構成 = 設定.split( /\/|'/g );
-		const 音量 = ( 構成[ 0 ] || 0 ) / 100;
-		const 種類 = 構成[ 1 ] || "Sin";
-		const 逓倍 = 構成[ 2 ] || 1;
-		const 減衰 = 構成[ 3 ] || 0;
+		const 種類 = 構成[ 0 ] || "Sin";
+		const 逓倍 = 構成[ 1 ] || 1;
+		const 減衰 = 構成[ 2 ] || 0;
+		const 音量 = ( 構成[ 3 ] || 0 ) / 100;
 		const 次数 = 構成[ 4 ] || 128;
 
 		if( 種類 == "Saw" )

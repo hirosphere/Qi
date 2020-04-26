@@ -35,12 +35,14 @@ const アプリケーション型 = function()
 	{
 		const 音響文脈 = new AudioContext();
 		const 残響器 = new 残響1型( 音響文脈, 音響文脈.destination );
-		const 音源1 = new 音源1型( 音響文脈, 残響器.入力, 64, 4, 1 / 20 );
-		const 音源2 = new 音源1型( 音響文脈, 残響器.入力, 69, 4, 1 / 24 );
+		const 音源1 = new 音源1型( 音響文脈, 残響器.入力, 57, 4, 1 / 28 );
+		const 音源2 = new 音源1型( 音響文脈, 残響器.入力, 64, 4, 1 / 27 );
+		const 音源3 = new 音源1型( 音響文脈, 残響器.入力, 71, 4, 1 / 26 );
 		{
 			const 主エレメント = エレメントを作成( "div", document.body, { クラス: "Pad" } );
 			new 発車ベル版型( 主エレメント, 音源1 );
 			new 発車ベル版型( 主エレメント, 音源2 );
+			new 発車ベル版型( 主エレメント, 音源3 );
 		}
 	};
 
@@ -66,14 +68,21 @@ const 発車ベル版型 = function( 幹エレメント, 音源 )
 			"touchstart",
 			( ev ) =>
 			{
-				if( ! 動作中 ){
+				if( 動作中 )
+				{
+					動作中 = いいえ;
+					音源.指令を投函( { 種類: "離健" } );
+				}
+				else
+				{
 					動作中 = はい;
-					if( ev.cancelable ){
-						ev.preventDefault();
-					}
-					else console.log( "キャンセル不可" );
 					音源.指令を投函( { 種類: "打鍵" } );
 				}
+
+				if( ev.cancelable ){
+					ev.preventDefault();
+				}
+				else console.log( "キャンセル不可" );
 			}
 		);
 
@@ -98,8 +107,8 @@ const 発車ベル版型 = function( 幹エレメント, 音源 )
 			{
 				if( 動作中 )
 				{
-					動作中 = いいえ;
-					音源.指令を投函( { 種類: "離健" } );
+					//動作中 = いいえ;
+					//音源.指令を投函( { 種類: "離健" } );
 				}
 			}
 		);
@@ -165,6 +174,8 @@ const 音源1型 = function( 音響文脈, 送り先, 基本音程, 変調幅, �
 		この実体.音声発振.frequency.value = 55;
 		この実体.音声発振.detune.value = ( ( 基本音程 - 69 ) * 100 );
 		この実体.音声発振.type = "sawtooth";
+		//この実体.音声発振.type = "triangle";
+		// この実体.音声発振.type = "sin";
 		この実体.音声制幅.gain.value = 0.0;
 		
 		この実体.変調発振.frequency.value = 変調速度;
@@ -179,7 +190,10 @@ const 音源1型 = function( 音響文脈, 送り先, 基本音程, 変調幅, �
 			
 			for( let i = 0; i < output.length; i ++ )
 			{
-				const ph = ( ( carr[ i ] * mod[ i ] ) % 1 + 1 ) / 2;
+				const ph =
+				(
+					( ( carr[ i ] + 1 ) * ( mod[ i ] ) ) % 2
+				) / 2;
 				output[ i ] = Math.sin( ph * Math.PI );
 			}
 		};
