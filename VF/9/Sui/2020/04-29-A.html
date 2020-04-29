@@ -6,10 +6,11 @@
 		<link rel="stylesheet" href="Style.css"/>
 <style>
 
-section { margin-bottom: 20px; }
+section { margin-bottom: 0px; }
 button { padding: 1.5ex 1.5em; }
 
-
+.CONTENT { margin-bottom: 40px; }
+.CONTROL { margin-bottom: 5px; }
 .OUTPUT { background: hsl( 210, 8%, 38% ); padding: 20px; border-radius: 6px; font-size: 12px; }
 .OUTPUT p { font-family: 'Segoe UI', Tahoma, Geneva, Verdana; color: hsl( 210, 90%, 86% ); }
 .OUTPUT .BSEP { margin-bottom: 20px; }
@@ -21,9 +22,13 @@ button { padding: 1.5ex 1.5em; }
 		<script src="URON3.js"></script>
 	</head>
 	<body style="width: 800px;" onload="new App()">
-		<header>
-			<h1 id="Title"></h1>
-		</header>
+		<section class="CONTENT">
+			<header>
+				<h1 id="Title"></h1>
+				<p id="Caption"></p>
+			</header>
+			<section class=""></section>
+		</section>
 
 		<section class="CONTROL">
 			<button id="Save">URLに反映</button>
@@ -57,6 +62,7 @@ const App = function()
 	{
 		document.title =
 		 document.getElementById( "Title" ).textContent = doc.Title;
+		document.getElementById( "Caption" ).textContent = doc.Caption;
 	};
 
 	const load = () =>
@@ -121,6 +127,8 @@ const App = function()
 };
 
 
+//  20. 04. 29. B
+
 //  //
 
 const PFDefinitions =
@@ -130,7 +138,7 @@ const PFDefinitions =
 		Items:
 		{
 			"Title":  { Type: "string", Init: "", Opt: "" },
-			//"Caption":  { Type: "string", Init: "", Opt: "" },
+			"Caption":  { Type: "string", Init: "", Opt: "" },
 			//"Shape1": { Type: "Shape", Opt: null },
 			//"Field2": { Type: "number", Init: 0 },
 			//"Field3": { Type: "bool", Init: false, Opt: false },
