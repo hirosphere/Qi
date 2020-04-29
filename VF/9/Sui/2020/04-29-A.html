@@ -26,7 +26,6 @@ button { padding: 1.5ex 1.5em; }
 		</header>
 
 		<section class="CONTROL">
-			<button id="Load">URL取り込み</button>
 			<button id="Save">URLに反映</button>
 			<button id="Clear">消去</button>
 		</section>
@@ -114,7 +113,6 @@ const App = function()
 		return false;
 	};
 	
-	document.getElementById( "Load" ).onclick = load;
 	document.getElementById( "Save" ).onclick = save;
 	document.getElementById( "Clear" ).onclick = clear;
 
@@ -132,9 +130,10 @@ const PFDefinitions =
 		Items:
 		{
 			"Title":  { Type: "string", Init: "", Opt: "" },
-			"Shape1": { Type: "Shape", Opt: null },
-			"Field2": { Type: "number", Init: 0 },
-			"Field3": { Type: "bool", Init: false, Opt: false },
+			//"Caption":  { Type: "string", Init: "", Opt: "" },
+			//"Shape1": { Type: "Shape", Opt: null },
+			//"Field2": { Type: "number", Init: 0 },
+			//"Field3": { Type: "bool", Init: false, Opt: false },
 		}
 	},
 	Shape:
