@@ -31,8 +31,7 @@ button { padding: 1.5ex 1.5em; }
 		</section>
 
 		<section class="CONTROL">
-			<button id="Save">URLに反映</button>
-			<button id="Clear">消去</button>
+			<a href="./" target="_blank" id="NewTab">新規タブで開く</a>
 		</section>
 
 		<section>
@@ -49,14 +48,16 @@ button { padding: 1.5ex 1.5em; }
 
 const App = function()
 {
+	const newtab = document.getElementById( "NewTab" );
 	const editor = document.getElementById( "Editor" );
 	const output_1 = document.getElementById( "Output-1" );
 	const output_2 = document.getElementById( "Output-2" );
 
 	const uron = new URON( "#?", "v" );
 
-	const CS = new PermFields.ClassSet( PFDefinitions );
-	const doc = new CS.Doc();
+	const CS = new Perm.ClassSet( PFDefinitions );
+	const doc = CS.Doc();
+	newtab.href = location;
 
 	const view_update = () =>
 	{
@@ -76,6 +77,7 @@ const App = function()
 	const save = () =>
 	{
 		history.replaceState( null,  "" , uron.変換( doc.GetPerm() ) );
+		newtab.href = location;
 	};
 
 	const clear = () =>
@@ -94,6 +96,8 @@ const App = function()
 
 	const editor_cure = () =>
 	{
+		if( editor.value.length == 0 )  editor.value = JSON.stringify( doc.GetPerm() );
+		
 		let value;
 		try { doc.SetPerm( JSON.parse( editor.value ) ); }
 		catch( exc )
@@ -103,6 +107,7 @@ const App = function()
 
 		monitor_update();
 		view_update();
+		save();
 	};
 
 	const monitor_update = () =>
@@ -118,16 +123,15 @@ const App = function()
 		editor_cure();
 		return false;
 	};
-	
-	document.getElementById( "Save" ).onclick = save;
-	document.getElementById( "Clear" ).onclick = clear;
 
+	editor.onblur = () => editor_cure();
+	
 	// monitor_update();
 	load();
 };
 
 
-//  20. 04. 29. B
+//  20. 04. 29. C
 
 //  //
 
@@ -139,9 +143,18 @@ const PFDefinitions =
 		{
 			"Title":  { Type: "string", Init: "", Opt: "" },
 			"Caption":  { Type: "string", Init: "", Opt: "" },
+			"Logs": { Type: "Logs" },
 			//"Shape1": { Type: "Shape", Opt: null },
 			//"Field2": { Type: "number", Init: 0 },
 			//"Field3": { Type: "bool", Init: false, Opt: false },
+		}
+	},
+	Logs: { ItemType: "Log" },
+	Log:
+	{
+		Items:
+		{
+			Date: { Type: "string" }, Text: { Type: "string" }
 		}
 	},
 	Shape:
@@ -153,6 +166,9 @@ const PFDefinitions =
 		}
 	}
 };
+
+
+const Perm = {};
 
 const inits = { string: String, number: Number, bool: Boolean, any: ( v )=> v };
 
@@ -208,17 +224,79 @@ const PermFields = function( set, class_def, init_values )
 	};
 };
 
-PermFields.ClassSet = function( definition )
+Perm.CreateFields = function( set, class_def, init_values )
+{
+	const rt = {};
+	const field_defs = class_def.Items;
+	for( let name in field_defs )
+	{
+		const field_def = field_defs[ name ];
+		const type = field_def.Type;
+		const ctor = set[ type ];
+		const init_value =
+		(
+			init_values && name in init_values ? init_values[ name ]
+				: "Init" in field_def ? field_def.Init
+					: field_def.Opt
+		);
+		
+		if( ctor )
+		{
+			rt[ name ] = ctor( init_value );
+		}
+		else
+		{
+			field_def.initfn = inits[ type ] || inits.any;
+			rt[ name ] = field_def.initfn( init_value );
+		}
+
+		console.log( name, rt[ name ] + "" );
+	}
+
+	rt.GetPerm = function()
+	{
+		const rt = {};
+		for( let name in field_defs )
+		{
+			const field = this[ name ];
+			rt[ name ] = ( field && field.GetPerm ? field.GetPerm() : field );
+		}
+		return rt;
+	};
+
+	rt.SetPerm = function( values )
+	{
+		for( let name in field_defs )
+		{
+			const fd = field_defs[ name ];
+			const def_v = ( "Opt" in fd ? fd.Opt : fd.Init );
+			const value = ( values && name in values ? values[ name ] : def_v );
+			if( this[ name ].SetPerm )  this[ name ].SetPerm( value );
+			else this[ name ] = fd.initfn( value );
+		}
+	};
+
+	return rt;
+};
+
+Perm.CreateArray = function( set, class_def, init_value )
+{
+	;
+};
+
+Perm.ClassSet = function( set_def )
 {
 	const set = this;
-	for( let name in definition )
+
+	for( let name in set_def )
 	{
 		console.log( name );
+		const class_def = set_def[ name ];
 		const ctor = this[ name ] = function( init_values )
 		{
-			PermFields.call( this, set, definition[ name ], init_values );
+			return Perm.CreateFields( set, class_def, init_values );
+			//PermFields.call( this, set, class_def, init_values );
 		};
-		ctor.prototype.toString = function() { return name; };
 	}
 };
 
