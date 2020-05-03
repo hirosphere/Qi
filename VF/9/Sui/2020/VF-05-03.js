@@ -95,6 +95,7 @@ VF.Train = function( doc, context )
 	this.Start = function()
 	{
 		const schedule = doc.運転;
+		context.resume();
 		let t = context.currentTime + 0.001;
 
 		power.offset.cancelAndHoldAtTime( t );
