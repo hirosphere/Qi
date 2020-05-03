@@ -58,8 +58,6 @@ button { padding: 1.8ex 1.8em; font-size: 16px; }
 
 const App = function()
 {
-	const sgen = new VF.SoundGen();
-	
 	const newtab = document.getElementById( "NewTab" );
 	const editor = document.getElementById( "Editor" );
 	const output_1 = document.getElementById( "Output-1" );
@@ -78,6 +76,8 @@ const App = function()
 
 	const CS = new Perm.ClassSet( 型定義群 );
 	const doc = CS.Doc();
+	const sgen = new VF.SoundGen( doc );
+
 	newtab.href = location;
 
 	const load = () =>
@@ -248,7 +248,7 @@ const Perm = new function()
 				);
 				const init_fn = init_fns[ name ];
 
-				console.log( "F Set", name, init_fn, value, name in values );
+				// console.log( "F Set", name, init_fn, value, name in values );
 
 				if( init_fn )  this[ name ] = init_fn( value );
 				else this[ name ].SetPerm( value );
