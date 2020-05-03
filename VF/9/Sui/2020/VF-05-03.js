@@ -15,7 +15,7 @@ const VF = new function()
 
 VF.SoundGen = function( doc )
 {
-	this.Volume = 70;
+	this.Volume = 30;
 	this.IsPlay = false;
 
 	const context = new AudioContext();
@@ -23,7 +23,7 @@ VF.SoundGen = function( doc )
 	master_volume.connect( context.destination );
 
 	const train = new VF.Train( doc, context );
-	const pwm = new VF.PWM( context, train.Power, master_volume, - 0.485, 0.495, VF.PW_Shape_Curve_2 );
+	const pwm = new VF.PWM( context, train.Power, train.Freq, master_volume, - 0.485, 0.495, VF.PW_Shape_Curve_2 );
 
 
 	//
@@ -56,15 +56,45 @@ VF.SoundGen = function( doc )
 
 VF.Train = function( doc, context )
 {
+	let carrier_def = null;
+	
 	const power = this.Power = context.createConstantSource();
 	power.offset.value = 0;
 	power.start();
+
+	const freq = this.Freq = context.createScriptProcessor( 0, 1, 1 );
+
+	freq.onaudioprocess = ( ev ) =>
+	{
+		const input = ev.inputBuffer.getChannelData( 0 );
+		const output = ev.outputBuffer.getChannelData( 0 );
+		const freq = ptof( input[ 0 ] * 100 );
+
+		for( let i = 0; i < output.length; i ++ )
+		{
+			output[ i ] = freq;
+		}
+	};
+
+	const ptof = ( power ) =>
+	{
+		//return 600;
+		let freq = 0;
+		if( carrier_def ) for( let item of carrier_def )
+		{
+			freq = item[ 1 ];
+			if( power < item[ 0 ] ) break;
+		}
+		return freq;
+	};
+
+	power.connect( freq );
 
 	// 
 
 	this.Start = function()
 	{
-		const schedule = [ [ 2, 0.05, 0.1 ], [ 15.0, 0.1, 100 ], [ 5, 100, 100 ], [ 15.0, 100, 0 ], [ 0, 0, 0 ] ];
+		const schedule = doc.運転;
 		let t = context.currentTime + 0.001;
 
 		power.offset.cancelAndHoldAtTime( t );
@@ -84,17 +114,21 @@ VF.Train = function( doc, context )
 
 			t += time;
 		}
+
+		carrier_def = doc.キャリア設定;
+		if( carrier_def == null || carrier_def.length == 0 )  carrier_def = [ 100, 300 ];
 	};
 };
 
-VF.PWM = function( context, power, output, offset_v, att_v, shape_curve )
+VF.PWM = function( context, power, freq, output, offset_v, att_v, shape_curve )
 {
 	const carrier = context.createOscillator();
 	const att = context.createGain();
 	const offset = context.createConstantSource();
 	const shaper = context.createWaveShaper();
 	
-	carrier.frequency.value = 300 / 1;
+	carrier.frequency.value = 0;
+	freq.connect( carrier.frequency );
 	carrier.type = "triangle";
 	att.gain.value = att_v;
 	offset.offset.value = offset_v;

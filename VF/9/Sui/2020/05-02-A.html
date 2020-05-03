@@ -19,8 +19,13 @@ button { padding: 1.8ex 1.8em; font-size: 16px; }
 .OUTPUT p { font-family: 'Segoe UI', Tahoma, Geneva, Verdana; color: hsl( 210, 90%, 86% ); }
 .OUTPUT .BSEP { margin-bottom: 20px; }
 
-#Editor { box-sizing: content-box; width: 100%; height: 100px; color: hsl( 210, 8%, 38% ); font-size: 15px; }
-#Editor .ERROR { background-color: hsl( 0, 30%, 96% ); }
+#Editor
+{
+	box-sizing: content-box; width: 100%; height: 120px;
+	letter-spacing: 1px;
+	color: hsl( 210, 8%, 0% ); font-size: 16px;
+}
+#Editor.ERROR { background-color: hsl( 0, 60%, 98% ); }
 
 </style>
 	<script src="URON3.js"></script>
@@ -65,11 +70,11 @@ const App = function()
 
 	const doc_init_v =
 	{
-		Title: "201系 パルスチョッパ",
-		Caption: "150Hz / 300Hz",
-		Type: "PWM",
-		Setting: [ [ 0.2, 150 ], [ 99.8, 300 ], [ 100, 150 ] ],
-		Operation: [ [ 20, 0, 80 ], [ 5, 0 ], [ 10, 80, 100 ], [ 10, 0 ], [ 30, 100, 0 ], [ 10, 0 ] ]
+		"表題": "201系 パルスチョッパ",
+		"説明": "150Hz/300Hz",
+		"種類": "直流PWM",
+		"キャリア設定": [ [ 2, 150 ], [ 98, 300 ], [ 100, 150 ] ],
+		"運転": [ [ 20, 0, 100 ], [ 3, 100, 100 ], [ 3, 0, 0 ], [ 20, 100, 0 ], [ 5, 0, 0 ] ]
 	};
 
 	const uron = new URON( "#?", "v" );
@@ -91,8 +96,8 @@ const App = function()
 	const view_update = ( perm ) =>
 	{
 		document.title =
-			document.getElementById( "Title" ).textContent = doc.Title;
-		document.getElementById( "Caption" ).textContent = doc.Caption;
+			document.getElementById( "Title" ).textContent = doc.表題;
+		document.getElementById( "Caption" ).textContent = doc.説明;
 
 		//    //
 		history.replaceState( null,  "" , uron.変換( perm ) );
@@ -124,7 +129,7 @@ const App = function()
 			return;
 		}
 		
-		let value, is_err;
+		let value, is_err = false;
 		try
 		{
 			doc.SetPerm( JSON.parse( editor.value ) );
@@ -166,11 +171,11 @@ const 型定義群 =
 	{
 		Items:
 		{
-			Title: { Type: "string" },
-			Caption: { Type: "string" },
-			Type: { Type: "string" },
-			Setting: { Type: "any" },
-			Operation: { Type: "any" },
+			"表題": { Type: "string" },
+			"説明": { Type: "string" },
+			"種類": { Type: "string" },
+			"キャリア設定": { Type: "any" },
+			"運転": { Type: "any" },
 		},
 	},
 	Logs:
