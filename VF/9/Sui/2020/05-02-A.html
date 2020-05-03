@@ -41,7 +41,7 @@ button { padding: 1.8ex 1.8em; font-size: 16px; }
 				<button id="Start">開始</button>
 				<button id="Stop">中断</button>
 				<label>音量</label>
-				<input id="Volume" type="range" min="0" max="100"/>
+				<input id="Volume" type="range" min="0" max="100" style="width: 280px;"/>
 			</section>
 		</section>
 
@@ -74,7 +74,8 @@ const App = function()
 		"説明": "150Hz/300Hz",
 		"種類": "直流PWM",
 		"キャリア設定": [ [ 2, 150 ], [ 98, 300 ], [ 100, 150 ] ],
-		"運転": [ [ 20, 0, 100 ], [ 3, 100, 100 ], [ 3, 0, 0 ], [ 20, 100, 0 ], [ 5, 0, 0 ] ]
+		"運転": [ [ 30, 0, 100 ], [ 3, 100, 100 ], [ 30, 100, 0 ], [ 5, 0, 0 ] ],
+		"音響1": { "周波数": 400, "共振": 0 }
 	};
 
 	const uron = new URON( "#?", "v" );
@@ -103,6 +104,7 @@ const App = function()
 		history.replaceState( null,  "" , uron.変換( perm ) );
 		newtab.href = location;
 
+		sgen.Update();
 		monitor_update( perm );
 	};
 
@@ -176,7 +178,16 @@ const 型定義群 =
 			"種類": { Type: "string" },
 			"キャリア設定": { Type: "any" },
 			"運転": { Type: "any" },
+			"音響1": { Type: "Filter" }
 		},
+	},
+	Filter:
+	{
+		Items:
+		{
+			"周波数": { Type: "number" },
+			"共振": { Type: "number" },
+		}
 	},
 	Logs:
 	{

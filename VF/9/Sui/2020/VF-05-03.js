@@ -22,8 +22,12 @@ VF.SoundGen = function( doc )
 	const master_volume = context.createGain();
 	master_volume.connect( context.destination );
 
+	const eq_1 = context.createBiquadFilter();
+	eq_1.type = "bandpass";
+	eq_1.connect( master_volume );
+
 	const train = new VF.Train( doc, context );
-	const pwm = new VF.PWM( context, train.Power, train.Freq, master_volume, - 0.485, 0.495, VF.PW_Shape_Curve_2 );
+	const pwm = new VF.PWM( context, train.Power, train.Freq, eq_1, - 0.485, 0.495, VF.PW_Shape_Curve_2 );
 
 
 	//
@@ -44,14 +48,14 @@ VF.SoundGen = function( doc )
 	this.Update = function()
 	{
 		master_volume.gain.value = this.IsPlay ? this.Volume / 100 : 0;
+		eq_1.frequency.value = doc.音響1.周波数;
+		eq_1.Q.value = doc.音響1.共振;
 	};
 
 	this.Play = function( doc, vf )
 	{
 		;
 	};
-
-	this.Update();
 };
 
 VF.Train = function( doc, context )
