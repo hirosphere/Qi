@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title></title>
+		<link rel="stylesheet" href="Style.css"/>
+<style>
+
+h1 { font-size: 30px; }
+
+section { margin-bottom: 0px; }
+button { padding: 1.8ex 1.8em; font-size: 16px; }
+
+.CONTENT { margin-bottom: 10px; }
+.CONTENT .BODY { padding: 20px 20px; }
+
+.CONTROL { margin-bottom: 5px; min-height: 30px; }
+.OUTPUT { background: hsl( 210, 8%, 38% ); padding: 20px; border-radius: 6px; font-size: 12px; }
+.OUTPUT p { font-family: 'Segoe UI', Tahoma, Geneva, Verdana; color: hsl( 210, 90%, 86% ); }
+.OUTPUT .BSEP { margin-bottom: 20px; }
+
+#Editor { box-sizing: content-box; width: 100%; height: 100px; color: hsl( 210, 8%, 38% ); font-size: 15px; }
+#Editor .ERROR { background-color: hsl( 0, 30%, 96% ); }
+
+</style>
+	<script src="URON3.js"></script>
+	<script src="VF-05-03.js"></script>
+</head>
+	<body style="width: 800px;" onload="new App()">
+		<section class="CONTENT">
+			<header>
+				<h1 id="Title"></h1>
+				<p id="Caption"></p>
+			</header>
+			<section class="BODY">
+				<button id="Start">開始</button>
+				<button id="Stop">中断</button>
+				<label>音量</label>
+				<input id="Volume" type="range" min="0" max="100"/>
+			</section>
+		</section>
+
+		<section class="CONTROL">
+			<a href="./" target="_blank" id="NewTab">新規タブで開く</a>
+		</section>
+
+		<section>
+			<textarea id="Editor"></textarea>
+		</section>
+
+		<section class="OUTPUT">
+			<p id = "Output-1" title="Value -> URON"></p>
+			<div class="BSEP"></div>
+			<p id = "Output-2" title="URON -> Value -> URON"></p>
+		</section>
+
+<script>
+
+const App = function()
+{
+	const sgen = new VF.SoundGen();
+	
+	const newtab = document.getElementById( "NewTab" );
+	const editor = document.getElementById( "Editor" );
+	const output_1 = document.getElementById( "Output-1" );
+	const output_2 = document.getElementById( "Output-2" );
+
+	const doc_init_v =
+	{
+		Title: "201系 パルスチョッパ",
+		Caption: "150Hz / 300Hz",
+		Type: "PWM",
+		Setting: [ [ 0.2, 150 ], [ 99.8, 300 ], [ 100, 150 ] ],
+		Operation: [ [ 20, 0, 80 ], [ 5, 0 ], [ 10, 80, 100 ], [ 10, 0 ], [ 30, 100, 0 ], [ 10, 0 ] ]
+	};
+
+	const uron = new URON( "#?", "v" );
+
+	const CS = new Perm.ClassSet( 型定義群 );
+	const doc = CS.Doc();
+	newtab.href = location;
+
+	const load = () =>
+	{
+		doc.SetPerm( uron.復元( location.hash ) || doc_init_v );
+		const perm = doc.GetPerm();
+		editor_update( perm );
+		view_update( perm );
+	};
+
+	const view_update = ( perm ) =>
+	{
+		document.title =
+			document.getElementById( "Title" ).textContent = doc.Title;
+		document.getElementById( "Caption" ).textContent = doc.Caption;
+
+		//    //
+		history.replaceState( null,  "" , uron.変換( perm ) );
+		newtab.href = location;
+
+		monitor_update( perm );
+	};
+
+	const monitor_update = ( perm ) =>
+	{
+		let uron_str = output_1.textContent = uron.変換( perm );
+		let obj = uron.復元( uron_str );
+		output_2.textContent = JSON.stringify( obj );
+	};
+
+	const editor_update = ( perm ) =>
+	{
+		editor.value = JSON.stringify( perm );
+	};
+
+	const editor_cure = () =>
+	{
+		if( editor.value.length == 0 )
+		{
+			doc.SetPerm( doc_init_v );
+			const perm = doc.GetPerm();
+			editor.value = JSON.stringify( perm );
+			view_update( perm );
+			return;
+		}
+		
+		let value, is_err;
+		try
+		{
+			doc.SetPerm( JSON.parse( editor.value ) );
+			view_update( doc.GetPerm() );
+		}
+		catch( exc ) { is_err = true; }
+		editor.classList.toggle( "ERROR", is_err );
+	};
+
+	editor.onkeydown = ( ev ) =>
+	{
+		if( ev.keyCode != 13 ) return true;
+		editor_cure();
+		return false;
+	};
+
+	editor.onblur = () => editor_cure();
+
+	document.getElementById( "Start" ).onclick = () => sgen.Start();
+	document.getElementById( "Stop" ).onclick = () => sgen.Stop();
+	{
+		const e = document.getElementById( "Volume" );
+		e.value = sgen.Volume;
+		e.oninput = () =>
+		{
+			sgen.Volume = e.value;
+			sgen.Update();
+		};
+	}
+	
+	load();
+};
+
+//  //
+
+const 型定義群 =
+{
+	Doc:
+	{
+		Items:
+		{
+			Title: { Type: "string" },
+			Caption: { Type: "string" },
+			Type: { Type: "string" },
+			Setting: { Type: "any" },
+			Operation: { Type: "any" },
+		},
+	},
+	Logs:
+	{
+		ItemType: "Log"
+	},
+	Log:
+	{
+		Items:
+		{
+			Date: { Type: "string", Default: "?Date" },
+			Text: { Type: "string", Default: "??Text" }
+		}
+	}
+};
+
+const Perm = new function()
+{
+	this.ClassSet = function( class_defs )
+	{
+		const set = this;
+
+		for( let name in class_defs )
+		{
+			const class_def = class_defs[ name ];
+			
+			if( "Items" in class_def )  this[ name ] = function( init_vs )
+			{
+				const rt = {};  PermFields.call( rt, set, class_def, init_vs );  return rt;
+			};
+
+			else if( "ItemType" in class_def )  this[ name ] = function( init_vs )
+			{
+				const rt = {};  PermArray.call( rt, set, class_def, init_vs );  return rt;
+			}
+		}
+	};
+
+	const inits =
+	{
+		"string": ( v ) => v != null ? String( v ) : "",
+		"number": ( v ) => v != null ? Number( v ) : 0,
+		"bool": Boolean,
+		"any": ( v ) => v
+	};
+
+	function PermFields( set, class_def, init_vs )
+	{
+		const item_defs = class_def.Items;
+		const init_fns = {};
+
+		const init = () =>
+		{
+			for( let name in item_defs )
+			{
+				const item_def = item_defs[ name ];
+				const type = item_def.Type;
+				
+				const creator = set[ type ];
+				if( creator )  this[ name ] = creator();
+				else init_fns[ name ] = inits[ type ] || inits.any;
+			}
+			init_vs && this.SetPerm( init_vs );
+		};
+
+		this.SetPerm = function( values )
+		{
+			values = values || {};
+			for( let name in item_defs )
+			{
+				const item_def = item_defs[ name ];
+				const value =
+				(
+					name in values ? values[ name ] : item_def.Default
+				);
+				const init_fn = init_fns[ name ];
+
+				console.log( "F Set", name, init_fn, value, name in values );
+
+				if( init_fn )  this[ name ] = init_fn( value );
+				else this[ name ].SetPerm( value );
+			};
+		};
+
+		this.GetPerm = function()
+		{
+			const rt = {};
+			for( let name in item_defs )
+			{
+				const item_def = item_defs[ name ];
+				const item = this[ name ];
+				rt[ name ] = ( item && item.GetPerm ? item.GetPerm() : item );
+
+				// console.log( "GetPerm", name, rt[ name ] );
+
+			}
+			return rt;
+		};
+
+		init();
+	};
+
+	function PermArray( set, class_def, init_vs )
+	{
+		const item_creator = set[ class_def.ItemType ] || inits.any;
+
+		const init = () => 0;
+
+		this.SetPerm = function( values )
+		{
+			console.log( "A Set", values )
+			
+			this.length = 0;
+			if( values && values.constructor != Array ) return;
+			for( let i in values )  this[ i ] = item_creator( values[ i ] );
+		};
+
+		this.GetPerm = function()
+		{
+			const rt = [];
+			for( let i in this )
+			{
+				const item = this[ i ];
+				rt[ i ] = ( item && item.GetPerm ? item.GetPerm() : item );
+			}
+			return rt;
+		};
+
+		init();
+	};
+};
+
+</script>
+
+	</body>
+</html>

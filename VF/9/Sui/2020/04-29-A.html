@@ -96,7 +96,11 @@ const App = function()
 
 	const editor_cure = () =>
 	{
-		if( editor.value.length == 0 )  editor.value = JSON.stringify( doc.GetPerm() );
+		if( editor.value.length == 0 )
+		{
+			doc.SetPerm( null );
+			editor.value = JSON.stringify( doc.GetPerm() );
+		}
 		
 		let value;
 		try { doc.SetPerm( JSON.parse( editor.value ) ); }
@@ -131,7 +135,7 @@ const App = function()
 };
 
 
-//  20. 04. 29. C
+//  20. 04. 29. C 2316
 
 //  //
 
