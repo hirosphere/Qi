@@ -122,6 +122,13 @@ const App = function()
 
 	const editor_cure = () =>
 	{
+		if( editor.value[ 0 ] == "r" )
+		{
+			const perm = doc.GetPerm();
+			editor.value = JSON.stringify( perm );
+			return;
+		}
+
 		if( editor.value.length == 0 )
 		{
 			doc.SetPerm( doc_init_v );
