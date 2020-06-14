@@ -22,13 +22,15 @@ button { padding: 1.8ex 1.8em; font-size: 16px; }
 #Editor
 {
 	box-sizing: content-box; width: 600px; height: 400px;
-	color: hsl( 210, 8%, 14% ); font-size: 14px;
+	background: hsl( 185, 35%, 95% ); color: hsl( 210, 8%, 14% );
+	font-size: 19px;
 }
-#Editor.ERROR { background-color: hsl( 225, 60%, 60% );  color: hsl( 0, 0%, 100% ); }
+#Editor.ERROR { background-color: hsl( 195, 60%, 80% );  color: hsl( 0, 0%, 100% ); }
 
 </style>
 	<script src="URON3.js"></script>
 	<script src="VF-05-03.js"></script>
+	<script src="VF-05-03-Tra.js"></script>
 </head>
 	<body style="width: 800px;" onload="new App()">
 		<section class="CONTENT">
@@ -36,12 +38,14 @@ button { padding: 1.8ex 1.8em; font-size: 16px; }
 				<h1 id="Title"></h1>
 				<p id="Caption"></p>
 			</header>
-			<section class="BODY">
+			<section class="CONTROL">
 				<button id="Start">開始</button>
 				<button id="Stop">中断</button>
 				<label>音量</label>
 				<input id="Volume" type="range" min="0" max="100" style="width: 280px;"/>
 			</section>
+			<section class="INFO"><p id="Vars"></p></section>
+			<section class="INFO"><p id="Pars"></p></section>
 		</section>
 
 		<section>
@@ -75,11 +79,19 @@ const App = function()
 	{
 		"表題": "VFラボ",
 		"説明": "設定と指令の仕様。",
-		"種類": "VVVF",
-		"運転": [ [ 30, 0, 100 ], [ 0.3, 100, 0 ], [ 2 ], [ 0.3, 0, 100 ], [ 30, 100, 0 ] ],
-		"VVVF設定":
+		"運転": [ [ "加速度", 3, 120 ], [ "惰行", 5 ], [ "加速度", 3, 0 ], [ "停止", 10 ] ],
+		"動力設定":
 		{
-			"電力飽和周波数": 60, "すべり": 5,
+			"種類": "VVVF",
+
+			"車輪径": 860,
+			"車輪歯数": 15,
+			"電動機歯数": 84,
+			
+			"電力飽和速度": 200,
+			"電力変動緩和時間": 1,
+
+			"誘導すべり率": 2,
 			"切り替え": [ [ 6, 0, 150, 160 ], [ 12, 27 ], [ 20, 15 ], [ 30, 9 ], [ 50, 3 ] ],
 		},
 		"音響1": { "周波数": 400, "共振": 0 }
@@ -90,9 +102,9 @@ const App = function()
 		"表題": "PWMテスト",
 		"説明": "アンチエイリアスと小数段",
 		"運転": [ [ 30, 0, 100 ], [ 2, 100, 100 ], [ 30, 100, 0 ] ],
-		"種類": "PWM",
-		"直流PWM設定":
+		"動力設定":
 		{
+			"種類": "PWM",
 			"切り替え": [ [ 0.8, 150 ], [ 1.6, 300 ], [ 2.4, 600 ], [ 3.6, 900 ] ],
 			//"切り替え": [ [ 2, 150 ], [ 98, 300 ], [ 100, 150 ] ],
 		},
@@ -120,6 +132,39 @@ const App = function()
 		view_update( perm );
 	};
 
+	const disp_update = () =>
+	{
+		const vars = sgen.GetTrainVars();
+
+		document.getElementById( "Vars" ).innerText =
+		[
+			"加速指令 : " + ft( vars.Acc, 1 ) + "km/h/s",
+			"電力 : " + ft( vars.Power * 100, 0 ) + "%",
+			"時速 : " + ft( vars.Speed, 1 ) + "km/h",
+			"モーター : " + ft( vars.Motor, 1 ) + "Hz",
+			"交流駆動 : " + ft( vars.ACDrive, 1 ) + "Hz",
+		]
+		 .join( "\n" );
+
+		
+		const parms = sgen.Train.GetParms();
+
+		document.getElementById( "Pars" ).innerText =
+		[
+			"(車輪径) : " + ft( parms.whdia, 0 ) + "mm",
+			"((車輪周)) : " + ft( parms.whcirc, 0 ) + "mm",
+			"(車輪歯数) : " + ft( parms.whge, 0 ) + "",
+			"(電動機歯数) : " + ft( parms.moge, 0 ) + "",
+			"((減速比)) : " + ft( parms.redr, 2 ) + "",
+			"(電力飽和速度) : " + ft( parms.psats, 2 ) + "km/h",
+			"(電力変動緩和時間) : " + ft( parms.relax, 1 ) + "秒",
+			"(誘導すべり率) : " + ft( parms.slip, 0 ) + "%",
+		]
+		 .join( "\n" );
+	};
+
+	const ft = ( v, d ) => { const s = Math.pow( 10, d ); return Math.floor( v * s ) / s; }; 
+
 	const view_update = ( perm ) =>
 	{
 		document.title =
@@ -143,7 +188,7 @@ const App = function()
 
 	const editor_update = ( perm ) =>
 	{
-		editor.value = JSON.stringify( perm, null, "" );
+		editor.value = JSON.stringify( perm, null, "\t" );
 	};
 
 	const editor_cure = () =>
@@ -200,7 +245,8 @@ const App = function()
 		requestAnimationFrame( graph_update );
 	};
 
-	setInterval( () => graph.Update(), 1000 / 20 * 1 );
+	setInterval( disp_update, 1000 / 4 * 1 );
+	//setInterval( () => graph.Update(), 1000 / 20 * 1 );
 	canvas.onclick = () => graph.Update();
 
 	//graph_update();
@@ -217,18 +263,25 @@ const 型定義群 =
 			"表題": { Type: "string" },
 			"説明": { Type: "string" },
 			"運転": { Type: "any" },
-			"種類": { Type: "string" },
-			"直流PWM設定": { Type: "any" },
-			"VVVF設定": { Type: "VVVF設定" },
+			"動力設定": { Type: "動力設定" },
 			"音響1": { Type: "Filter" }
 		},
 	},
 
-	"VVVF設定":
+	"動力設定":
 	{
 		Items:
 		{
-			"電力飽和周波数": { Type: "number" },
+			"種類": { Type: "string" },
+
+			"車輪径": { Type: "number" },
+			"車輪歯数": { Type: "number" },
+			"電動機歯数": { Type: "number" },
+			
+			"電力変動緩和時間": { Type: "number" },
+			"電力飽和速度": { Type: "number" },
+			"誘導すべり率": { Type: "number" },
+			
 			"切り替え": { Type: "any" }
 		}
 	},
