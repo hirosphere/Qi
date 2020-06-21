@@ -9,6 +9,8 @@
 h1 { font-size: 30px; }
 
 section { margin-bottom: 0px; }
+table { border: 1px solid hsl( 0, 0%, 60% );  border-collapse: collapse; }
+td { border: 1px dotted hsl( 210, 0%, 70% );  padding: 0 0.7ex; }
 button { padding: 1.8ex 1.8em; font-size: 16px; }
 
 .CONTENT { margin-bottom: 10px; }
@@ -22,10 +24,10 @@ button { padding: 1.8ex 1.8em; font-size: 16px; }
 #Editor
 {
 	box-sizing: content-box; width: 600px; height: 400px;
-	background: hsl( 185, 35%, 95% ); color: hsl( 210, 8%, 14% );
-	font-size: 19px;
+	background: hsl( 55, 55%, 99% ); color: hsl( 210, 8%, 0% );
+	font-size: 16px;
 }
-#Editor.ERROR { background-color: hsl( 195, 60%, 80% );  color: hsl( 0, 0%, 100% ); }
+#Editor.ERROR { background-color: hsl( 200, 85%, 80% );  color: hsl( 0, 0%, 0% ); }
 
 </style>
 	<script src="URON3.js"></script>
@@ -45,12 +47,14 @@ button { padding: 1.8ex 1.8em; font-size: 16px; }
 				<input id="Volume" type="range" min="0" max="100" style="width: 280px;"/>
 			</section>
 			<section class="INFO"><p id="Vars"></p></section>
-			<section class="INFO"><p id="Pars"></p></section>
+			<section class="INFO"><p id="Info_1"></p></section>
 		</section>
 
 		<section>
 			<textarea id="Editor"></textarea>
 		</section>
+
+		<section class="INFO"><p id="Pars"></p></section>
 
 		<section>
 			<canvas id="Graph" width="600" height="600"></canvas>
@@ -85,10 +89,10 @@ const App = function()
 			"種類": "VVVF",
 
 			"車輪径": 860,
-			"車輪歯数": 15,
-			"電動機歯数": 84,
+			"車輪歯数": 84,
+			"電動機歯数": 15,
 			
-			"電力飽和速度": 200,
+			"電力飽和速度": 180,
 			"電力変動緩和時間": 1,
 
 			"誘導すべり率": 2,
@@ -124,6 +128,34 @@ const App = function()
 
 	newtab.href = location;
 
+	const table_1 = new Table
+	(
+		document.getElementById( "Info_1" ),
+		sgen.Proc.Pars,
+		[
+			[
+				[ "指令加速度", "km/h/s", 0, 1, "acc" ],
+				[ "時速", "km/h", 0, 1, "speed" ],
+				[ "電力", "%", 0, 100, "power" ],
+				[ "=車輪回転", "Hz", 1, 1, "wheel" ],
+				[ "=モーター回転", "Hz", 0, 1, "motor" ],
+				[ "=交流駆動周波数", "Hz", 0, 1, "vf_drv_freq" ],
+				[ "=キャリア倍数", "", (vs)=>vs.vf_carr_rate != 0 ? vs.vf_carr_rate : "非同期", 1, "vf_carr_rate" ],
+				[ "=キャリア周波数", "Hz", 0, 1, "vf_carr_freq" ],
+			],
+			[
+				[ "<車輪径>", "mm", 0, 1, "wh_dia" ],
+				[ "<=車輪周>", "mm", 0, 1, "wh_circ" ],
+				[ "<=歯数比>", "", 2, 1, "mo_redr" ],
+				[ "<車輪歯数>", "", 0, 1, "wh_gear" ],
+				[ "<モーター歯数>", "", 0, 1, "mo_gear" ],
+				[ "<電力飽和速度>", "km/h", 0, 1, "pw_sat" ],
+				[ "<電力変動緩和時間>", "秒", 0, 1, "pw_relax" ],
+				[ "<交流駆動すべり率>", "%", 1, 1, "vf_slip" ],
+			],
+		]
+	);
+
 	const load = () =>
 	{
 		doc.SetPerm( uron.復元( location.hash ) || doc_init_v );
@@ -131,39 +163,6 @@ const App = function()
 		editor_update( perm );
 		view_update( perm );
 	};
-
-	const disp_update = () =>
-	{
-		const vars = sgen.GetTrainVars();
-
-		document.getElementById( "Vars" ).innerText =
-		[
-			"加速指令 : " + ft( vars.Acc, 1 ) + "km/h/s",
-			"電力 : " + ft( vars.Power * 100, 0 ) + "%",
-			"時速 : " + ft( vars.Speed, 1 ) + "km/h",
-			"モーター : " + ft( vars.Motor, 1 ) + "Hz",
-			"交流駆動 : " + ft( vars.ACDrive, 1 ) + "Hz",
-		]
-		 .join( "\n" );
-
-		
-		const parms = sgen.Train.GetParms();
-
-		document.getElementById( "Pars" ).innerText =
-		[
-			"(車輪径) : " + ft( parms.whdia, 0 ) + "mm",
-			"((車輪周)) : " + ft( parms.whcirc, 0 ) + "mm",
-			"(車輪歯数) : " + ft( parms.whge, 0 ) + "",
-			"(電動機歯数) : " + ft( parms.moge, 0 ) + "",
-			"((減速比)) : " + ft( parms.redr, 2 ) + "",
-			"(電力飽和速度) : " + ft( parms.psats, 2 ) + "km/h",
-			"(電力変動緩和時間) : " + ft( parms.relax, 1 ) + "秒",
-			"(誘導すべり率) : " + ft( parms.slip, 0 ) + "%",
-		]
-		 .join( "\n" );
-	};
-
-	const ft = ( v, d ) => { const s = Math.pow( 10, d ); return Math.floor( v * s ) / s; }; 
 
 	const view_update = ( perm ) =>
 	{
@@ -176,8 +175,17 @@ const App = function()
 		newtab.href = location;
 
 		sgen.Update();
+		disp_update();
 		monitor_update( perm );
 	};
+
+	const disp_update = () =>
+	{
+		const vars = sgen.GetTrainVars();
+		table_1.Update();
+	};
+
+	const ft = ( v, d ) => { const s = Math.pow( 10, d ); return Math.floor( v * s ) / s; }; 
 
 	const monitor_update = ( perm ) =>
 	{
@@ -193,13 +201,13 @@ const App = function()
 
 	const editor_cure = () =>
 	{
-		if( editor.value[ 0 ] == "r" )
+		if( editor.value.length == 0 )
 		{
 			const perm = doc.GetPerm();
 			editor_update( perm );
 		}
 
-		if( editor.value.length == 0 )
+		else if( editor.value == "init" )
 		{
 			doc.SetPerm( doc_init_v );
 			const perm = doc.GetPerm();
@@ -245,7 +253,7 @@ const App = function()
 		requestAnimationFrame( graph_update );
 	};
 
-	setInterval( disp_update, 1000 / 4 * 1 );
+	setInterval( disp_update, 1000 / 5 * 1 );
 	//setInterval( () => graph.Update(), 1000 / 20 * 1 );
 	canvas.onclick = () => graph.Update();
 
@@ -307,6 +315,69 @@ const 型定義群 =
 		}
 	}
 };
+
+//  //
+
+const ecr = ( type, com, text ) =>
+{
+	const e = document.createElement( type );
+	com && com.appendChild( e );
+	if( text != null ) e.innerText = text;
+	return e;
+};
+
+const Table = function( com, data, def )
+{
+	const table = ecr( "table", com );
+	const tbody = ecr( "tbody", table );
+
+	let rmax = 0;   for( let item of def ) rmax = Math.max( rmax, item.length );
+
+	const cols = [];
+
+	this.Update = () => { for( col of cols )  col.update(); };
+
+	const Col = function( tr, def )
+	{
+		const caption = def && def[ 0 ] || "";
+		const unit = def && def[ 1 ] || "";
+		const fnc = def && def[ 2 ].constructor == Function && def[ 2 ] || null;
+		const frac = def && fnc == null && Math.pow( 10, def[ 2 ] || 0 );
+		const per = def && def[ 3 ] || 1;
+		const name = def && def[ 4 ] || "";
+
+		ecr( "td", tr, caption );
+		const v = ecr( "td", tr );
+		//ecr( "td", tr, def ? def[ 1 ] : "" );
+
+		this.update = () =>
+		{
+			v.innerText = ( fnc ? fnc( data ) : ft( data[ name ] * per, frac ) + unit );
+		};
+
+		if( def )
+		{
+			this.update();
+			cols.push( this );
+		}
+	};
+
+	const ft = ( v, d ) => Math.round( v * d ) / d;
+	
+	for( let rx = 0; rx < rmax; rx ++ )
+	{
+		const tr = ecr( "tr", tbody );
+
+		for( let raws of def )
+		{
+			new Col( tr, raws[ rx ] );
+		}
+	}
+};
+
+
+
+//  //
 
 const Perm = new function()
 {

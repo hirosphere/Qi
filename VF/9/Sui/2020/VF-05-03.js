@@ -18,7 +18,7 @@ VF.SoundGen = function( doc )
 	eq_1.connect( master_volume );
 
 	const train = this.Train = new VF.Train( doc, context );
-	const proc = new VF.Proc( doc, train, context, eq_1, this.WaveMonitor );
+	const proc = this.Proc = new VF.Proc( doc, train, context, eq_1, this.WaveMonitor );
 
 	//
 
@@ -27,6 +27,7 @@ VF.SoundGen = function( doc )
 	this.Start = function()
 	{
 		const t = context.currentTime + 0.01;
+		proc.Update();
 		train.Start( t );
 		this.Update( t );
 	};
@@ -39,6 +40,7 @@ VF.SoundGen = function( doc )
 	
 	this.Update = function( t )
 	{
+		proc.Pars.update();
 		master_volume.gain.value = this.Volume / 100;
 		eq_1.frequency.value = doc.音響1.周波数;
 		eq_1.Q.value = doc.音響1.共振;
@@ -53,6 +55,8 @@ VF.Proc = function( doc, train, context, dest, wave_mon )
 	const 動力設定 = doc.動力設定;
 	this.vars = {};
 
+	const parms = this.Pars = new VF.Pars( doc );
+
 	// 実装 //
 
 	console.log( context.sampleRate );
@@ -66,6 +70,10 @@ VF.Proc = function( doc, train, context, dest, wave_mon )
 
 	let test_ph = 0;
 
+	this.Update = () =>
+	{
+		parms.update();
+	};
 
 	proc_node.onaudioprocess = ( ev ) =>
 	{
@@ -84,7 +92,8 @@ VF.Proc = function( doc, train, context, dest, wave_mon )
 				update_ctr -= samplerate;
 				for( let name in inp )  this.vars[ name ] = inp[ name ][ i ];
 
-				wg.update( this.vars, 動力設定.切り替え );
+				parms.update_vars( inp.Acc[ i ], inp.Speed[ i ], inp.Power[ i ], 動力設定.切り替え );
+				wg.update( parms, 動力設定.切り替え );
 			}
 	
 			if( inp.Ctrl[ i ] != 0 )
@@ -112,53 +121,115 @@ VF.Proc = function( doc, train, context, dest, wave_mon )
 	}
 };
 
+
+//  //
+
+VF.Pars = function( doc )
+{
+	const s = doc.動力設定;
+
+	this.update = () =>
+	{
+		this.wh_dia = s.車輪径 || 860;
+		this.wh_circ = this.wh_dia * Math.PI;
+		this.wh_gear = s.車輪歯数 || 83;
+		this.mo_gear = s.電動機歯数 || 16;
+		this.mo_redr = this.wh_gear / this.mo_gear;
+	
+		this.pw_sat = s.電力飽和速度 || 200;
+		this.pw_relax = s.電力変動緩和時間 || 0;
+		this.vf_slip = s.誘導すべり率 || 0;
+	
+	};
+
+	this.update_vars = ( acc, speed, power, vf_modes ) =>
+	{
+		this.acc = acc;
+		this.speed = speed;
+		this.power = power;
+		this.wheel = ( speed / 3.6 ) / ( this.wh_circ / 1000 );
+		this.motor = this.wheel * this.mo_redr;
+
+		this.vf_drv_freq = this.motor * ( 1 + this.vf_slip / 100 );
+		update_vf( vf_modes );
+	};
+
+	const update_vf = ( modes ) =>
+	{
+		this.vf_carr_freq = 1000;
+		this.vf_carr_rate = 27;
+
+		let sig_beg = 0;  // Hz
+		let sig_end = 0;  // Hz
+		let ac_beg = 1050;  // Hz
+		let ac_end = 700;  // Hz
+
+		if( modes && modes.constructor == Array ) for( let i in modes )
+		{
+			const mode = modes[ i ];
+			
+			sig_beg = sig_end;
+			sig_end = mode[ 0 ];
+
+			if( this.vf_drv_freq < mode[ 0 ] || i == ( modes.length - 1 ) )
+			{
+				this.vf_carr_rate = mode[ 1 ];
+
+				ac_beg = mode[ 2 ] || 0;
+				ac_end = emp_fill( mode[ 3 ], ac_beg );
+	
+				break;
+			}
+		}
+
+		const ac_freq = clip
+		(
+			ac_beg +
+				( ac_end - ac_beg  ) *
+				( this.vf_drv_freq - sig_beg ) / ( sig_end - sig_beg )
+			,
+			Math.max( ac_beg, ac_end ),
+			Math.min( ac_beg, ac_end )
+		);
+
+		this.vf_carr_freq =
+		(
+			this.vf_carr_rate > 0 ?
+				this.vf_carr_rate * this.vf_drv_freq :
+				ac_freq
+		);
+	};
+
+	const emp_fill = ( value, fill ) => value != null ? value : fill;
+	const clip = ( value, max, min ) => Math.min( max, Math.max( min, value ) );
+
+	this.update();
+	this.update_vars( 0, 0, 0 );
+};
+
+
+//  //
+
 VF.VVVF_WG = function( samplerate )
 {
 	const sig = { gain: 0, step: 0, phase: 0 };
 	const async_carr = { step: 0, phase: 0 };
 	let sync_rate = 0;
 
-	this.update = ( vars, modes ) =>
+	this.update = ( pars, modes ) =>
 	{
-		sig.freq = vars.ACDrive;
-		sig.step = sig.freq / samplerate;
-		sig.gain = Math.abs( vars.Power );
-
-		sig_beg = 0;  // Hz
-		sig_end = 0;  // Hz
-		ac_beg = 1050;  // Hz
-		ac_end = 700;  // Hz
-
-		if( modes && modes.constructor == Array ) for( let mode of modes )
-		{
-			sig_beg = sig_end;
-			sig_end = mode[ 0 ];
-
-			if( sig.freq > mode[ 0 ] )  continue;
-			sync_rate = mode[ 1 ];
-
-			ac_beg = mode[ 2 ] || 0;
-			ac_end = emp_fill( mode[ 3 ], ac_beg );
-
-			break;
-		}
-
-		async_carr.freq = clip
-		(
-			ac_beg +
-				( ac_end - ac_beg  ) *
-				( sig.freq - sig_beg ) / ( sig_end - sig_beg )
-			,
-			Math.max( ac_beg, ac_end ),
-			Math.min( ac_beg, ac_end )
-		);
-
-		async_carr.step = async_carr.freq / samplerate;
+		sig.freq = pars.vf_drv_freq;
+		sig.step = pars.vf_drv_freq / samplerate;
+		sig.gain = Math.abs( pars.power );
+		
+		sync_rate = pars.vf_carr_rate;
+		
+		async_carr.freq = pars.vf_carr_freq;
+		async_carr.step = pars.vf_carr_freq / samplerate;
 
 	};
 
-	const emp_fill = ( value, fill ) => value != null ? value : fill;
-
+	
 	this.draw = ( i, main_out, s ) =>
 	{		
 		// モジュレーター //
@@ -212,6 +283,7 @@ VF.VVVF_WG = function( samplerate )
 		return clip( carr * scale + sig * scale, 1, -1 );
 	};
 	
+	const emp_fill = ( value, fill ) => value != null ? value : fill;
 	const clip = ( value, max, min ) => Math.min( max, Math.max( min, value ) );
 }
 

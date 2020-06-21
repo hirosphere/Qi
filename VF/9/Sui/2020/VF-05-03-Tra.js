@@ -1,3 +1,26 @@
+/*
+
+Train オーディオスケジュール属性
+
+	(スケジュールで個別に制御したい属性)
+
+	加速度	Acc
+	速度	Speed
+	モーター回転周波数	Motor
+	インバータ駆動周波数	Inv
+
+
+Proc 波形プロセッサが算出する属性
+
+	キャリアモード, キャリア周波数
+
+
+
+*/
+
+
+
+
 VF.Train = function( doc, context )
 {
 	//
@@ -5,7 +28,7 @@ VF.Train = function( doc, context )
 	const cs = {};
 	this.CS = [];
 
-	this.CSList = [ "Ctrl", "Acc", "Speed", "Power", "Gear", "Motor", "Brush", "ACDrive" ];
+	this.CSList = [ "Ctrl", "Acc", "Speed", "Power" ];
 
 	for( let i in this.CSList )
 	{
@@ -20,29 +43,6 @@ VF.Train = function( doc, context )
 	const seq = new VF.Sequence( this );
 
 	//
-
-	this.GetParms = () =>
-	{
-		const p = {}, s = doc.動力設定;
-		
-		p.whdia = s.車輪径;
-		p.whcirc = p.whdia * Math.PI;
-		p.whge = s.車輪歯数;
-		p.moge = s.電動機歯数;
-		p.redr = s.電動機歯数 / s.車輪歯数;
-
-		p.wheel = ( speed ) => ( speed / 3.6 ) / ( p.whcirc / 1000 );
-		p.motor = ( speed ) => p.wheel( speed ) * p.redr;
-
-		p.psats = s.電力飽和速度;
-		p.relax = s.電力変動緩和時間;
-		p.slip = s.誘導すべり率;
-		p.acdrv = ( speed ) => p.motor( speed ) * ( 1 + p.slip / 100 );
-
-		p.power = ( acc, speed ) => acc * speed / p.psats;
-
-		return p;
-	};
 
 	let run = false;
 
@@ -68,9 +68,6 @@ VF.Train = function( doc, context )
 		cs.acc.offset.cancelAndHoldAtTime( t );
 		cs.speed.offset.cancelAndHoldAtTime( t );
 		cs.power.offset.cancelAndHoldAtTime( t );
-		cs.motor.offset.cancelAndHoldAtTime( t );
-		cs.acdrive.offset.cancelAndHoldAtTime( t );
-
 	};
 
 	this.AddAccSchedule = ( toff, starttime, endtime, acc, startspeed, endspeed ) =>
@@ -80,22 +77,18 @@ VF.Train = function( doc, context )
 		cs.speed.offset.setValueAtTime( startspeed, toff + starttime );
 		cs.speed.offset.linearRampToValueAtTime( endspeed, toff + endtime );
 
-		const p = this.GetParms();
 
-		{
-			const rel = Math.min( p.relax, startspeed <= 0 ? 0 : endtime - starttime );
-			cs.power.offset.linearRampToValueAtTime( p.power( acc, startspeed ), toff + starttime + rel );	
-			cs.power.offset.linearRampToValueAtTime( p.power( acc, endspeed ), toff + endtime );	
-		}
-
-		cs.motor.offset.setValueAtTime( p.motor( startspeed ), toff + starttime );
-		cs.motor.offset.linearRampToValueAtTime( p.motor( endspeed ), toff + endtime );
-
-		cs.acdrive.offset.setValueAtTime( p.acdrv( startspeed ), toff + starttime );
-		cs.acdrive.offset.linearRampToValueAtTime( p.acdrv( endspeed ), toff + endtime );
+		const rel = Math.min( doc.動力設定.電力変動緩和時間, startspeed <= 0 ? 0 : endtime - starttime );
+		cs.power.offset.linearRampToValueAtTime( calc_power( acc, startspeed ), toff + starttime + rel );	
+		cs.power.offset.linearRampToValueAtTime( calc_power( acc, endspeed ), toff + endtime );	
 	};
 
+	const calc_power = ( acc, speed ) => acc * ( speed / doc.動力設定.電力飽和速度 );
+
 };
+
+
+//  //
 
 VF.Sequence = function( train )
 {
