@@ -133,31 +133,32 @@ VF.Pars = function( doc )
 		this.wh_dia = s.車輪径 || 860;
 		this.wh_circ = this.wh_dia * Math.PI;
 		this.wh_gear = s.車輪歯数 || 83;
-		this.mo_gear = s.電動機歯数 || 16;
+		this.mo_gear = s.動力歯数 || 16;
 		this.mo_redr = this.wh_gear / this.mo_gear;
+		this.wh_sp_rat = 1 / ( 3.6 * ( this.wh_circ / 1000 ) );
+		this.mo_sp_rat = this.wh_sp_rat * ( this.wh_gear / this.mo_gear );
 	
-		this.pw_sat = s.電力飽和速度 || 200;
+		this.pw_sat = s.電力飽和回転数 || 120;
 		this.pw_relax = s.電力変動緩和時間 || 0;
-		this.vf_slip = s.誘導すべり率 || 0;
 	
 	};
 
 	this.update_vars = ( acc, speed, power, vf_modes ) =>
 	{
-		this.acc = acc;
-		this.speed = speed;
-		this.power = power;
-		this.wheel = ( speed / 3.6 ) / ( this.wh_circ / 1000 );
-		this.motor = this.wheel * this.mo_redr;
+		this.加速指令 = acc;
+		this.時速 = speed;
+		this.電力 = power;
+		this.車輪 = speed * s.車輪時速比;
+		this.動力 = speed * s.動力時速比;
 
-		this.vf_drv_freq = this.motor * ( 1 + this.vf_slip / 100 );
+		this.交流駆動周波数 = this.動力 * ( 1 + s.誘導すべり率 / 100 );
 		update_vf( vf_modes );
 	};
 
 	const update_vf = ( modes ) =>
 	{
-		this.vf_carr_freq = 1000;
-		this.vf_carr_rate = 27;
+		this.キャリア周波数 = 1000;
+		this.キャリア倍数 = 27;
 
 		let sig_beg = 0;  // Hz
 		let sig_end = 0;  // Hz
@@ -171,9 +172,11 @@ VF.Pars = function( doc )
 			sig_beg = sig_end;
 			sig_end = mode[ 0 ];
 
-			if( this.vf_drv_freq < mode[ 0 ] || i == ( modes.length - 1 ) )
+			const 上限周波数 = mode[ 0 ];
+
+			if( this.交流駆動周波数 < 上限周波数 || i == ( modes.length - 1 ) )
 			{
-				this.vf_carr_rate = mode[ 1 ];
+				this.キャリア倍数 = mode[ 1 ];
 
 				ac_beg = mode[ 2 ] || 0;
 				ac_end = emp_fill( mode[ 3 ], ac_beg );
@@ -186,16 +189,16 @@ VF.Pars = function( doc )
 		(
 			ac_beg +
 				( ac_end - ac_beg  ) *
-				( this.vf_drv_freq - sig_beg ) / ( sig_end - sig_beg )
+				( this.交流駆動周波数 - sig_beg ) / ( sig_end - sig_beg )
 			,
 			Math.max( ac_beg, ac_end ),
 			Math.min( ac_beg, ac_end )
 		);
 
-		this.vf_carr_freq =
+		this.キャリア周波数 =
 		(
-			this.vf_carr_rate > 0 ?
-				this.vf_carr_rate * this.vf_drv_freq :
+			this.キャリア倍数 > 0 ?
+				this.キャリア倍数 * this.交流駆動周波数 :
 				ac_freq
 		);
 	};
@@ -216,16 +219,16 @@ VF.VVVF_WG = function( samplerate )
 	const async_carr = { step: 0, phase: 0 };
 	let sync_rate = 0;
 
-	this.update = ( pars, modes ) =>
+	this.update = ( pars ) =>
 	{
-		sig.freq = pars.vf_drv_freq;
-		sig.step = pars.vf_drv_freq / samplerate;
-		sig.gain = Math.abs( pars.power );
+		sig.freq = pars.交流駆動周波数;
+		sig.step = sig.freq / samplerate;
+		sig.gain = Math.abs( pars.電力 );
 		
-		sync_rate = pars.vf_carr_rate;
+		sync_rate = pars.キャリア倍数;
 		
-		async_carr.freq = pars.vf_carr_freq;
-		async_carr.step = pars.vf_carr_freq / samplerate;
+		async_carr.freq = pars.キャリア周波数;
+		async_carr.step = pars.キャリア周波数 / samplerate;
 
 	};
 
@@ -268,7 +271,7 @@ VF.VVVF_WG = function( samplerate )
 		const pul_vw = pul_v - pul_w;
 		const pul_wu = pul_w - pul_u;
 
-		const main = main_out[ i ] = pul_uv;
+		const main = main_out[ i ] = pul_uv || 0;
 
 		s.a = carr_tri;
 		//s.a = sig.phase;

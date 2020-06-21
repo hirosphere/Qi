@@ -24,6 +24,7 @@ Proc 波形プロセッサが算出する属性
 VF.Train = function( doc, context )
 {
 	//
+	const ds = doc.動力設定;
 
 	const cs = {};
 	this.CS = [];
@@ -78,12 +79,12 @@ VF.Train = function( doc, context )
 		cs.speed.offset.linearRampToValueAtTime( endspeed, toff + endtime );
 
 
-		const rel = Math.min( doc.動力設定.電力変動緩和時間, startspeed <= 0 ? 0 : endtime - starttime );
+		const rel = Math.min( ds.電力変動緩和時間, startspeed <= 0 ? 0 : endtime - starttime );
 		cs.power.offset.linearRampToValueAtTime( calc_power( acc, startspeed ), toff + starttime + rel );	
 		cs.power.offset.linearRampToValueAtTime( calc_power( acc, endspeed ), toff + endtime );	
 	};
 
-	const calc_power = ( acc, speed ) => acc * ( speed / doc.動力設定.電力飽和速度 );
+	const calc_power = ( acc, speed ) => acc * ( ( speed * ds.動力時速比 ) / ds.電力飽和回転数 );
 
 };
 

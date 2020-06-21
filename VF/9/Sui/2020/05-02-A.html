@@ -10,7 +10,7 @@ h1 { font-size: 30px; }
 
 section { margin-bottom: 0px; }
 table { border: 1px solid hsl( 0, 0%, 60% );  border-collapse: collapse; }
-td { border: 1px dotted hsl( 210, 0%, 70% );  padding: 0 0.7ex; }
+td { border: 1px dotted hsl( 210, 0%, 70% );  padding: 0 0.7ex; white-space: nowrap; }
 button { padding: 1.8ex 1.8em; font-size: 16px; }
 
 .CONTENT { margin-bottom: 10px; }
@@ -89,30 +89,15 @@ const App = function()
 			"種類": "VVVF",
 
 			"車輪径": 860,
-			"車輪歯数": 84,
-			"電動機歯数": 15,
+			"車輪歯数": 85,
+			"動力歯数": 14,
 			
-			"電力飽和速度": 180,
+			"電力飽和回転数": 120,
 			"電力変動緩和時間": 1,
 
 			"誘導すべり率": 2,
 			"切り替え": [ [ 6, 0, 150, 160 ], [ 12, 27 ], [ 20, 15 ], [ 30, 9 ], [ 50, 3 ] ],
 		},
-		"音響1": { "周波数": 400, "共振": 0 }
-	};
-
-	const doc_init_v_1 =
-	{
-		"表題": "PWMテスト",
-		"説明": "アンチエイリアスと小数段",
-		"運転": [ [ 30, 0, 100 ], [ 2, 100, 100 ], [ 30, 100, 0 ] ],
-		"動力設定":
-		{
-			"種類": "PWM",
-			"切り替え": [ [ 0.8, 150 ], [ 1.6, 300 ], [ 2.4, 600 ], [ 3.6, 900 ] ],
-			//"切り替え": [ [ 2, 150 ], [ 98, 300 ], [ 100, 150 ] ],
-		},
-		"駆動": { "歯数": [ 16, 83 ], "車輪径": 810 },
 		"音響1": { "周波数": 400, "共振": 0 }
 	};
 
@@ -131,28 +116,34 @@ const App = function()
 	const table_1 = new Table
 	(
 		document.getElementById( "Info_1" ),
-		sgen.Proc.Pars,
+		{ sta: doc.動力設定, dyn: sgen.Proc.Pars },
 		[
 			[
-				[ "指令加速度", "km/h/s", 0, 1, "acc" ],
-				[ "時速", "km/h", 0, 1, "speed" ],
-				[ "電力", "%", 0, 100, "power" ],
-				[ "=車輪回転", "Hz", 1, 1, "wheel" ],
-				[ "=モーター回転", "Hz", 0, 1, "motor" ],
-				[ "=交流駆動周波数", "Hz", 0, 1, "vf_drv_freq" ],
-				[ "=キャリア倍数", "", (vs)=>vs.vf_carr_rate != 0 ? vs.vf_carr_rate : "非同期", 1, "vf_carr_rate" ],
-				[ "=キャリア周波数", "Hz", 0, 1, "vf_carr_freq" ],
+				[ "加速指令", "km/h/s", 0, 1, "dyn", "加速指令" ],
+				[ "時速", "km/h", 0, 1, "dyn", "時速" ],
+				[ "電力", "%", 0, 100, "dyn", "電力" ],
 			],
 			[
-				[ "<車輪径>", "mm", 0, 1, "wh_dia" ],
-				[ "<=車輪周>", "mm", 0, 1, "wh_circ" ],
-				[ "<=歯数比>", "", 2, 1, "mo_redr" ],
-				[ "<車輪歯数>", "", 0, 1, "wh_gear" ],
-				[ "<モーター歯数>", "", 0, 1, "mo_gear" ],
-				[ "<電力飽和速度>", "km/h", 0, 1, "pw_sat" ],
-				[ "<電力変動緩和時間>", "秒", 0, 1, "pw_relax" ],
-				[ "<交流駆動すべり率>", "%", 1, 1, "vf_slip" ],
+				[ "=車輪回転", "Hz", 1, 1, "dyn", "車輪" ],
+				[ "=動力回転", "Hz", 0, 1, "dyn", "動力" ],
+				[ "=交流駆動周波数", "Hz", 0, 1, "dyn", "交流駆動周波数" ],
+				[ "=キャリア倍数", "", ( v ) => v != 0 ? v : "非同期", 1, "dyn", "キャリア倍数" ],
+				[ "=キャリア周波数", "Hz", 0, 1, "dyn", "キャリア周波数" ],
 			],
+			[
+				[ "<車輪径>", "mm",			0, 1, "sta", "車輪径" ],
+				[ "<車輪歯数>", "",			0, 1, "sta", "車輪歯数" ],
+				[ "<動力歯数>", "",		0, 1, "sta", "動力歯数" ],
+				[ "<電力飽和回転数>", "Hz",		0, 1, "sta", "電力飽和回転数" ],
+				[ "<電力変動緩和時間>", "秒",	0, 1, "sta", "電力変動緩和時間" ],
+				[ "<交流駆動すべり率>", "%",	1, 1, "sta", "誘導すべり率" ],
+			],
+			[
+				[ "<=車輪周>", "mm",		0, 1, "sta", "車輪周" ],
+				[ "<=車輪/時速>", "%",		1, 100, "sta", "車輪時速比" ],
+				[ "<=歯車比>", "",			2, 1, "sta", "歯車比" ],
+				[ "<=動力/時速>", "",	2, 1, "sta", "動力時速比" ],
+			]
 		]
 	);
 
@@ -284,13 +275,23 @@ const 型定義群 =
 
 			"車輪径": { Type: "number" },
 			"車輪歯数": { Type: "number" },
-			"電動機歯数": { Type: "number" },
+			"動力歯数": { Type: "number" },
 			
 			"電力変動緩和時間": { Type: "number" },
-			"電力飽和速度": { Type: "number" },
+			"電力飽和回転数": { Type: "number" },
 			"誘導すべり率": { Type: "number" },
 			
 			"切り替え": { Type: "any" }
+		},
+		Funcs:
+		{
+			Update: function()
+			{
+				this.車輪周 = this.車輪径  * Math.PI;
+				this.車輪時速比 = 1 / ( 3.6 * ( this.車輪周 / 1000 ) );
+				this.歯車比 = this.車輪歯数 / this.動力歯数;
+				this.動力時速比 = this.車輪時速比 * this.歯車比;
+			}
 		}
 	},
 
@@ -326,7 +327,7 @@ const ecr = ( type, com, text ) =>
 	return e;
 };
 
-const Table = function( com, data, def )
+const Table = function( com, srcs, def )
 {
 	const table = ecr( "table", com );
 	const tbody = ecr( "tbody", table );
@@ -344,7 +345,10 @@ const Table = function( com, data, def )
 		const fnc = def && def[ 2 ].constructor == Function && def[ 2 ] || null;
 		const frac = def && fnc == null && Math.pow( 10, def[ 2 ] || 0 );
 		const per = def && def[ 3 ] || 1;
-		const name = def && def[ 4 ] || "";
+		const src = def && def[ 4 ] || "";
+		const name = def && def[ 5 ] || "";
+
+		const data = srcs[ src ];
 
 		ecr( "td", tr, caption );
 		const v = ecr( "td", tr );
@@ -352,7 +356,8 @@ const Table = function( com, data, def )
 
 		this.update = () =>
 		{
-			v.innerText = ( fnc ? fnc( data ) : ft( data[ name ] * per, frac ) + unit );
+			const value = data[ name ];
+			v.innerText = ( fnc ? fnc( value ) : ft( value * per, frac ) + unit );
 		};
 
 		if( def )
@@ -425,6 +430,10 @@ const Perm = new function()
 				if( creator )  this[ name ] = creator();
 				else init_fns[ name ] = inits[ type ] || inits.any;
 			}
+
+			const fns = class_def.Funcs;
+			if( fns )  for( let name in fns )  this[ name ] = fns[ name ];
+			
 			init_vs && this.SetPerm( init_vs );
 		};
 
@@ -445,6 +454,7 @@ const Perm = new function()
 				if( init_fn )  this[ name ] = init_fn( value );
 				else this[ name ].SetPerm( value );
 			};
+			this.Update && this.Update();
 		};
 
 		this.GetPerm = function()
