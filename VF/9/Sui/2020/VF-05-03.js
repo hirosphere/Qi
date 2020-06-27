@@ -296,7 +296,6 @@ VF.Graph = function( canvas, mon )
 	const context = canvas.getContext( "2d" );
 	const width = canvas.width;
 	const height = canvas.height;
-	const y_half = height / 2;
 
 	const clear = () =>
 	{
@@ -309,7 +308,7 @@ VF.Graph = function( canvas, mon )
 		clear();
 
 		const yp = 80; let yc = yp / 2 + 0;
-		const sl = 60, dl = 120;
+		const sl = 480, dl = 480;
 		draw_wave( mon.a, yc, yp * 0.4, 0, sl, 0, dl );  yc += yp;
 		draw_wave( mon.b, yc, yp * 0.4, 0, sl, 0, dl );  yc += yp;
 		draw_wave( mon.c, yc, yp * 0.4, 0, sl, 0, dl );  yc += yp;

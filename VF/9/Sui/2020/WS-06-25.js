@@ -1,0 +1,5 @@
+
+const Storage = new function()
+{
+	;
+};

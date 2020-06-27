@@ -96,7 +96,7 @@ const App = function()
 			"電力変動緩和時間": 1,
 
 			"誘導すべり率": 2,
-			"切り替え": [ [ 6, 0, 150, 160 ], [ 12, 27 ], [ 20, 15 ], [ 30, 9 ], [ 50, 3 ] ],
+			"切り替え": [ [ 6, 0, 400, 400 ], [ 12, 27 ], [ 20, 15 ], [ 30, 9 ], [ 50, 3 ] ],
 		},
 		"音響1": { "周波数": 400, "共振": 0 }
 	};
@@ -107,6 +107,8 @@ const App = function()
 
 	const CS = new Perm.ClassSet( 型定義群 );
 	const doc = CS.Doc();
+	let history_stage = history.state = 1;
+
 	const sgen = new VF.SoundGen( doc );
 	const canvas = document.getElementById( "Graph" );
 	const graph = new VF.Graph( canvas, sgen.WaveMonitor );
@@ -155,14 +157,37 @@ const App = function()
 		view_update( perm );
 	};
 
+	const save_to_url = ( perm, push ) =>
+	{
+		if( history_stage == 1 || push )
+		{
+			history_stage ++;
+			history.pushState( history_stage, perm.表題 , uron.変換( perm ) );
+		}
+		else
+		{
+			history.replaceState( history_stage, perm.表題 , uron.変換( perm ) );
+		}
+	};
+
+	window.addEventListener
+	(
+		"popstate",
+		( ev ) =>
+		{
+			//console.log( JSON.stringify( history_stage ) );
+			load();
+		}
+	);
+
 	const view_update = ( perm ) =>
 	{
-		document.title =
-			document.getElementById( "Title" ).textContent = doc.表題;
+		document.getElementById( "Title" ).textContent = 
+		document.title = `${ doc.表題 }`;
+		//document.getElementById( "Title" ).textContent = doc.表題;
 		document.getElementById( "Caption" ).textContent = doc.説明;
 
 		//    //
-		history.replaceState( null,  "" , uron.変換( perm ) );
 		newtab.href = location;
 
 		sgen.Update();
@@ -208,10 +233,16 @@ const App = function()
 		let value, is_err = false;
 		try
 		{
-			doc.SetPerm( JSON.parse( editor.value ) );
-			view_update( doc.GetPerm() );
+			const perm = JSON.parse( editor.value );
+			doc.SetPerm( perm );
+
+			{
+				const perm = doc.GetPerm();
+				save_to_url( perm );
+				view_update( perm );
+			}
 		}
-		catch( exc ) { is_err = true; }
+		catch( exc ) { is_err = true; console.log( exc ); }
 		editor.classList.toggle( "ERROR", is_err );
 	};
 
