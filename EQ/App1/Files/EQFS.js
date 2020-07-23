@@ -27,7 +27,7 @@ let EQFS = new function()
 			// console.log( csv );
 			let list = [];
 			let lines = csv.split( /\r?\n/ );
-			lines.pop();
+			//lines.pop();
 			for( var line of lines )
 			{
 				let cols = line.split( "\t" );

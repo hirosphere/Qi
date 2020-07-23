@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="Chrome" modified="2020-07-18T04:07:54.187Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36" etag="oK2kvcDGiI3bI8QLUF3H" version="13.4.4">
+  <diagram id="2jaEJFF6elMT00x7Npk3" name="ページ1">
+    <mxGraphModel dx="600" dy="485" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="48xwXskgI1SbyKiIUa4i-3" value="" style="shape=xor;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="54" y="233.33333333333334" width="69.47368421052632" height="62.22222222222222" as="geometry" />
+        </mxCell>
+        <mxCell id="48xwXskgI1SbyKiIUa4i-4" value="" style="shape=xor;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="199.26315789473682" y="202.22222222222223" width="69.47368421052632" height="62.22222222222222" as="geometry" />
+        </mxCell>
+        <mxCell id="48xwXskgI1SbyKiIUa4i-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.175;entryY=0.25;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="48xwXskgI1SbyKiIUa4i-3" target="48xwXskgI1SbyKiIUa4i-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

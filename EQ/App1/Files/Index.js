@@ -128,8 +128,8 @@ let RootIndex = class_def
 	function( base )
 	{
 		this.Initiate = function() { base.Initiate.call( this, null, "", "" ) };
-		this.GetCaption = function() { return this.Caption; };
 		this.LongCap = this.Caption = "トップ";
+		this.GetCaption = function() { return "トップ" + this.Caption; };
 	}
 );
 
