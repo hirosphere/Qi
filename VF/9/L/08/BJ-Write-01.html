@@ -108,23 +108,24 @@ function sig_button( id, patt )
    bu.onclick = () => ble.write('UUID2', patt );
 }
 
-sig_button( "sig_r", "2" );
-sig_button( "sig_yy", "0" );
-sig_button( "sig_y", "4" );
-sig_button( "sig_yg", "5" );
-sig_button( "sig_g", "1" );
-sig_button( "sig_bl", "0" );
+sig_button( "sig_r", "2." );
+sig_button( "sig_yy", "9.." );
+sig_button( "sig_y", "4..." );
+sig_button( "sig_yg", "5...." );
+sig_button( "sig_g", "1....." );
+sig_button( "sig_bl", "0......   0......   0......   0......   0......   0......   0......   0......   0......   0......   " );
 
 
 // 更新テスト //
 
 let iid = 0;
 let ph = 0;
-const patt = [ "1", "0", "2", "4", "5" ];
+const patt = [ "1", "0", "2", "9", "4", "5" ];
+const pad = "........  ........  ........  ........  ........  ";
 
 const test_op = () =>
 {
-    ble.write('UUID2', patt[ ph ] );
+    ble.write('UUID2', patt[ ph ] + pad );
     if( ++ ph >= patt.length ) ph = 0;
 }
 
