@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Touch 111</title>
+<style>
+
+html
+{
+	min-height: 800px;
+	background-color: hsl( 0, 0%, 27% );
+	color: hsl( 0, 0%, 80% );
+	font-family: sans-serif;
+}
+
+button { padding: 1ex 2ex; }
+
+.KB
+{
+	position: relative;
+	box-sizing: border-box;
+	height: 240px;
+	margin-left: 40px;
+}
+
+.KI
+{
+	position: absolute;
+	display: inline-block;
+	box-sizing: border-box;
+	width: 45px;  height: 210px;
+	border: 1px solid hsl( 0, 0%, 80% );
+	background: hsl( 0, 0%, 100% );
+}
+
+.KI.-active { background: hsl( 205, 80%, 88% ); }
+
+</style>
+<script src="../Prime.js"></script>
+<script src="Keyboard.js"></script>
+<script>
+
+class App
+{
+	constructor()
+	{
+		const e = document.getElementById( "App" );
+		new Keyboard( e );
+	}
+}
+
+</script>
+	
+</head>
+
+<body onload="new App()">
+
+<h1>Touch 111</h1>
+
+<div id="App"></div>
+
+<div style="
+	box-sizing: border-box; width: 1600px; border: 1px solid hsl( 0, 0%, 80% ); border-radius: 10px;
+	padding: 10px;
+	">
+	<button onclick="location.reload()">Reload</button>
+	<button onclick="document.documentElement.requestFullscreen()">Full</button>
+	<button onclick="document.exitFullscreen()">Exit</button>
+</div>
+
+</body>
+</html>
