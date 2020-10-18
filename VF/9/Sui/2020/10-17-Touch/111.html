@@ -33,10 +33,11 @@ button { padding: 1ex 2ex; }
 	background: hsl( 0, 0%, 100% );
 }
 
-.KI.-active { background: hsl( 205, 80%, 88% ); }
+.KI.-active { background: hsl( 180, 100%, 94% ); }
 
 </style>
 <script src="../Prime.js"></script>
+<script src="SoundGen.js"></script>
 <script src="Keyboard.js"></script>
 <script>
 
@@ -45,7 +46,8 @@ class App
 	constructor()
 	{
 		const e = document.getElementById( "App" );
-		new Keyboard( e );
+		const sg = new SoundGen();
+		new Keyboard( e, ( ev ) => sg.PostKeyEvent( ev ) );
 	}
 }
 
