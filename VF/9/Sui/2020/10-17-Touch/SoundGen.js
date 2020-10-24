@@ -46,10 +46,9 @@ class Voice
 		o.connect( g );
 		g.connect( dest );
 		
-		o.detune.value = key * 100;
+		o.detune.value = ( key - 69 ) * 100;
 
 		const t = context.currentTime + 0.001;
-		console.log( t );
 		o.start( t );
 		g.gain.setTargetAtTime( 1 / 0.63, t, 0.1 );
 	}

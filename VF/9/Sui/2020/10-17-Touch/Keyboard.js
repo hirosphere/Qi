@@ -1,8 +1,9 @@
 
 class Keyboard
 {
-	KeyPitch = 45;
+	KeyPitch = 50;
 	Channel = 0;
+	Trainspose = 48;
 
 	constructor( com, on_event )
 	{
@@ -14,25 +15,14 @@ class Keyboard
 
 		this.touch_works = {};
 		this.note_id = 0;
+		this.keysp = new KeySpace();
 		this.key_buttons = {};
-		this.create_key_buttons( 52, 77 );
+		this.create_key_buttons( 0, 36 );
 
 		e.addEventListener( "touchstart", ev => this.touchstart( ev ) );
 		e.addEventListener( "touchmove", ev => this.touchmouve( ev ) );
 		e.addEventListener( "touchend", ev => this.touchend( ev ) );
 		e.addEventListener( "touchcancel", ev => this.touchend( ev ) );
-	}
-
-	// pos //
-	
-	pos_to_key( x, y )
-	{
-		return Math.floor( x / this.KeyPitch );
-	}
-
-	key_to_pos( key )
-	{
-		return { left: key * this.KeyPitch, top: 0 };
 	}
 
 	// key buttons //
@@ -41,22 +31,10 @@ class Keyboard
 	{
 		for( let key = begin, left = 0; key <= end; key ++ )
 		{
-			this.create_key_button( left, key, key );
-			left += this.KeyPitch;
+			const area = this.keysp.KeyToSpace( key );
+			const bu = this.key_buttons[ key ] = new KeyButton( this.kb_con, area, key );
+			bu.update( this.Trainspose );
 		}
-	}
-
-	create_key_button( left, label, key )
-	{
-		const top = 0 + "px";
-		const e = ecr( "span", this.kb_con, { class: "KI", text: label, style: { left: left + "px", top: top } } );
-		e.active = 0;
-		e.add_active = ( v ) =>
-		{
-			e.active += v;
-			e.classList.toggle( "-active", e.active > 0 );
-		};
-		this.key_buttons[ key ] = e;
 	}
 
 	// touch //
@@ -70,6 +48,7 @@ class Keyboard
 
 			const w = this.get_touch_work( touch );
 			w.key = this.touch_to_key( touch );
+			w.tr_key = w.key + this.Trainspose;
 			this.post_note_on( w )
 		}
 	}
@@ -86,6 +65,7 @@ class Keyboard
 			
 			this.post_note_off( w );
 			w.key = key;
+			w.tr_key = w.key + this.Trainspose;
 			this.post_note_on( w );
 		}
 	}
@@ -104,7 +84,8 @@ class Keyboard
 
 	touch_to_key( ev )
 	{
-		return this.pos_to_key(  ev.pageX - this.e.offsetLeft, ev.pageY - this.e.offsetTop);
+		return this.keysp.PosToKey(  ev.pageX - this.e.offsetLeft, ev.pageY - this.e.offsetTop);
+		//return this.pos_to_key(  ev.pageX - this.e.offsetLeft, ev.pageY - this.e.offsetTop);
 	}
 
 	get_touch_work( touch )
@@ -125,7 +106,7 @@ class Keyboard
 		const note_id = w.note_id = ++ this.note_id;
 		const kb = this.key_buttons[ w.key ];
 		kb && kb.add_active( 1 );
-		this.on_event( { type: "Key-On", ch: this.Channel, note_id: w.note_id, key: w.key, touch_id: w.id } );
+		this.on_event( { type: "Key-On", ch: this.Channel, note_id: w.note_id, key: w.tr_key, touch_id: w.id } );
 		
 		this.post( [ "Key-On", "w" + w.id, "n" + w.note_id, "k" + w.key ].join( " " ) );
 	}
@@ -134,7 +115,7 @@ class Keyboard
 	{
 		const kb = this.key_buttons[ w.key ];
 		kb && kb.add_active( -1 );
-		this.on_event( { type: "Key-Off", ch: this.Channel, note_id: w.note_id, key: w.key, touch_id: w.id } );
+		this.on_event( { type: "Key-Off", ch: this.Channel, note_id: w.note_id, key: w.tr_key, touch_id: w.id } );
 		
 		this.post( [ "Key-Off", "w" + w.id, "n" + w.note_id, "k" + w.key ].join( " " ) );
 	}
@@ -143,5 +124,56 @@ class Keyboard
 
 	post( msg ) { this.mon.innerText = msg; }
 
+}
+
+class KeySpace
+{
+	Pitch = 65;
+	Height = 90;
+	
+	PosToKey( x, y )
+	{
+		const half = ( y < this.Height ? 1 : 0 );
+		return Math.floor( ( x - half * this.Pitch / 2 ) / ( this.Pitch ) ) * 2 + half;
+	}
+
+	KeyToSpace( key )
+	{
+		const half = key % 2;
+		const left = key * this.Pitch / 2;
+		const top = ( half ? 0 : this.Height );
+		const w = this.Pitch - 0;
+		const h = this.Height;
+		return { left: left, top: top, width: w, height: h };
+	}
+}
+
+const note_name = [ "C", "C#", "D", "D#",  "E", "F", "F#", "G",  "G#", "A", "A#", "B" ];
+
+class KeyButton
+{
+	constructor( com, a, key )    // a: area
+	{
+		const label = key;
+		const s = { left: a.left + "px", top: a.top + "px", width: a.width + "px", height: a.height + "px" };
+		this.e = ecr( "span", com, { class: "KI", text: label, style: s } );
+		this.key = key;
+		this.active = 0;
+	}
+
+	update( transpose )
+	{
+		const key = this.key + transpose;
+		const oct = Math.floor( key / 12 );
+		const note = note_name[ key - ( oct * 12 ) ];
+		this.e.innerHTML = `${ note }${ oct - 1 }<br/>${ key }`;
+		this.e.classList.toggle( "-half", note.length == 2 );
+	}
+
+	add_active( v )
+	{
+		this.active += v;
+		this.e.classList.toggle( "-active", this.active > 0 );
+	};
 }
 
