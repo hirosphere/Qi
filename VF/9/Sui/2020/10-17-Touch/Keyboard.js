@@ -1,7 +1,6 @@
 
 class Keyboard
 {
-	KeyPitch = 50;
 	Channel = 0;
 	Trainspose = 48;
 
@@ -25,6 +24,14 @@ class Keyboard
 		e.addEventListener( "touchcancel", ev => this.touchend( ev ) );
 	}
 
+	// interface //
+
+	Shift( value )
+	{
+		this.Trainspose += value;
+		this.update();
+	}
+
 	// key buttons //
 
 	create_key_buttons( begin, end )
@@ -33,8 +40,13 @@ class Keyboard
 		{
 			const area = this.keysp.KeyToSpace( key );
 			const bu = this.key_buttons[ key ] = new KeyButton( this.kb_con, area, key );
-			bu.update( this.Trainspose );
 		}
+		this.update();
+	}
+
+	update()
+	{
+		for( const n in this.key_buttons )  this.key_buttons[ n ].update( this.Trainspose );
 	}
 
 	// touch //
@@ -128,8 +140,8 @@ class Keyboard
 
 class KeySpace
 {
-	Pitch = 65;
-	Height = 90;
+	Pitch = 55;
+	Height = 120;
 	
 	PosToKey( x, y )
 	{
@@ -148,25 +160,27 @@ class KeySpace
 	}
 }
 
-const note_name = [ "C", "C#", "D", "D#",  "E", "F", "F#", "G",  "G#", "A", "A#", "B" ];
-
 class KeyButton
 {
 	constructor( com, a, key )    // a: area
 	{
-		const label = key;
 		const s = { left: a.left + "px", top: a.top + "px", width: a.width + "px", height: a.height + "px" };
-		this.e = ecr( "span", com, { class: "KI", text: label, style: s } );
+		this.e = ecr( "span", com, { class: "KI", style: s } );
 		this.key = key;
 		this.active = 0;
 	}
+
+	static note_name = [ "C", "C#", "D", "D#",  "E", "F", "F#", "G",  "G#", "A", "A#", "B" ];
 
 	update( transpose )
 	{
 		const key = this.key + transpose;
 		const oct = Math.floor( key / 12 );
-		const note = note_name[ key - ( oct * 12 ) ];
-		this.e.innerHTML = `${ note }${ oct - 1 }<br/>${ key }`;
+		const note_num = key - ( oct * 12 );
+		const note = KeyButton.note_name[ note_num ];
+		const freq = Math.floor( 10 * 440 * Math.pow( 2, ( key - 69 ) / 12 ) ) / 10;
+		this.e.innerHTML = `${ oct - 1 }.${ note_num }<br/>${ freq }`;
+		//this.e.innerHTML = `${ note }${ oct - 1 }<br/>${ key }`;
 		this.e.classList.toggle( "-half", note.length == 2 );
 	}
 

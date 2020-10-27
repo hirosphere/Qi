@@ -19,7 +19,7 @@ button { padding: 1ex 2ex; }
 {
 	position: relative;
 	box-sizing: border-box;
-	height: 180px;
+	height: 240px;
 	margin-left: 40px;
 }
 
@@ -28,7 +28,6 @@ button { padding: 1ex 2ex; }
 	position: absolute;
 	display: inline-block;
 	box-sizing: border-box;
-	width: 45px;  height: 210px;
 	border: 1px solid hsl( 0, 0%, 80% );
 	background: hsl( 0, 0%, 100% );
 }
@@ -49,7 +48,7 @@ class App
 	{
 		const e = document.getElementById( "App" );
 		const sg = new SoundGen();
-		new Keyboard( e, ( ev ) => sg.PostKeyEvent( ev ) );
+		this.KB = new Keyboard( e, ( ev ) => sg.PostKeyEvent( ev ) );
 	}
 }
 
@@ -57,7 +56,7 @@ class App
 	
 </head>
 
-<body onload="new App()">
+<body onload="window.app = new App()">
 
 <h1>Touch 111</h1>
 
@@ -70,6 +69,9 @@ class App
 	<button onclick="location.reload()">Reload</button>
 	<button onclick="document.documentElement.requestFullscreen()">Full</button>
 	<button onclick="document.exitFullscreen()">Exit</button>
+	<span> ---- </span>
+	<button onclick="app.KB.Shift( -12 )">Down</button>
+	<button onclick="app.KB.Shift( 12 )">Up</button>
 </div>
 
 </body>
