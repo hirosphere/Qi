@@ -14,7 +14,7 @@ class Keyboard
 
 		this.touch_works = {};
 		this.note_id = 0;
-		this.keysp = new KeySpace();
+		this.layout = new KeyLayout();
 		this.key_buttons = {};
 		this.create_key_buttons( 0, 36 );
 
@@ -38,7 +38,7 @@ class Keyboard
 	{
 		for( let key = begin, left = 0; key <= end; key ++ )
 		{
-			const area = this.keysp.KeyToSpace( key );
+			const area = this.layout.KeyToArea( key );
 			const bu = this.key_buttons[ key ] = new KeyButton( this.kb_con, area, key );
 		}
 		this.update();
@@ -53,7 +53,7 @@ class Keyboard
 
 	touchstart( ev )
 	{
-		ev.preventDefault();
+		ev.cancelable && ev.preventDefault();
 		for( const touch of ev.changedTouches )
 		{
 			if( ! this.is_key_button( touch.target ) ) continue;
@@ -96,8 +96,7 @@ class Keyboard
 
 	touch_to_key( ev )
 	{
-		return this.keysp.PosToKey(  ev.pageX - this.e.offsetLeft, ev.pageY - this.e.offsetTop);
-		//return this.pos_to_key(  ev.pageX - this.e.offsetLeft, ev.pageY - this.e.offsetTop);
+		return this.layout.PosToKey( ev.pageX - this.e.offsetLeft, ev.pageY - this.e.offsetTop );
 	}
 
 	get_touch_work( touch )
@@ -120,7 +119,7 @@ class Keyboard
 		kb && kb.add_active( 1 );
 		this.on_event( { type: "Key-On", ch: this.Channel, note_id: w.note_id, key: w.tr_key, touch_id: w.id } );
 		
-		this.post( [ "Key-On", "w" + w.id, "n" + w.note_id, "k" + w.key ].join( " " ) );
+		this.post( [ "Key-On", "w" + w.id, "n" + w.note_id, "b" + w.key ].join( " " ) );
 	}
 
 	post_note_off( w )
@@ -129,7 +128,7 @@ class Keyboard
 		kb && kb.add_active( -1 );
 		this.on_event( { type: "Key-Off", ch: this.Channel, note_id: w.note_id, key: w.tr_key, touch_id: w.id } );
 		
-		this.post( [ "Key-Off", "w" + w.id, "n" + w.note_id, "k" + w.key ].join( " " ) );
+		this.post( [ "Key-Off", "w" + w.id, "n" + w.note_id, "b" + w.key ].join( " " ) );
 	}
 
 	// monitor //
@@ -138,9 +137,9 @@ class Keyboard
 
 }
 
-class KeySpace
+class KeyLayout
 {
-	Pitch = 55;
+	Pitch = 50;
 	Height = 120;
 	
 	PosToKey( x, y )
@@ -149,7 +148,7 @@ class KeySpace
 		return Math.floor( ( x - half * this.Pitch / 2 ) / ( this.Pitch ) ) * 2 + half;
 	}
 
-	KeyToSpace( key )
+	KeyToArea( key )
 	{
 		const half = key % 2;
 		const left = key * this.Pitch / 2;
@@ -179,9 +178,8 @@ class KeyButton
 		const note_num = key - ( oct * 12 );
 		const note = KeyButton.note_name[ note_num ];
 		const freq = Math.floor( 10 * 440 * Math.pow( 2, ( key - 69 ) / 12 ) ) / 10;
-		this.e.innerHTML = `${ oct - 1 }.${ note_num }<br/>${ freq }`;
-		//this.e.innerHTML = `${ note }${ oct - 1 }<br/>${ key }`;
-		this.e.classList.toggle( "-half", note.length == 2 );
+		this.e.innerHTML = `${ note_num }<br/>${ note }${ oct - 1 }<br/>${ freq }`;
+		this.e.classList.toggle( "-sharp", note.length == 2 );
 	}
 
 	add_active( v )

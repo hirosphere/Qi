@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>Doch-Dech</title>
+<style>
+
+html { color: hsl( 0, 0%, 100% ); }
+#gs1 { color: hsl( 0, 0%, 100% ); }
+#gs2 { color: hsl( 0, 0%, 50% ); }
+#gs3 { color: hsl( 0, 0%, 0% ); }
+
+</style>
+<script>
+
+class App
+{
+	color = new Color();
+	count = 0;
+	constructor()
+	{
+		document.documentElement.onmousedown = ev =>
+		{
+			ev.cancelable && ev.preventDefault();
+			this.action();
+		}
+
+		document.onkeydown = ev =>
+		{
+			if( ev.keyCode == 13 ) this.action();
+		}
+
+		this.action();
+	}
+
+	action()
+	{
+		++ this.count;
+		this.color.random( 60, 25, 25 );
+		this.color.to_style( document.body, "background" );
+		document.getElementById( "gs1").innerText = this.count + " " + this.color.hsl();
+		document.getElementById( "gs2").innerText = this.count + " " + this.color.hsl();
+		document.getElementById( "gs3").innerText = this.count + " " + this.color.hsl();
+	}
+}
+
+class Color
+{
+	constructor()
+	{
+		this.hue = 0;
+		this.sat = 50;
+		this.lig = 50;
+	}
+
+	random( h, s, l )
+	{
+		this.hue = ( this.hue + rand( h ) ) % 360;
+		if( this.hue < 0 ) this.hue += 360;
+		this.sat = clip( this.sat + rand( s ), 15, 100 );
+		this.lig = clip( this.lig + rand( l ), 15, 100 );
+	}
+
+	hsl() { return `hsl( ${ this.hue }, ${ this.sat }%, ${ this.lig }% )`; }
+
+	to_style( e, prop )
+	{
+		e.style[ prop ] = this.hsl();
+	}
+}
+
+const clip = ( value, min, max ) => Math.max( min, Math.min( max, value ) );
+const rand = ( value ) => Math.round( ( Math.random() - 0.5 ) * value );
+
+
+</script>
+	</head>
+	<body onload="new App()">
+		<h1 id="gs1">Doch-Dech-Boch</h1>
+		<h1 id="gs2">Doch-Dech-Boch</h1>
+		<h1 id="gs3">Doch-Dech-Boch</h1>
+	</body>
+</html>

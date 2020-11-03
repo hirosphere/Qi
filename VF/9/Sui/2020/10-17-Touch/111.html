@@ -5,6 +5,8 @@
 <title>Touch 111</title>
 <style>
 
+* { box-sizing: border-box; }
+
 html
 {
 	min-height: 800px;
@@ -30,15 +32,28 @@ button { padding: 1ex 2ex; }
 	box-sizing: border-box;
 	border: 1px solid hsl( 0, 0%, 80% );
 	background: hsl( 0, 0%, 100% );
+	line-height: 1.1em;  font-size: 12px;
 }
 
-.KI.-half { background: hsl( 0, 0%, 0% ); }
-.KI.-active { background: hsl( 180, 100%, 94% ); }
-.KI.-half.-active { background: hsl( 180, 40%, 75% ); }
+.KI { background: hsl( 0, 0%, 100% );  color:hsl( 55, 3%, 70% ); }
+.KI.-sharp { background: hsl( 55, 1%, 45% );  color:hsl( 0, 0%, 85% ); border-right-color: hsl( 0, 0%, 95% ); }
+.KI.-active { background: hsl( 180, 100%, 90% );  color:hsl( 0, 0%, 40% ); }
+.KI.-sharp.-active { background: hsl( 180, 60%, 80% );  color:hsl( 0, 0%, 30% ); }
+
+.Ctrl { width: 1000px; }
+
+.Sl { display: inline-block; }
+.Sl .-value { display: inline-block; min-width: 2em; margin-left: 1ex; }
+.Sl input { vertical-align: middle; }
+
+.Env { border: 1px solid hsl( 0, 0%, 100% ); display: inline-block; padding: 7px; width: 300px; min-height: 100px; }
+.Env .Sl input { width: 200px }
 
 </style>
 <script src="../Prime.js"></script>
+<script src="Model.js"></script>
 <script src="SoundGen.js"></script>
+<script src="CtrlUI.js"></script>
 <script src="Keyboard.js"></script>
 <script>
 
@@ -46,9 +61,13 @@ class App
 {
 	constructor()
 	{
-		const e = document.getElementById( "App" );
-		const sg = new SoundGen();
-		this.KB = new Keyboard( e, ( ev ) => sg.PostKeyEvent( ev ) );
+		const kb = document.getElementById( "KB" );
+		const ct = document.getElementById( "Ct" );
+
+		this.Model = new Model.Main();
+		this.SG = new SG.Main( this.Model );
+		this.KB = new Keyboard( kb, ( ev ) => this.SG.Channels.Melody.PostKeyEvent( ev ) );
+		new CU.Main( ct, this.Model );
 	}
 }
 
@@ -60,7 +79,7 @@ class App
 
 <h1>Touch 111</h1>
 
-<div id="App"></div>
+<div id="KB"></div>
 
 <div style="
 	box-sizing: border-box; width: 1600px; border: 1px solid hsl( 0, 0%, 80% ); border-radius: 10px;
@@ -69,10 +88,14 @@ class App
 	<button onclick="location.reload()">Reload</button>
 	<button onclick="document.documentElement.requestFullscreen()">Full</button>
 	<button onclick="document.exitFullscreen()">Exit</button>
-	<span> ---- </span>
+	<span> --Oct-- </span>
 	<button onclick="app.KB.Shift( -12 )">Down</button>
 	<button onclick="app.KB.Shift( 12 )">Up</button>
+	<input onchange="app.SG.Tune = this.value; console.log( this.value )" value="440" />
 </div>
+
+<div id="Ct"></div>
+
 
 </body>
 </html>
