@@ -9,9 +9,10 @@
 
 html
 {
+	padding-top: 30px;
 	min-height: 800px;
-	background-color: hsl( 225, 40%, 40% );
-	color: hsl( 0, 0%, 80% );
+	background-color: hsl( 105, 35%, 45% );
+	color: hsl( 90, 4%, 97% );
 	font-family: sans-serif;
 }
 
@@ -32,15 +33,20 @@ button { padding: 1ex 2ex; }
 	box-sizing: border-box;
 	border: 1px solid hsl( 0, 0%, 80% );
 	background: hsl( 0, 0%, 100% );
-	line-height: 1.1em;  font-size: 12px;
+	text-align: center;
+	vertical-align: top;
+	font-size: 12px;
+	color:hsl( 0, 0%, 60% );
 }
 
-.KI { background: hsl( 0, 0%, 100% );  color:hsl( 55, 3%, 70% ); }
-.KI.-sharp { background: hsl( 55, 1%, 45% );  color:hsl( 0, 0%, 85% ); border-right-color: hsl( 0, 0%, 95% ); }
+.KI { background: hsl( 0, 0%, 100% ); }
 .KI.-active { background: hsl( 180, 100%, 90% );  color:hsl( 0, 0%, 40% ); }
-.KI.-sharp.-active { background: hsl( 180, 60%, 80% );  color:hsl( 0, 0%, 30% ); }
+.KI .-nn { font-size: 24px; color:hsl( 0, 0%, 20% ); }
 
 .Ctrl { width: 1000px; }
+.Ctrl div { vertical-align: top; }
+
+input[type="range"] { height: 23px; }
 
 .Sl { display: inline-block; }
 .Sl .-value { display: inline-block; min-width: 2em; margin-left: 1ex; }
@@ -48,6 +54,8 @@ button { padding: 1ex 2ex; }
 
 .Env { border: 1px solid hsl( 0, 0%, 100% ); display: inline-block; padding: 7px; width: 300px; min-height: 100px; }
 .Env .Sl input { width: 200px }
+
+.Tone { border: 1px solid hsl( 0, 0%, 100% ); display: inline-block; padding: 7px; width: 600px;  }
 
 </style>
 <script src="../Prime.js"></script>
@@ -76,8 +84,6 @@ class App
 </head>
 
 <body onload="window.app = new App()">
-
-<h1>Touch 111</h1>
 
 <div id="KB"></div>
 

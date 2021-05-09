@@ -1,0 +1,53 @@
+Checking whether the ASM compiler is GNU using "--version" did not match "(GNU assembler)|(GCC)|(Free Software Foundation)":
+Microsoft(R) C/C++ Optimizing Compiler Version 19.28.29913 for x86
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+cl : コマンド ライン warning D9002 : 不明なオプション '--version' を無視します。
+cl : コマンド ライン error D8003 : ソース ファイル名がありません
+Checking whether the ASM compiler is Clang using "--version" did not match "(clang version)":
+Microsoft(R) C/C++ Optimizing Compiler Version 19.28.29913 for x86
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+cl : コマンド ライン warning D9002 : 不明なオプション '--version' を無視します。
+cl : コマンド ライン error D8003 : ソース ファイル名がありません
+Checking whether the ASM compiler is AppleClang using "--version" did not match "(Apple LLVM version)":
+Microsoft(R) C/C++ Optimizing Compiler Version 19.28.29913 for x86
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+cl : コマンド ライン warning D9002 : 不明なオプション '--version' を無視します。
+cl : コマンド ライン error D8003 : ソース ファイル名がありません
+Checking whether the ASM compiler is ARMClang using "--version" did not match "armclang":
+Microsoft(R) C/C++ Optimizing Compiler Version 19.28.29913 for x86
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+cl : コマンド ライン warning D9002 : 不明なオプション '--version' を無視します。
+cl : コマンド ライン error D8003 : ソース ファイル名がありません
+Checking whether the ASM compiler is HP using "-V" did not match "HP C":
+Microsoft(R) C/C++ Optimizing Compiler Version 19.28.29913 for x86
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+cl : コマンド ライン error D8004 : '/V' には引数が必要です
+Checking whether the ASM compiler is Intel using "--version" did not match "(ICC)":
+Microsoft(R) C/C++ Optimizing Compiler Version 19.28.29913 for x86
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+cl : コマンド ライン warning D9002 : 不明なオプション '--version' を無視します。
+cl : コマンド ライン error D8003 : ソース ファイル名がありません
+Checking whether the ASM compiler is IntelLLVM using "--version" did not match "(Intel[^
+]+oneAPI)":
+Microsoft(R) C/C++ Optimizing Compiler Version 19.28.29913 for x86
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+cl : コマンド ライン warning D9002 : 不明なオプション '--version' を無視します。
+cl : コマンド ライン error D8003 : ソース ファイル名がありません
+Checking whether the ASM compiler is SunPro using "-V" did not match "Sun C":
+Microsoft(R) C/C++ Optimizing Compiler Version 19.28.29913 for x86
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+cl : コマンド ライン error D8004 : '/V' には引数が必要です
+Checking whether the ASM compiler is XL using "-qversion" did not match "XL C":
+Microsoft(R) C/C++ Optimizing Compiler Version 19.28.29913 for x86
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+cl : コマンド ライン warning D9002 : 不明なオプション '-qversion' を無視します。
+cl : コマンド ライン error D8003 : ソース ファイル名がありません

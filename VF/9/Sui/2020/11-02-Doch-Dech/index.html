@@ -5,29 +5,60 @@
 		<title>Doch-Dech</title>
 <style>
 
-html { color: hsl( 0, 0%, 100% ); }
-#gs1 { color: hsl( 0, 0%, 100% ); }
-#gs2 { color: hsl( 0, 0%, 50% ); }
-#gs3 { color: hsl( 0, 0%, 0% ); }
+h1 { font-size: 26px; }
 
 </style>
+<script src="../Prime.js"></script>
 <script>
 
 class App
 {
 	color = new Color();
 	count = 0;
+	grays = [];
 	constructor()
 	{
-		document.documentElement.onmousedown = ev =>
+		document.documentElement.addEventListener
+		(
+			"touchstart",
+			ev =>
+			{
+				ev.cancelable && ev.preventDefault();
+				this.action();
+			},
+			false
+		);
+
+		document.onkeypress = ev =>
 		{
-			ev.cancelable && ev.preventDefault();
-			this.action();
+			switch( String.fromCharCode( ev.keyCode ) )
+			{
+				case "\r": this.action();  break;
+
+				case "w": this.color.h_shift( 1 ); this.update();  break;
+				case "q": this.color.h_shift( -1 ); this.update();  break;
+				case "r": this.color.h_shift( 5 ); this.update();  break;
+				case "e": this.color.h_shift( -5 ); this.update();  break;
+
+				case "s": this.color.s_shift( 1 ); this.update();  break;
+				case "a": this.color.s_shift( -1 ); this.update();  break;
+				case "f": this.color.s_shift( 5 ); this.update();  break;
+				case "d": this.color.s_shift( -5 ); this.update();  break;
+
+				case "x": this.color.l_shift( 1 ); this.update();  break;
+				case "z": this.color.l_shift( -1 ); this.update();  break;
+				case "v": this.color.l_shift( 5 ); this.update();  break;
+				case "c": this.color.l_shift( -5 ); this.update();  break;
+			}
+			
 		}
 
-		document.onkeydown = ev =>
+		const e = ecr( "div", document.body );
+
+		for( let i = 0, m = 12; i <= m; i ++ )
 		{
-			if( ev.keyCode == 13 ) this.action();
+			const light = Math.round( ( m - i ) / m * 1000 ) / 10;
+			this.grays[ i ] = ecr( "h1", e, { attr: { light: light },  style: { color: `hsl( 0, 0%, ${ light }% )` } } );
 		}
 
 		this.action();
@@ -36,11 +67,14 @@ class App
 	action()
 	{
 		++ this.count;
-		this.color.random( 60, 25, 25 );
+		this.color.random( 30, 15, 15 );
+		this.update();
+	}
+
+	update()
+	{
 		this.color.to_style( document.body, "background" );
-		document.getElementById( "gs1").innerText = this.count + " " + this.color.hsl();
-		document.getElementById( "gs2").innerText = this.count + " " + this.color.hsl();
-		document.getElementById( "gs3").innerText = this.count + " " + this.color.hsl();
+		for( let item of this.grays ) item.innerText = `${ item.light } : ${ this.color.to_string() }`;
 	}
 }
 
@@ -48,17 +82,21 @@ class Color
 {
 	constructor()
 	{
-		this.hue = 0;
+		this.hue = rand( 360 );
 		this.sat = 50;
 		this.lig = 50;
 	}
+
+	h_shift( value ) { this.hue += value + 36000; this.hue %= 360; }
+	s_shift( value ) { this.sat = Math.max( 0, Math.min( 100, this.sat + value ) ); }
+	l_shift( value ) { this.lig = Math.max( 0, Math.min( 100, this.lig + value ) ); }
 
 	random( h, s, l )
 	{
 		this.hue = ( this.hue + rand( h ) ) % 360;
 		if( this.hue < 0 ) this.hue += 360;
-		this.sat = clip( this.sat + rand( s ), 15, 100 );
-		this.lig = clip( this.lig + rand( l ), 15, 100 );
+		this.sat = clip( this.sat + rand( s ), 35, 90 );
+		this.lig = clip( this.lig + rand( l ), 30, 75 );
 	}
 
 	hsl() { return `hsl( ${ this.hue }, ${ this.sat }%, ${ this.lig }% )`; }
@@ -67,6 +105,8 @@ class Color
 	{
 		e.style[ prop ] = this.hsl();
 	}
+
+	to_string() { return `HSL ${ this.hue },${ this.sat },${ this.lig }`; }
 }
 
 const clip = ( value, min, max ) => Math.max( min, Math.min( max, value ) );
@@ -76,8 +116,5 @@ const rand = ( value ) => Math.round( ( Math.random() - 0.5 ) * value );
 </script>
 	</head>
 	<body onload="new App()">
-		<h1 id="gs1">Doch-Dech-Boch</h1>
-		<h1 id="gs2">Doch-Dech-Boch</h1>
-		<h1 id="gs3">Doch-Dech-Boch</h1>
 	</body>
 </html>

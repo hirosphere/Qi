@@ -1,0 +1,25 @@
+
+クラス継承
+
+	Renderer
+		Train
+
+クラス構成
+
+	App
+		Train[ 4 ]
+		Canvas
+			* Renderer
+		PWM_Channel[ 4 ]
+			PWM_Channel
+				* Wave_Canvas
+
+
+
+DMA( PWM )
+	バッファー
+		大きさ 32ビット * 500標本 * ダブル
+
+PWM
+	幅段数 : 2500段
+	標本頻度 : 50kHz

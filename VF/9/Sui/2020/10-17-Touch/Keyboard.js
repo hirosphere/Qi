@@ -139,8 +139,8 @@ class Keyboard
 
 class KeyLayout
 {
-	Pitch = 50;
-	Height = 120;
+	Pitch = 52;
+	Height = 130;
 	
 	PosToKey( x, y )
 	{
@@ -178,7 +178,8 @@ class KeyButton
 		const note_num = key - ( oct * 12 );
 		const note = KeyButton.note_name[ note_num ];
 		const freq = Math.floor( 10 * 440 * Math.pow( 2, ( key - 69 ) / 12 ) ) / 10;
-		this.e.innerHTML = `${ note_num }<br/>${ note }${ oct - 1 }<br/>${ freq }`;
+		this.e.innerHTML = `${ oct - 1 }-<span class="-nn">${ note_num }</span><br/>${ freq }`;
+		//this.e.innerHTML = `${ freq }<br/>${ note }${ oct - 1 }<br/>${ note_num }`;
 		this.e.classList.toggle( "-sharp", note.length == 2 );
 	}
 

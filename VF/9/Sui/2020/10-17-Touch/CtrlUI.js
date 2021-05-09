@@ -46,8 +46,8 @@ CU.Wave = class
 	constructor( com, model )
 	{
 		const e = ecr( "div", com, { class: "Wave" } );
-		new CU.Slide( e, model.Level,  { title: "Level", min: 0, max: 100 } );
 		new CU.Slide( e, model.Att,  { title: "Att", min: 0, max: 100 } );
+		new CU.Slide( e, model.Level,  { title: "Level", min: 0, max: 100 } );
 	}
 }
 
@@ -56,10 +56,10 @@ CU.Env = class
 	constructor( com, model )
 	{
 		const e = ecr( "div", com, { class: "Env" } );
-		new CU.Slide( e, model.Attack,  { title: "A", min: 0, max: 100 } );
-		new CU.Slide( e, model.Decay,   { title: "D", min: 0, max: 100 } );
-		new CU.Slide( e, model.Sustain, { title: "S", min: 0, max: 100 } );
-		new CU.Slide( e, model.Release, { title: "R", min: 0, max: 100 } );
+		new CU.Slide( e, model.Attack,  { title: "A", min: 0, max: 80 } );
+		new CU.Slide( e, model.Decay,   { title: "D", min: 0, max: 80 } );
+		new CU.Slide( e, model.Sustain, { title: "S", min: 0, max: 80 } );
+		new CU.Slide( e, model.Release, { title: "R", min: 0, max: 80 } );
 	}
 }
 

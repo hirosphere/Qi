@@ -1,0 +1,187 @@
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=400"/>
+<title>Boeh--Boeh hh</title>
+<style>
+
+body
+{
+	margin: 30px auto;
+	width: 600px;
+}
+
+input[type="range"] { width: 300px; height: 26px; }
+.Range .-Label { display: inline-block; width: 10ex; }
+</style>
+<script src="Prime.js"></script>
+<script>
+
+class App
+{
+	constructor()
+	{
+		const so = new Sound();
+		const e = ecr( "div", document.body, { class: "App" } );
+		new Range( e, so.Volume, "音量", "Vol" );
+		new Range( e, so.Osc_1.Pitch, "Osc 1 Pitch", "Pitch" );
+		document.body.addEventListener( "touchstart", ev => so.update(), false );
+	}
+}
+
+// Model //
+
+
+const Model = { next_id: 1 };
+
+Model.Number = class
+{
+	constructor( init, changeoper )
+	{
+		this.Value = init;
+	}
+
+	opers = {};
+
+	AddOper( oper )
+	{
+		this.opers[ Model.next_id ++ ] = oper;
+	}
+
+	SetValue( value )
+	{
+		if( value != this.Value )
+		{
+			this.Value = value;
+			this.NoteChanged( this.Value );
+		}
+	}
+
+	NoteChanged( arg )
+	{
+		for( let id in this.opers ) this.opers[ id ]( arg );
+	}
+}
+
+// GUI //
+
+class Range
+{
+	constructor( com, model, title, type )
+	{
+		const def = Range.Convs[ type ];
+
+		const e = ecr( "div", com, { class: "Range" } );
+		ecr( "span", e, { class: "-Label", text: title } );
+		this.input = ecr( "input", e, { class: "-Input", attr: { type: "range", min: def.min, max: def.max } } );
+		this.input.addEventListener( "input", ev => model.SetValue( def.mtov( this.input.value ) ), false );
+		this.value = ecr( "span", e, { class: "-Value" } );
+
+		model.AddOper( () => this.update() );
+
+		this.model = model;
+		this.def = def;
+
+		this.update();
+	}
+
+	update()
+	{
+		this.input.value = this.def.vtom( this.model.Value );
+		this.value.innerText = this.def.vtol( this.model.Value );
+	}
+
+	static Convs =
+	{
+		Vol: { mtov: m => m, vtom: v => v, vtol: v => v, min: 0, max: 100 },
+		Pitch: { mtov: m => m * 30, vtom: v => v / 30, vtol: v => v, min: -120, max: 120 },
+	}
+}
+
+
+// Audio //
+
+class Sound
+{
+	Volume = new Model.Number( 30 );
+
+	constructor()
+	{
+		// 音源要素構築 //
+		{
+			const ac = new AudioContext();
+			const master_gain = ac.createGain();
+			master_gain.connect( ac.destination );
+
+			this.Osc_1 = new Oscillator( ac, master_gain, {  } );
+			this.LFO_1 = new LFO( ac, {} );
+			//LFO_1.Output.connect( osc. );
+
+			this.master_gain = master_gain;
+
+		}
+
+		//  //
+		{
+			this.Volume.AddOper( () => this.update() );
+		}
+		this.update();
+	}
+
+	update()
+	{
+		//this.master_gain.gain.value = 0;
+		this.master_gain.gain.value = this.Volume.Value / 100;
+	}
+}
+
+class Oscillator
+{
+	Pitch = new Model.Number( 0 );
+
+	constructor( ac, dest, params )
+	{
+		const osc = ac.createOscillator();
+		osc.type = "triangle";
+		osc.frequency.value = 100;
+		osc.connect( dest );
+		osc.start();
+
+		this.osc = osc;
+
+		this.Pitch.AddOper( () => this.update() );
+		this.update();
+	}
+
+	update()
+	{
+		this.osc.detune.value = this.Pitch.Value;
+	}
+}
+
+class LFO
+{
+	Freq = new Model.Number( 20 );
+
+	constructor( ac, params )
+	{
+		const osc = ac.createOscillator();
+		osc.type = "tirangle";
+		osc.start();
+
+		this.Osc = osc;
+		this.update();
+	}
+
+	update()
+	{
+		this.Osc.frequency.value = this.Freq.Value;
+	}
+}
+
+</script>
+
+</head>
+<body onload="new App">
+</body>
+</html>

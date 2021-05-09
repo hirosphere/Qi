@@ -1,0 +1,24 @@
+cmake_minimum_required(VERSION 3.20)
+message( STATUS なんだろな@ )
+message( STATUS ${CMAKE_C_COMPILER} )
+message( STATUS ${CMAKE_CXX_COMPILER} )
+message( STATUS ${PICO_SDK_PATH} )
+# set(CMAKE_C_COMPILER "C:/Program Files (x86)/GNU Arm Embedded Toolchain/10 2020-q4-major/arm-none-eabi-gcc")
+# set(CMAKE_CXX_COMPILER "C:/Program Files (x86)/GNU Arm Embedded Toolchain/10 2020-q4-major/arm-none-eabi-g++")
+project(hello_pwm)
+
+
+message( STATUS ${CMAKE_CXX_COMPILER} )
+
+add_executable(hello_pwm
+        hello_pwm.c
+        )
+
+# Pull in our pico_stdlib which pulls in commonly used features
+target_link_libraries(hello_pwm pico_stdlib hardware_pwm)
+
+# create map/bin/hex file etc.
+pico_add_extra_outputs(hello_pwm)
+
+# add url via pico_set_program_url
+example_auto_set_url(hello_pwm)

@@ -25,10 +25,10 @@ Model.Channel = class
 
 Model.EG = class
 {
-	Attack = new Model.Number( { Init: 50 } );
+	Attack = new Model.Number( { Init: 5 } );
 	Decay = new Model.Number( { Init: 50 } );
-	Sustain = new Model.Number( { Init: 50 } );
-	Release = new Model.Number( { Init: 50 } );
+	Sustain = new Model.Number( { Init: 60 } );
+	Release = new Model.Number( { Init: 5 } );
 }
 
 Model.Tone = class
@@ -41,10 +41,10 @@ Model.Tone = class
 		this.imag = new Float32Array( 256 );
 		this.Waves = [ new Model.Wave( this ), new Model.Wave( this ), new Model.Wave( this ), new Model.Wave( this ), new Model.Wave( this ) ];
 		
-		this.SetParameter( [ "Saw 1 30 100", "Saw 2 30 30", "Saw 3 30 0", "Saw 4 30 0", "Saw 8 30 0" ] );
+		this.SetParameter( [ "Saw 1 16 45", "Saw 2 12 55", "Saw 3 30 0", "Saw 4 30 0", "Saw 8 30 0" ] );
 		this.update();
 
-		setInterval( () => { if( this.modified ) { this.update(); this.modified = false; } }, 1000 );
+		setInterval( () => { if( this.modified ) { this.update(); this.modified = false; } }, 100 );
 	}
 
 	ToOsc( osc )

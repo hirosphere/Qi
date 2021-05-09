@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-msvc-x64",
+            "compileCommands": "C:/17/D/GITHUB/QI/SUI/2021/PLATT/ESP32-1/.PIO/BUILD/ESP32DEV/BOOTLOADER/COMPILE_COMMANDS.JSON"
+        }
+    ],
+    "version": 4
+}

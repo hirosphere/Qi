@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=440"/>
+<title>Slide-1</title>
+
+<style>
+
+body
+{
+	max-width: 860px;
+	text-align: center;
+}
+
+button { padding: 16px 24px; }
+
+.Slide-Pad
+{
+	display: inline-block;
+	border: 1px solid black;
+	background: hsl( 0, 40%, 90% );
+	width: 400px;
+	height: 100px;
+}
+
+</style>
+
+<script src="../Prime.js"></script>
+<script>
+
+class App
+{
+	constructor()
+	{
+		const e = ecr( "div", document.body, { class: "App" } );
+		ecr( "p", e, { text: "UI-Dev-Slide-1" } );
+
+		const num = new Model.Number( 100 );
+		const range = new Range( { model: { min: 0, max: 30 }, step: 1000 } );
+		new UI.Vinp( e, new UI.Cell( num, range ) );
+
+		{
+			const c = ecr( "div", e, { style: { padding: "10px" } } );
+			ecr( "button", c, { text: "更新" } ).onclick = ev => location.reload();
+		}
+	}
+}
+
+const Model = {};
+
+Model.Number = class
+{
+	constructor( init )
+	{
+		this.Value = init;
+	}
+}
+
+const UI = {};
+
+UI.Cell = class
+{
+	constructor( model, range )
+	{
+		this.model = model;
+		this.range = range;
+	}
+
+	GetValueText()
+	{
+		return "" + this.model.Value;
+	}
+}
+
+UI.Range = class
+{
+	constructor()
+	{
+		this.Min = 0;
+		this.Max = 1000;
+	}
+}
+
+UI.Vinp = class
+{
+	constructor( com, cell )
+	{
+		const e = ecr( "div", com, { class: "Vinp" } );
+		{
+			const c = ecr( "div", e, { class: "-disp" } );
+			this.valuedisp = ecr( "span", c, { class: "-value" } );
+		}
+
+		new UI.SlidePad( ecr( "div", e, {  } ) );
+
+		this.cell = cell;
+		this.update();
+	}
+
+	update()
+	{
+		console.log( this.cell );
+		this.valuedisp.innerText = this.cell.GetValueText();
+	}
+}
+
+UI.SlidePad = class
+{
+	rx = null
+	ry = null
+
+	constructor( com )
+	{
+		const e = ecr( "div", com, { class: "Slide-Pad", text: "SlidePad" } );
+		e.addEventListener( "touchstart", ev => this.touchstart( ev ), false );
+		e.addEventListener( "touchmove", ev => this.touchmove( ev ), false );
+		e.addEventListener( "touchend", ev => this.touchend( ev ), false );
+		e.addEventListener( "touchcancel", ev => this.touchcancal( ev ), false );
+		this.e = e;
+	}
+
+	works = {};
+	getwork( id ) {  return this.works[ id ] = this.works[ id ] || new UI.SlidePad.TouchWork( id, this ); }
+
+	touchstart( ev )
+	{
+		ev.cancelable && ev.preventDefault();
+		for( const touch of ev.changedTouches ) this.getwork( touch.identifier ).start( touch );
+	}
+
+	touchmove( ev )
+	{
+		for( const touch of ev.changedTouches ) this.getwork( touch.identifier ).move( touch );
+	}
+
+	touchend( ev )
+	{
+		for( const touch of ev.changedTouches ) this.getwork( touch.identifier ).end( touch );
+	}
+
+	touchcancel( ev )
+	{
+		for( const touch of ev.changedTouches ) this.getwork( touch.identifier ).cancel( touch );
+	}
+
+	touchmon( text )
+	{
+		this.e.innerText = text;
+	}
+}
+
+UI.SlidePad.TouchWork = class
+{
+	constructor( id, pad )
+	{
+		this.id = id;
+		this.pad = pad;
+	}
+
+	start( ev )
+	{
+		this.pad.touchmon( this.mon( "start", ev ) );
+	}
+
+	move( ev )
+	{
+		this.pad.touchmon( this.mon( "move", ev ) );
+	}
+
+	end( ev )
+	{
+		this.pad.touchmon( this.mon( "end", ev ) );
+	}
+
+	cancel( ev )
+	{
+		this.pad.touchmon( this.mon( "cancel", ev ) );
+	}
+
+	mon( op, ev ) { return `${ this.id } ${ op } ${ ev.pageX }`; }
+}
+
+const sf = f => { const r = []; for( let n in f ) r.push( `${ n } : ${ f[ n ] }` ); return r.join( "\n" ); };
+
+
+</script>
+</head>
+<body onload="new App()"></body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>Promise-1</title>
+<script src="./Prime.js"></script>
+<script>
+
+class App
+{
+	constructor()
+	{
+		const e = ecr( "section", document.body );
+		{
+			const c = ecr( "section", e );
+			this.output = ecr( "textarea", c, { class: "Output" } );
+		}
+		{
+			const c = ecr( "section", e );
+			ecr( "button", c, { text: "実行" } ).onclick = ev => this.test1();
+		}
+		this.test2();
+		this.test1();
+	}
+
+	async test2()
+	{
+		class X
+		{
+			constructor() {}
+			then( s, j ) { setTimeout( x => s( 555 ), 1000 ); setTimeout( x => j( 444 ), 500 ); }
+		}
+
+		try{ console.log( await new X() ); }
+		catch( e ) { console.log( e ) }
+	}
+
+	async test1()
+	{
+		try
+		{
+			const res = await this.post( { Command: "List" } );
+			this.output.value = ( res ? JSON.stringify( res ) : "空っぽを返されました.." )
+		}
+		catch( err ) { this.output.value = "サーバーが無いようです.." }
+	}
+
+	test1_()
+	{
+		this.post( { Command: "List" } )
+		.then( res => this.output.value = ( res ? JSON.stringify( res ) : "空っぽを返されました.." ) )
+		.catch( err => this.output.value = "サーバーが無いようです.." );
+	}
+
+	async post( body )
+	{
+		try
+		{
+			const res = await fetch( "/API/COMPort", { method: "POST", headers:{ "Content-Type": "application/json" }, body: JSON.stringify( body ) } );
+			return res.ok ? await res.json() : null;
+		}
+		catch( err ) { throw err; }
+	}
+}
+
+
+
+</script>
+<style>
+
+html { background: hsl( 210, 60%, 65% ); font-family: sans-serif; }
+
+textarea
+{
+	font-size: 18px;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	border: 2px solid hsl( 90, 0%, 100% );
+	background: hsl( 90, 50%, 35% );
+	color:hsl( 90, 0%, 90% );
+}
+
+button { padding: 1em 2em; font-size: 16px; }
+
+.Output { width: 600px; height: 200px; }
+
+</style>
+</head>
+<body onload="new App">
+<h1>Promise-1</h1>
+</body>
+
+</html>
