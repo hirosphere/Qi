@@ -47,7 +47,7 @@ void Serial_Monitor::Tick()
 		ch = stream->read();
 		if( ch == '\n' )  { lncomp = true; break; }
 		
-		if( buff.length() == 0 && is_current && ! ( ch == '@' || ch == '!' || ch == ':' ) )
+		if( buff.length() == 0 && is_current && ! ( ch == '@' || ch == ':' ) )
 			onkeystroke( ch );
 		else
 			buff += ch;
