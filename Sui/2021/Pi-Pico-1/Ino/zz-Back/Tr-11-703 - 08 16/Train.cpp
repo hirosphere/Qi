@@ -8,6 +8,8 @@ struct
 	Float::Profile speed { "km/h", 0.f, 0.f, 1200.f, { 0.1f, 1.f, 5.f, 10.f } };
 	Float::Profile limit { "km/h", 200.f, 0.f, 1200.f, { 0.1f, 1.f, 5.f, 10.f } };
 	Float::Profile act { "km/h/s", 0.f, -50.f, 50.f, { 0.05f, 0.1f, 1.f, 5.f } };
+	Float::Profile target { "km/h", 0.f, 0.f, 1200.f, { 1.f, 5.f, 10.f, 50.f } };
+	Int::Profile run { "", 1, 0, 1, { 1, 1, 1, 1 } };
 
 	Float::Profile vftype { "", 3.f, 0.f, 15.f, { 1.f, 1.f, 1.f, 1.f } };
 	Float::Profile freq { "Hz", 300.f, 0.f, 12000.f, { 0.1f, 1.f, 10.f, 100.f } };
@@ -27,6 +29,8 @@ void Train::Init()
 	add( "Limit", Limit, profs.limit );
 	add( "Speed", Speed, profs.speed );
 	add( "Act", Act, profs.act );
+	add( "Target", Target, profs.target );
+	add( "Run", Run, profs.run );
 	
 	add( "VF-Type", VF_Type, profs.vftype );
 	add( "Volume", Volume, profs.volume );
@@ -40,11 +44,6 @@ void Train::Init()
 	waves[ 3 ] = Test_WG( 3 );
 }
 
-String Train::runstatestr()
-{
-	return run ? "R" : "";
-}
-
 
 void Train::Tick( int32_t tick_ms )
 {
@@ -52,7 +51,7 @@ void Train::Tick( int32_t tick_ms )
 
 	_time_test += tick_ms;
 
-	if( run )
+	if( Run.value )
 	{
 		switch( seq_mode )
 		{
@@ -69,7 +68,7 @@ void Train::Tick( int32_t tick_ms )
 				if( ( Act.value > 0.f && act_speed >= run_target ) || ( Act.value < 0.f && act_speed <= run_target ) )
 				{
 					seq_is_timeout = true;
-					act_speed = run_target;
+					act_speed >= run_target;
 					Act.value = 0.f;
 				}
 				break; 
@@ -120,8 +119,7 @@ void Train::seq_act( Word_Reader & cmd )
 		run_target = cmd.Next_Float();
 		Act.value = cmd.Next_Float();
 		
-		//if( test >= 0 )  Serial.println( String( Act.value ) + "km/h/s" );
-		if( test >= 0 )  Serial.println( Act.value.fullstring() ) );
+		if( test >= 0 )  Serial.println( String( Target.value ) + "km/h " + String( Act.value ) + "km/h/s" );
 		return;
 	}
 

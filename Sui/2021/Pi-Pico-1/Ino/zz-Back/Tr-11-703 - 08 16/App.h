@@ -32,6 +32,15 @@ struct Powers
 		{
 			if( value >= 0 )  * p ++ = value << 16;
 			else              * p ++ = - value;
+			
+			//if( value >= 0 )  * p ++ = value;
+			//else              * p ++ = - value << 16;
+			
+			//if( value >= 0 )  * p ++ = ( PWM_Range << 16 ) | ( PWM_Range - value );
+			//else              * p ++ = ( ( PWM_Range + value ) << 16 ) | PWM_Range;
+			
+			//if( value >= 0 )  * p ++ = ( ( PWM_Range - value ) << 16 ) | PWM_Range;
+			//else              * p ++ = ( PWM_Range << 16 ) | ( PWM_Range + value );
 		}
 
 		inline explicit operator bool() { return ct > 0 ? ct -- : false; }
@@ -111,17 +120,15 @@ struct Wave_Gen
 struct Train : public Fields, public Powers::Renderer, public Seq
 {
 	Float VF_Type, Volume, Freq, Width, Param_1;
-	Float Limit, Act;
-	Float Speed;
+	Float Target; Int Run;
+	Float Act;
+	Float Speed, Limit;
 	Float Idle, Bias, Max;
-	int dir = 1;
 
-	bool run = false;
 	float run_target;
 	float act_speed = 0.f;
-
+	int dir = 1;
 	float speed = 0.f;
-	String runstatestr();
 
 	void Tick( int32_t tick_ms );
 

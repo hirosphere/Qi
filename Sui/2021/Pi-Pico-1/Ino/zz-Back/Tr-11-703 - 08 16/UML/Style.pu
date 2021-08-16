@@ -1,0 +1,13 @@
+@startuml
+
+skinparam sequence {
+
+	ParticipantBackgroundColor  #e8f6ff
+	ParticipantBorderColor  #909080
+	ParticipantFontColor  #505050
+	ArrowColor  #40a018
+	ArrowFontColor  #606040
+}
+
+
+@enduml

@@ -1,0 +1,47 @@
+@startuml
+
+!include  Style.pu
+
+title シーケンス図
+
+participant Global
+participant App
+participant Powers
+participant Train
+participant "Wave Gen" as WG
+participant Buffer
+participant Output
+participant DMA
+participant PWM
+
+loop 繰り返し
+
+	DMA --> App : DMA終了
+
+	group DMA終了割り込み
+
+		App --> Powers : Next()
+		Powers --> Output : Next( index )
+		Output --> DMA : Trigger( buff )
+		App --> Powers : Render()
+		Powers --> Train : Render( writer )
+		Train --> WG : Render( writer )
+		WG --> Buffer : "writer ="
+
+	end
+
+	group 通常処理
+
+		App --> Train : Tick( time )
+
+	end
+
+	group DMA (Buffer->PWM)
+		
+		Buffer --> PWM : DMA
+
+	end
+
+end
+
+@enduml
