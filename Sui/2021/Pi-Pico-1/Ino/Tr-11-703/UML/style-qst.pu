@@ -1,0 +1,82 @@
+@startuml q-seq
+
+title シーケンス図
+
+participant "A .." as A
+participant "B .." as B
+
+A --> B : Call ..
+A <-- B : Res ..
+
+
+skinparam sequence {
+
+	ParticipantBackgroundColor  #e8f6ff
+	ParticipantBorderColor  #808070
+	ParticipantFontColor  #505050
+	ArrowColor  #40a018
+	ArrowFontColor  #606040
+}
+
+@enduml
+
+@startuml q-class
+
+title クラス図
+
+class App {
+	+ void Init()
+	+ void Loop()
+	# void tick()
+
+	# Train trains[8]
+	# Powers powers
+}
+
+class Train {
+	+ Float Idle
+	+ Float Bias
+	+ Float Max
+	..
+	+ Float Speed
+	..
+	+ Float Act
+	+ Float Limit
+
+	+ void Tick(time)
+	# Render(output)
+
+}
+
+class Powers {
+	+ Set_Renderer()
+	+ Next()
+	+ Render()
+	# Canvas canvases
+	# Output outputs
+	# int cur_i
+}
+
+class Canvas {
+	+ xxx
+	+ Render
+	+ Render()
+	# buffers
+}
+
+class Output {
+	+ Init(pin_a)
+	+ Set_Src(Canvas *src)
+	+ Next(cur_i)
+	# Canvas * Src
+}
+
+
+skinparam class {
+
+	AttributeFontName  Consolas
+	BackgroundColor  #e8f6ff
+	BorderColor  #404038
+}
+
+@enduml

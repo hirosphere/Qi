@@ -4,6 +4,7 @@
 void setup()
 {
 	Serial.begin( 115200 );
+	pinMode( PICO_DEFAULT_LED_PIN, OUTPUT );
 	delay( 500 );
 }
 

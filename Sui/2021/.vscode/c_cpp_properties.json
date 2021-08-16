@@ -3,7 +3,8 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "C:/Users/hiroshi/AppData/Local/Arduino15/packages/arduino/hardware/mbed_rp2040/2.0.0/cores/arduino"
             ],
             "defines": [
                 "_DEBUG",

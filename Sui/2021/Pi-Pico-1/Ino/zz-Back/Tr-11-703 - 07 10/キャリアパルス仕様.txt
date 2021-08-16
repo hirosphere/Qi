@@ -1,0 +1,71 @@
+
+
+
+
+
+const pg = ( len ) =>
+{
+	const rt = [], step = 1 / len;  
+	
+	for( let ph = 0; ph < 1; ph += step )
+	{
+		rt.push( ph );
+	}
+	return rt;
+}
+
+pg( 13 ).join( "\n" );
+
+
+[エイリアシングを抑えたオーディオ用パルス発生器]
+
+・1づつ増分し、振幅が波長に比例するキャリアを用いて
+
+固定小数点・搬送波発振器
+
+	周波数型発振器　位相→三角波→パルス波変換プロセス
+
+		要素     型
+		step    ufix <0:32>     ffff ffff ffff ffff ffff ffff ffff ffff
+		phase   ufix <0:32>     ffff ffff ffff ffff ffff ffff ffff ffff
+
+		power   ufix <t:10>     .... .... .... ....  .... .t ff ffff ffff    0  ~  1
+		wave    ufix <0:10>     .... .... .... ....  .... .. ff ffff ffff    0  ~  1'
+		mag     ufix <12:10>    .... .... ..ii iiii  iiii ii ff ffff ffff    0  ~  4096'
+		mag_wv  ufix <12:10>    .... .... ..ii iiii  iiii ii ff ffff ffff    0  ~  4096'
+		mag_wv' ufix <12:10>    .... .... ..ii iiii  iiii ii 00 0000 0000    0  ~  4096'
+		mag*wv  ufix <12:10,10> iiii iiii iiii ffff  ffff ff 00 0000 0000    0  ~  4096' * 1023
+		pulse   ufix <t:10>     .... .... .... ....  .... .. ff ffff ffff    0  ~  1
+
+
+		fs/2  0 - 0.5 - 
+		fs/3  0 - 0.33 - 0.66 - 
+		fs/4  0 - 0.25 - 0.5 - 0.75 -
+
+
+
+
+	波長型発振器　位相→三角波→パルス波変換プロセス (32ビット整数乗算器利用)
+
+		要素     型      
+		step    uint32_t     ffff ffff ffff ffff ffff ffff ffff ffff
+		phase   uint32_t     ffff ffff ffff ffff ffff ffff ffff ffff
+
+		length  ufix<12:8>  .... .... .... iiii iiii iiii ffff ffff
+		wave    ufix<0:12>  .... .... .... .... .... ffff ffff ffff
+		m-wave  ufix<12:20> iiii iiii iiii ffff ffff ffff ffff ffff
+
+	
+
+
+
+[floatによる実装]
+
+
+
+[32ビット整数による実装]
+
+・符号なし32ビット精度の [等振幅・変段] 位相カウントのを、符号付き20:12ビット固定小数点
+
+・キャリア増幅倍率の設定は割り算を必要とするため、周波数設定の機に行い、演算負荷をおさえることと..
+

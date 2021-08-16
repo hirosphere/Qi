@@ -1,0 +1,47 @@
+@startuml
+interface Renderer {
+    +Render( uint32_t * output, len )
+}
+
+class Canvas {
+    +Render( cur_index )
+    -buffer[ 2 ][ blen ]
+}
+
+class Output {
+    +Init( pows, a_pin, on_dma )
+    +SetDmaStart( cur_index )
+..
+    source : Canvas *
+    dma_ch
+}
+
+class Powers {
+    +SetRenderer( canv_i, renderer )
+    +InitOutput( out_i, a_pin, on_dma )
+    +SelectOutputSource( out_i, canv_i )
+    +TriggerPWMs()
+..
+    +Render()
+    +TriggerDMAs()
+    +ClearDMAIRQ()
+..
+    -canvas[ canv_c ]
+    -output[ out_c ]
+    -cur_index
+..
+    -pwm_trigger_bits
+    -dma_trigger_bits
+    -dma_irq_bits
+}
+
+Powers *--  Canvas
+Powers *--  Output
+Canvas o-- Renderer
+
+skinparam class {
+    BackgroundColor #cea
+    BorderColor #111
+    ArrowColor #aa9
+}
+@enduml
