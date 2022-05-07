@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>HeatRails API</title>
+<style>
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { height: 100%; background:hsl( 45, 3%, 95% ); padding: 0% 10%; }
+body
+{
+	height: 100%;
+	background: hsl( 0, 0%, 100% );
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	color:hsl( 0, 0%, 20% );
+}
+
+a { text-decoration: none; color: hsl( 0, 0%, 40% ); }
+
+#content
+{
+	width: 100%;
+	max-height: 100%;
+	padding: 5%;
+	overflow: auto;
+	text-align: center;
+}
+
+.list
+{
+}
+
+.listhead
+{
+	cursor: pointer;
+	font-size: 30px;
+}
+
+.listhead:hover { background:hsl( 45, 3%, 95% ); }
+
+.items
+{
+	border-radius: 16px;
+	border: 1px solid hsl( 0, 0%, 30% );
+	margin: 2%;
+	padding: 2%;
+}
+
+.station { font-size: 28px; }
+
+</style>
+</head>
+<body>
+
+<div id="content"></div>
+<div id="credit">データソース : <a href="http://express.heartrails.com/api.html" target="_blank">HeartRails Express</a></div>
+
+<script type="module">
+
+
+//  http://express.heartrails.com/api.html  //
+
+
+
+import { create } from "../../base/ht-dom.js";
+
+
+const List = ( args, self, dec ) =>
+{
+	const { title, itemdef } = args;
+	let { open } = args;
+
+	let itemmaked;
+
+	dec.init = () =>
+	{
+		// console.log( self.es.items );
+		open && loaditems();
+	};
+
+	const toggle = ev =>
+	{
+		if( open = ! open ) loaditems();
+		else self.es.items.style.display = "none";
+		
+	};
+
+	const loaditems = async () =>
+	{
+		self.es.items.style.display = "";
+
+		if( itemmaked || itemdef == null ) return;
+		itemmaked = true;
+		
+		const res = await fetch( itemdef.url );
+		const cont = await res.json();
+		// console.log( cont.response[ itemdef.pname ] );
+		// console.log( cont, cont.response[ itemdef.pname ] );
+		if( cont && itemdef.pname ) for( const item of cont.response[ itemdef.pname ] )
+		{
+			const def = itemdef.compo( item );
+			// console.log( def );
+			create( def, self.es.items );
+		}
+	};
+
+	const parts =
+	[
+		{ type: "div", class: "listhead", text: title,  events: { mousedown: toggle } },
+		{ type: "div", class: "items", name: "items", style: { display: "none" } },
+	];
+
+	return { type: "div", class: "list", parts };
+}
+
+const Station = args =>
+{
+	const { item } = args;
+
+	return { type: "p", class: "station", text: item.name, };
+}
+
+const Line = args =>
+{
+	const { title } = args;
+
+	const itemdef =
+	{
+		url: `http://express.heartrails.com/api/json?method=getStations&line=${ title }` ,
+		pname: "station",
+		compo( item ) { return { type: Station, item }; },
+	};
+
+	return { type: List, title, head: "h4", itemdef };
+}
+
+const Pref = args =>
+{
+	const { title } = args;
+
+	const itemdef =
+	{
+		url: `http://express.heartrails.com/api/json?method=getLines&prefecture=${ title }` ,
+		pname: "line",
+		compo( title ) { return { type: Line, title }; },
+	};
+
+	return { type: List, title, head: "h3", itemdef, open: false };
+}
+
+const Area = args =>
+{
+	const { title } = args;
+
+	const itemdef =
+	{
+		url: `http://express.heartrails.com/api/json?method=getPrefectures&area=${ title }` ,
+		pname: "prefecture",
+		compo( title ) { return { type: Pref, title }; },
+	};
+
+	return { type: List, title, head: "h2", itemdef, open: false };
+}
+
+const Top = args =>
+{
+	const itemdef =
+	{
+		url: "http://express.heartrails.com/api/json?method=getAreas",
+		pname: "area",
+		compo( title ) { return { type: Area, title }; },
+	};
+
+	return { type: List, title: "Top", head: "h1", itemdef, open: true };
+}
+
+
+create( { type: Top }, "#content" );
+
+</script>
+
+
+</body>
+</html>

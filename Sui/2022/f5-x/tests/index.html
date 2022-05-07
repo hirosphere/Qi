@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, a, textarea, button, input { color: hsl( 0, 0%, 18% ); }
+html { height: 100%; }
+body { height: 100%; }
+h1 { font-size: 22px; }
+h2 { font-size: 19px; }
+.app { height: 100%; display: flex; flex-flow: column; padding: 20px 60px; overflow: auto; }
+.app >.body { flex-grow: 1; border: 2px solid hsl( 50, 3%, 50% ); height: 100%; border-radius: 12px; padding: 6px; display: flex; flex-flow: column; gap: 6px; }
+.app >.body >.items { flex-grow: 1; display: flex; align-items: stretch; gap: 6px; overflow: auto; }
+.app >.body >.items >.item { border-radius: 9px; min-width: 170px; height: 100%; overflow: auto; background:hsl( 180, 0%, 96% ); padding: 12px; }
+.app >.body >.items >.item.bg-1 { background:hsl( 180, 50%, 90% ); }
+.app >.body >.items >.item.monitor { background:hsl( 180, 50%, 90% ); color:hsl( 0, 0%, 30% ); }
+.app >.body >.items >.item.monitor >.-content-{ font-family:'Courier New', Courier, monospace; font-size: 17px; }
+.app >.body >.items >.item.tree { width: 220px; background:hsl( 215, 50%, 95% ); }
+.app >.body >.items >.item.tree .index { cursor: default; }
+.app >.body >.items >.item.tree .index >.-label- { margin-bottom: 1px; border-bottom: 1px solid hsla( 0, 0%, 30%, 15% ); height: 2.2em; padding: 0.4em 0.2em; border-radius: 0.5ex; }
+.app >.body >.items >.item.tree .index >.-label- >._toggle_ { display: inline-block; width: 1.4em; text-align: center; color:hsl( 180, 0%, 50% ); }
+.app >.body >.items >.item.tree .index >.-label-:hover { background:hsla( 180, 0%, 50%, 10% ); }
+.app >.body >.items >.item.tree .index >.-label-._selected_  { background:hsla( 105, 50%, 50%, 88% ); color:hsl( 180, 0%, 100% ); }
+.app >.body >.items >.item.tree .index >.-label-._selected_ >._toggle_ { color:hsla( 180, 0%, 100%, 80% ); }
+.app >.body >.items >.item.tree .index >.parts { padding-left: 1.0em; }
+.app >.body >.items >.item.tree .index >.parts._muted_ { display: none }
+.app >.body >.ctrl { height: 100px; padding: 20px; display: flex; gap: 3px; }
+
+button { border-radius: 0.8ex; padding: 1em 2em; }
+
+</style>
+
+</head>
+<body>
+
+
+<script type="module">
+
+import { Leaf } from "../base/model.js";
+import { create } from "../base/ht-dom.js";
+import { Tree } from "../book/code/navi-index.js";
+
+const Index = args =>
+{
+	const { index, sel } = args;
+
+	const stat = {};
+	const muted = Leaf.make( args.muted, true );
+	const i_view = sel.get_item( index );
+
+	//
+
+	const toggle_open = ev =>
+	{
+		muted.v = ! muted.v;
+		ev.stopPropagation();
+	};
+
+	const select = ev => i_view.select();
+
+	//
+
+	const tmark = ( index.has_part.v ? "+" : "" );
+
+	const label =
+	{
+		type: "div", class: "-label-",
+		clist: { _selected_: i_view.selected },
+		events: { mousedown: select },
+		parts:
+		[
+			{ type: "span", class: "_toggle_", text: tmark, events: { mousedown: toggle_open } },
+			{ type: "span", text: index.title },	
+		]
+	};
+
+	const part_items =
+	{
+		type: "div", class: "parts", clist: { _muted_: muted },
+		parts:
+		{
+			model: index.parts,
+			def: index => { return { type: Index, index, sel } },
+			muted,
+		},
+	};
+	
+	return { type: "div", class: "index", parts: [ label, part_items ] };
+};
+
+const TreePane = args =>
+{
+	const { tree, sel } = args;
+	const root = { type: Index, index: tree.root, sel, muted: false };
+	return { type: "div", class: "item tree", parts: [ root ] };
+};
+
+const TreeMonitor = args =>
+{
+	const { tree } = args;
+	const parts =
+	[
+		{ type: "h2", text: "TreeMonitor" },
+		{ type: "p", class: "-content-", text: tree.monitor },
+	];
+	return { type: "div", class: "item monitor", parts };
+};
+
+const Ctrl = args =>
+{
+	const parts =
+	[
+		{ type: "button", text: "追加", events: {  }, },
+		{ type: "button", text: "削除", events: {  }, },
+		{ type: "button", text: "一括追加", events: {  }, },
+		{ type: "button", text: "", events: {  }, },
+	];
+	return { type: "div", class: "item ctrl", parts };
+};
+
+const index_src = args =>
+{
+	const leafs = ( ct, depth = 1 ) =>
+	{
+		if( depth <= 0 ) return [];
+
+		const rt = [];
+		for( let i = 0; i < ct; i ++ ) rt[ i ] =
+		{
+			title: `Item ${ i + 1 }`,
+			name: `item-${ i + 1 }`,
+			parts: leafs( ct, depth - 1 ),
+		};
+		return rt;
+	};
+
+	const parts = leafs( 5, 2 );
+
+	return { title: "Book", name: "book", parts };
+};
+
+const App = args =>
+{
+	const tree = new Tree( index_src() );
+	const sel = tree.new_selection();
+	sel.load_url();
+
+	//
+
+	sel.url.moreview = url =>
+	{
+		history.replaceState( "", null, url );
+		const index = sel.curr_page.value;
+		document.title = index && index.title.value || "Tree";
+	};
+
+	//
+
+	const items =
+	[
+		{ type: TreePane, tree, sel },
+		{ type: "div", class: "item", style: { flexGrow: "1" } },
+		{ type: "div", class: "item", text: rec },
+		{ type: TreeMonitor, tree },
+	];
+
+	const contents =
+	[
+		{ type: "div", class: "items", parts: items },
+		{ type: Ctrl, tree },
+	];
+
+	const parts =
+	[
+		// { type: "h1", text: "Index, Dyn Path, Array, Tree, Selection, Hiliting" },
+		{ type: "div", class: "body", parts: contents },
+	];
+
+	return { type: "div", class: "app", parts };
+};
+
+//
+
+const rec = `
+「値追従」
+「構造追従」
+「CSSクラススイッチ」
+`;
+
+//
+
+create( { type: App }, "body" );
+
+</script>
+
+
+	
+
+
+</body>
+</html>

@@ -1,0 +1,113 @@
+
+* { margin: 0; border: 0; padding: 0; box-sizing: border-box; }
+
+html
+{
+	height: 100%; color:hsl( 50, 4%, 14% );
+}
+
+body
+{
+	height: 100%;
+}
+
+
+a { text-decoration: none;  color:hsl( 0, 0%, 7% );  }
+
+
+/*  */
+
+.book
+{
+	height: 100%;
+	padding: 1.5px;
+	
+	display: flex;
+	align-items: stretch;
+	gap: 1px;
+}
+
+.book .contents
+{
+	background: hsl( 0, 0%, 100% );
+	background-image: linear-gradient( 180deg, hsl( 0, 0%, 100% ), hsl( 55, 10%, 94% ) );
+	flex-grow: 10;
+	min-width: 300px;
+	overflow: auto;
+}
+
+.book .content
+{
+	padding: 20px;
+}
+
+/*  */
+
+.book > .side
+{
+	background: hsl( 96, 55%, 67% );
+	min-width: 280px;
+	max-width: 280px;
+	padding: 16px 12px;
+}
+
+.book > .side > .navi
+{
+	border-radius: 15px;
+	height: 100%;
+	background: hsl( 55, 0%, 100% );
+	flex-grow: 2;
+	background: hsl( 0, 0%, 100% );
+	padding: 10px 0px;
+}
+
+
+.navi .list { height: 100%; display: flex; flex-direction: column; }
+.navi .list > .-items { overflow: auto; }
+
+.navi ul { list-style: none; }
+
+.navi li.link.-head { margin: 0 10px 1.4px; border-bottom: 2px solid hsl( 50, 3%, 80% ); }
+.navi li.link.-part { margin: 0 10px 1.4px; border-bottom: 1px dotted hsl( 50, 4%, 80% ); }
+
+.navi li.link a
+{
+	margin-bottom: 1.0px; border-radius: 0.7ex; padding: 0.7em;
+	display: grid;
+	grid-template-columns: 1fr auto;
+	grid-gap: 1px;
+}
+
+.navi li.link:hover a { background:hsl( 50, 6%, 96% ); }
+.navi li.link._selected_ a { background:hsl( 210, 5%, 30% ); color:hsl( 0, 0%, 100% ); }
+
+.navi li.link a .-label { display: block; text-align: left; overflow: hidden; white-space: nowrap; }
+.navi li.link.-head a .-label { font-weight: bold; font-size: 135%; }
+
+.navi li.link a .-rel
+{
+	display: block; border-radius: 0.5ex;
+	width: 2em; height: 2em; line-height: 1;
+	font-size: 80%;
+	display: flex; justify-content: center; align-items: center;
+	background:hsl( 70, 6%, 96% ); visibility: visible;
+}
+.navi li.link:hover a .-rel { background:hsl( 0, 0%, 100% ); }
+.navi li.link._selected_ a .-rel { background:hsla( 70, 0%, 100%, 75% ); }
+.navi li.link.-head[ is_root = "false" ] a .-rel,
+.navi li.link.-part[ has_part = "true" ] a .-rel { visibility: visible; }
+
+/*  */
+
+.top-page h1 { background:hsl( 50, 3%, 22% ); padding: 0.5em 0.7em; color:hsl( 50, 3%, 90% ); display: flex; justify-content: space-between; }
+.top-page h1 .clock { font-size: 100%; }
+
+
+/*  */
+
+
+
+/*  */
+
+
+

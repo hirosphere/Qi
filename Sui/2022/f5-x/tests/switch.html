@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>switch</title>
+
+<style>
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body { display: flex; padding: 30px; justify-content: center; }
+
+button { padding: 1em; }
+
+.App { display: flex; width: 1200px; flex-flow: column; align-items: strech; gap: 10px; }
+
+.switch
+{
+	width: 500px;
+	height: 200px;
+	padding: 20px;
+	border: 2px solid hsl( 0, 0%, 40% );
+	overflow: hidden;
+}
+
+.ctrl { display: flex; padding: 1ex; gap: 6px; border: 1px solid hsl( 0, 0%, 30% ); }
+
+</style>
+
+</head>
+<body>
+	
+<script type="module">
+
+import { Leaf } from "../base/model.js";
+import { create } from "../base/ht-dom.js";
+
+
+//  //
+
+const Switch = ( args, self, dec ) =>
+{
+	const { class: cname, key, create_content } = args;
+
+	const contents = {};
+
+	const onkeychange = ( new_v, old_v ) =>
+	{
+		// console.log( { new_v } );
+		if( new_v === undefined ) return;
+
+		const old = contents[ old_v ];
+		if( old ) old.e.style.display = "none";
+
+		if( contents[ new_v ] == null && create_content )
+		{
+			const def = create_content( new_v );
+			contents[ new_v ] = create( def, self.e );
+			// console.log( "Switch", contents[ new_v ] );
+		}
+
+		const content = contents[ new_v ];
+		if( content ) content.e.style.display = "";
+	}
+
+	dec.init = () => { key.moreview = onkeychange };
+
+	return { type: "div", class: cname };
+}
+
+
+const Switch2 = args =>
+{
+	const { key } = args;
+
+	const parts =
+	{
+		key,
+		def( key ) { return { type: "div", parts: [ { type: "h1", text: key } ] } },
+	};
+
+	return { type: "div", class: "switch", parts };
+};
+
+
+//  //
+
+const App = args =>
+{
+	const key = new Leaf( 0 );
+
+	const create_content = key =>
+	{
+		const parts =
+		[
+			{ type: "h1", text: key },
+			{ type: "p", text: key },
+		];
+		return { type: "div", class: "Page", parts };
+	};
+
+	const prev = ev => key.v --;
+	const next = ev => key.v ++;
+
+	const keydown = ev =>
+	{
+		switch( ev.keyCode )
+		{
+			case 39: next(); break;
+			case 37: prev(); break;
+		}
+	}
+
+	const ctrl =
+	[
+		{
+			type: "input",
+
+			attrs: { type: "range", value: key },
+			style: { width: "300px" },
+			events: { input: ev => key.v = + ev.target.value }
+		},
+
+		{ type: "button", text: "<", events: { click: prev, keydown } },
+		{ type: "button", text: ">", events: { click: next, keydown } },
+
+		{ type: "span", class: "info", text: key.adapt( m => `${ m }ページ` ) },
+	];
+
+	const parts =
+	[
+		{ type: "h1", text: "Switch" },
+		{ type: Switch, class: "switch", key, create_content },
+		{ type: Switch2, class: "switch", key },
+		{ type: "div", class: "ctrl", parts: ctrl }
+	];
+
+	return { type: "div", class: "App", parts };
+}
+
+create( { type: App }, "body" );
+
+</script>
+
+
+</body>
+</html>

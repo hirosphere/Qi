@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="./code/book.css"/>
+</head>
+<body>
+
+<script type="module">
+
+
+import { create } from "../base/ht-dom.js";
+import { Book } from "./code/book.js";
+import { index_src } from "./data/book-index.js";
+
+//  //
+
+const main = () =>
+{
+	create( { type: Book, index_src }, "body" );
+};
+
+
+//  //
+
+main();
+
+
+</script>
+
+</body>
+</html>

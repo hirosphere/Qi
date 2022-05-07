@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Eki API test</title>
+
+<style>
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { background: hsl( 210, 80%, 96% ); width: 100%; height: 100%; padding: 0 30px; display: flex; justify-content: center; }
+body { background: hsl( 210, 80%, 100% ); width: 960px; height: 100%; padding: 30px 60px; display: flex; justify-content: center; }
+
+html, a, button, textarea { color: hsl( 50, 4%, 18% ); }
+a { text-decoration: none; }
+button { border-radius: 1ex; padding: 1em 2em; }
+
+.app { width: 100%; display: flex; flex-flow: column; align-items: stretch; gap: 9px; }
+.res { width: auto; height: 500px; padding: 1ex; display: block; font-size: 16px; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+.commands { display: flex; gap: 1ex; }
+
+</style>
+
+</head>
+<body>
+
+<script type="module">
+
+import { Leaf } from "../../base/model.js";
+import { create } from "../../base/ht-dom.js";
+
+const App = args =>
+{
+	const res = new Leaf( "response data" );
+
+	const req = async path =>
+	{
+		res.v = "loading " + path;
+		const fres = await fetch( "/API/Eki/" + path );
+		const obj = await fres.json();
+		const json = JSON.stringify( obj, null, "\t" );
+		res.v = `${ json.length / 1000 } kBytes\n${ json }`;
+	};
+
+	// UI //
+
+	const head = { type: "h1", text: "駅名APIテスター" };
+	
+	const r1 = { type: "textarea", class: "res", attrs: { value: res } };
+
+	const r2 =
+	{
+		type: "div",  class: "commands",
+		parts:
+		[
+			{ type: "button", text: "Companies", events: { click: ev => req( "companies" ) } },
+			{ type: "button", text: "Lines", events: { click: ev => req( "lines" ) } },
+			{ type: "button", text: "Stations", events: { click: ev => req( "stations" ) } },
+			{ type: "button", text: "テスト", events: { click: ev => req( "" ) } },
+		]
+	};
+
+	return { type: "div", class: "app", parts: [ head, r1, r2 ] };
+};
+
+create( { type: App }, "body" );
+
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Synth-1</title>
+	<link rel="stylesheet" href="../theme-1.css"/>
+
+<style>
+
+.app { border-radius: 10px; margin: 1px; background: hsl( 215, 80%, 90% ); padding: 20px; color:hsl( 60, 2%, 100% ); }
+
+.modules.-y { flex-direction: column; gap: 1px; }
+.module { margin-bottom: 3px; display: flex; border-radius: 10px; border: 2px solid hsl( 60, 2%, 100% ); padding: 3px; }
+.module.-y { flex-direction: column; gap: 1px;  }
+.module > .-title- { border-radius: 3px; background: hsl( 330, 1%, 36% ); padding: 0.3ex 1ex 0; line-height: 1.4; font-size: 12px; }
+.range { border-radius: 5px; height: 47px; background: hsl( 330, 2%, 47% );
+		padding: 0px 12px; display: flex; align-items: center; gap: 14px; }
+.range > .-title- { display: inline-block; width: 5.5em; }
+.range > .-range- { flex-grow: 1; }
+.range > .-value- { display: inline-block; width: 3.5em; }
+.range .-unit- { margin-left: 0.4ex; font-size: 86%; color: hsla( 0, 0%, 100%, 70% ); }
+
+.module.eg { width: 650px; }
+
+</style>
+
+</head>
+<body>
+
+<script type="module">
+
+import { Leaf } from "../../base/model.js";
+import { create } from "../../base/ht-dom.js";
+import { App } from "./gui.js";
+import Model from "./model.js";
+import sui from "./sui.js";
+
+const MG = args =>
+{
+	const { model } = args;
+
+	const ctrls =
+	[
+		[ model.freq, "Osc.frequency" ],
+		[ model.level, "Level.gain" ],
+	];
+
+	const parts =
+	{
+		Osc: { type: "osc", params:{ detune: 0 } },
+		Level:  { type: "gain", params: { gain: 0 } },
+	};
+
+	const conns =
+	[
+		[ "Osc", "Level" ],
+	];
+	
+	return { output: "Level", ctrls, parts, conns };
+};
+
+const env_action = ( param, start, time, value ) =>
+{
+	param.setTargetAtTime( value, start, time );
+
+	const end = start + time;
+	// param.cancelAndHoldAtTime( start );
+	// param.cancelScheduledValues( start );
+	// param.linearRampToValueAtTime( value, end );
+};
+
+const W1 = ( args, self ) =>
+{
+	// action //
+
+	self.do_msg = msg =>
+	{
+		self.activate();
+		const { type, note } = msg;
+		const eg = self.parts.EG;
+		const start = self.context.currentTime;
+
+		switch( type )
+		{
+			case "note-on": env_action( eg.gain, start, .1, 1 ); break;
+			case "note-off": env_action( eg.gain, start, .1, 0 ); break;
+		}
+	};
+
+
+	// structure //
+
+	const { model } = args;
+
+	const ctrls =
+	[
+		[ model.volume, "Master.gain", { mtov: m => m / 100 } ],
+		[ model.osc_freq, "Osc.frequency" ],
+	];
+
+	const parts =
+	{
+		MG1: { type: MG, model: model.mg1 },
+		MG2: { type: MG, model: model.mg2 },
+		Osc: { type: "osc", params:{ detune: 0 } },
+		EG:  { type: "gain", params: { gain: 0 } },
+		Master: { type: "gain", params: { gain: 0.04 } },
+	};
+
+	const conns =
+	[
+		[ "MG1", "Osc.frequency" ],
+		[ "MG2", "Osc.frequency" ],
+		[ "Osc", "EG" ],
+		[ "EG", "Master" ],
+	];
+	
+	return { output: "Master", ctrls, parts, conns };
+};
+
+const model = {};
+
+model.MG = class
+{
+	freq = new Leaf( 1 );
+	level = new Leaf( 0 );
+};
+
+model.W1 = class
+{
+	volume = new Leaf( 10 );
+	osc_freq = new Leaf( 440 );
+	mg1 = new model.MG();
+	mg2 = new model.MG();
+};
+
+
+const w1m = new model.W1();
+const w1s = sui.create( { type: W1, model: w1m } );
+
+
+create( { type: App, w1s , w1m }, "body" );
+
+
+</script>
+	
+
+</body>
+</html>

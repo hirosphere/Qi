@@ -1,0 +1,9 @@
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+a { text-decoration: none; color: hsl( 0, 0%, 30% ); }
+button { border-radius: 1ex; padding: 1em 2em; }
+
+html { height: 100%; background:hsl( 215, 80%, 84% ); padding: 20px; }
+body { height: 100%; border-radius: 20px; background:hsl( 205, 78%, 100% ); }
+.app { height: 100%; }

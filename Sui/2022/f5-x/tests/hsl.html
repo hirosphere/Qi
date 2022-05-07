@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html
+{
+	height: 100%;
+	background: hsl( 100, 80%, 80% );
+	
+	display: flex;
+	justify-content: center;
+}
+
+body
+{
+	height: 100%;
+	width: 800px;
+	background: hsl( 0, 0%, 100% );
+	padding: 0px;
+	
+	display: flex;
+	flex-flow: column;
+	align-items: strech;
+}
+
+button { padding: 1em; }
+
+.App
+{
+	padding: 30px;
+	display: flex;
+	flex-flow: column;
+	align-items: strech;
+	gap: 10px;
+}
+
+.display
+{
+	height: 400px;
+	border-radius: 16px;
+	border: 2px solid hsl( 0, 0%, 60% );
+	
+	padding: 20px;
+	overflow: hidden;
+}
+
+.ctrl { display: flex; flex-direction: column; gap: 2px; }
+
+.range
+{
+	border-radius: 8px;
+	background: hsla( 270, 20%, 20%, 40% );
+	padding: 16px;
+	display: flex;
+	color:hsl( 0, 0%, 100% );
+}
+
+.range .title { width: 3em; margin-right: 1em; }
+.range input { flex-grow: 1; }
+.range .value { width: 3em; margin-left: 1ex; }
+
+</style>
+
+</head>
+<body>
+	
+<script type="module">
+
+import { Leaf } from "../base/model.js";
+import { create } from "../base/ht-dom.js";
+
+
+//  //
+
+const ad = rels =>
+{
+	;
+};
+
+const model = {};
+
+class Fields
+{
+	set def( def )
+	{
+		;
+	}
+}
+
+model.HSLA = function( hue = 0, sat = 0, light = 0, alpha = 100 )
+{
+	const rel = () => this.css.value = `hsla( ${ this.hue }, ${ this.sat }%, ${ this.light }%, ${ this.alpha }% )`;
+
+	this.hue = new Leaf( hue, rel );
+	this.sat = new Leaf( sat, rel );
+	this.light = new Leaf( light, rel );
+	this.alpha = new Leaf( alpha, rel );
+
+	this.css = new Leaf();
+	
+	this.hue.enter = this.sat.enter = this.light.enter = this.alpha.enter = true;
+}
+
+//  //
+
+const Range = args =>
+{
+	const { title, value, max } = args;
+
+	const input = ev => value.v = + ev.target.value;
+
+	const parts =
+	[
+		{ type: "label", class: "title", text: title },
+		{ type: "input", attrs: { type: "range", value, max }, events: { input } },
+		{ type: "input", attrs: { type: "input", value, max }, events: { input } },
+		{ type: "label", class: "value", text: value },
+	];
+
+	return { type: "div", class: "range", parts };
+};
+
+
+//  //
+
+const HSLA = args =>
+{
+	const value = new model.HSLA( 180, 60, 60 );
+
+	url_title( value );
+
+	const ctrl =
+	[
+		{ type: Range, title: "Hue", value: value.hue, max: 360 },
+		{ type: Range, title: "Sat", value: value.sat, max: 100 },
+		{ type: Range, title: "Light", value: value.light, max: 100 },
+		{ type: Range, title: "Alpha", value: value.alpha, max: 100 },
+	];
+
+	const parts =
+	[
+		{ type: "h1", text: "HSLA" },
+		{ type: "div", class: "info", text: value.css },
+		{ type: "div", class: "display", style: { background: value.css } },
+		{ type: "div", class: "ctrl", parts: ctrl },
+	];
+
+	return { type: "div", class: "App", parts };
+}
+
+
+const url_title = ( color ) =>
+{
+	const update = () =>
+	{
+		const css = color.css.v.toUpperCase();
+		document.title = `${ css }`;
+		//history.replaceState( null, "", `#?${ css }` );
+	};
+
+	color.css.moreview = update;
+
+	update();
+};
+
+//  //
+
+create( { type: HSLA }, "body" );
+
+</script>
+
+
+</body>
+</html>

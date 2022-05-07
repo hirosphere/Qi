@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>inherit</title>
+</head>
+<body>
+
+<script type="module">
+
+import { Component } from "../base/ht-dom.js";
+
+//
+
+//
+
+const A = ( args, self, dec ) =>
+{
+	const { text } = args;
+
+	dec.init = () =>
+	{
+		console.log( "A init", self.msg );
+	};
+
+	dec.msg = "基底である。";
+
+	return { type: "p", text };
+}
+
+const B = ( args, self, dec, base ) =>
+{
+	const { text = "B" } = args;
+
+	dec.init = () =>
+	{
+		base.init();
+		console.log( "B init" );
+	};
+
+	dec.msg = "応用である。";
+
+	return { type: A, text };
+}
+
+const C = ( args, self, dec, base ) =>
+{
+	dec.init = () =>
+	{
+		base.init();
+		console.log( "C init" );
+	};
+
+	dec.msg = "応用2である。";
+
+	return { type: B, text: "C" };
+}
+
+//
+
+const main = () =>
+{
+	new Component( { type: C }, "body" );
+}
+
+main();
+
+</script>
+
+	
+</body>
+</html>
