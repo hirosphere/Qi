@@ -52,28 +52,28 @@ const profs =
 {
 	root:
 	{
-		url() { return "http://express.heartrails.com/api/json?method=getAreas" },
+		url() { return "https://express.heartrails.com/api/json?method=getAreas" },
 		propname : "area",
 		parttype : AreaIndex,
 	},
 
 	area:
 	{
-		url( title ) { return `http://express.heartrails.com/api/json?method=getPrefectures&area=${ title }` },
+		url( title ) { return `https://express.heartrails.com/api/json?method=getPrefectures&area=${ title }` },
 		propname : "prefecture",
 		parttype : PrefIndex,
 	},
 
 	pref:
 	{
-		url( title ) { return `http://express.heartrails.com/api/json?method=getLines&prefecture=${ title }` },
+		url( title ) { return `https://express.heartrails.com/api/json?method=getLines&prefecture=${ title }` },
 		propname : "line",
 		parttype : LineIndex,
 	},
 
 	line:
 	{
-		url( title ) { return `http://express.heartrails.com/api/json?method=getStations&line=${ title }` },
+		url( title ) { return `https://express.heartrails.com/api/json?method=getStations&line=${ title }` },
 		propname : "station",
 		parttype : StationIndex,
 		title: i => i.name,
