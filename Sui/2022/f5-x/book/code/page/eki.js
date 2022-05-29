@@ -1,15 +1,20 @@
+import { Leaf } from "../../../base/model.js";
 import Navi from "../navi-index.js";
 
+const baseurl = "https://express.heartrails.com/api/json?method=";
 
-//  //
+
+// Index //
 
 class Index extends Navi.Index
 {
-	constructor( src, composition )
+	constructor( src, composition, order )
 	{
-		super( src, composition );
-		this.has_part.value = true;
+		super( src, composition, order );
+		this.has_part.value = this._has_part;
 	}
+
+	_has_part = true;
 
 	parts_loaded = false;
 
@@ -18,70 +23,163 @@ class Index extends Navi.Index
 		if( this.parts_loaded )  return;
 		this.parts_loaded = true;
 
-		const p = this.prof();
-		if( ! p ) return;
+		console.log( "load_parts", this.title.value );
 
-		// console.log( p.url( this.title.value ), p.propname );
-
-		const res = await fetch( p.url( this.title.value ) );
+		const url = baseurl + this.url();
+		const res = await fetch( url );
 		const cont = await res.json();
 		const data = cont && cont.response;
-		const tot = p.title || ( s => s );
-		// console.log( data[p.propname ] );
+		//  console.log( data[p.propname ] );
 
 		const parts = [];
-		for( const item of data[ p.propname ] )
+		let order = 0;
+		for( const p_data of this.list( data ) )
 		{
-			const title = tot( item );
-			parts.push( new p.parttype( { title, name: title }, this ) );
+			const p_src = this.part_src( p_data );
+			parts.push( new this.Part( p_src, this, order ++ ) );
 		}
 
 		this.parts.add( parts );
+		this.mon.url.value = url;
+		this.mon.json.value = JSON.stringify( cont, null, "	" );
 	}
 
-	prof() {}
+	part_src( data ) { return { name: data, title: data }; }
+
+	get_content_def( location )
+	{
+		return { type: Frame, index: this, location };
+	}
+
+	mon =
+	{
+		url: new Leaf( "" ),
+		json: new Leaf( "" ),
+	};
 }
 
-class RootIndex extends Index { prof() { return profs.root } }
-class AreaIndex extends Index { prof() { return profs.area; } }
-class PrefIndex extends Index { prof() { return profs.pref; } }
-class LineIndex extends Index { prof() { return profs.line; } }
-class StationIndex extends Navi.Index {}
 
-const profs =
+class StationIndex extends Navi.Index
 {
-	root:
-	{
-		url() { return "https://express.heartrails.com/api/json?method=getAreas" },
-		propname : "area",
-		parttype : AreaIndex,
-	},
+	_has_part = false;
+}
 
-	area:
-	{
-		url( title ) { return `https://express.heartrails.com/api/json?method=getPrefectures&area=${ title }` },
-		propname : "prefecture",
-		parttype : PrefIndex,
-	},
 
-	pref:
-	{
-		url( title ) { return `https://express.heartrails.com/api/json?method=getLines&prefecture=${ title }` },
-		propname : "line",
-		parttype : LineIndex,
-	},
+class LineIndex extends Index
+{
+	url() {  return "getStations" + "&line=" + this.title.value; }
+	list( data ) { return data.station };
+	Part = StationIndex;
 
-	line:
+	part_src( data ) { return { name: data.name, title: data.name }; }
+}
+
+
+class PrefIndex extends Index
+{
+	url() {  return "getLines" + "&prefecture=" + this.title.value; }
+	list( data ) { return data.line; };
+	Part = LineIndex;
+}
+
+
+class AreaIndex extends Index
+{
+	url() {  return "getPrefectures" + "&area=" + this.title.value; }
+	list( data ) { return data.prefecture; };
+	Part = PrefIndex;
+}
+
+
+class RootIndex extends Index
+{
+	constructor( src, composition )
 	{
-		url( title ) { return `https://express.heartrails.com/api/json?method=getStations&line=${ title }` },
-		propname : "station",
-		parttype : StationIndex,
-		title: i => i.name,
-	},
+		super( src, composition );
+	}
+
+	url() { return "getAreas"; }
+	list( data ) { return data.area; };
+	Part = AreaIndex;
+}
+
+
+// HTML DOM //
+
+const Item = args =>
+{
+	const { index, location } = args;
+
+	const click = ev =>
+	{
+		ev.preventDefault();
+		location.select( index );
+	};
+
+	const con = 
+	{
+		type: "a",
+		class: "-item",
+		attrs: { href: location.get_link( index ) },
+		parts:
+		[
+			{ type: "span", class: "-nomble", text: index.order + 1 },
+			{ type: "span", class: "-name", text: index.title }
+		],
+		events: { click },
+	};
+
+	return { type: "li", parts: [ con ] };
+};
+
+const Frame = args =>
+{
+	const { index, location } = args;
+
+	index.load_parts();
+
+	//  //
+	
+	const list =
+	{
+		type: "ul",  class: "-list",
+		parts:
+		{
+			model: index.parts,
+			def: index => { return { type: Item, index, location }; },
+		}
+	};
+
+	const content =
+	{
+		type: "div", class: "-content",
+		parts:
+		[
+			{
+				type: "div", class: "-list-wrapper",
+				parts: [ list ]
+			},
+			{ type: "textarea", class: "-monitor", props:{ value: index.mon.json }, },
+		]
+	};
+
+	const main =
+	{
+		type: "div", class: "Eki content col-flex",
+		parts:
+		[
+			{ type: "h1", text: index.title },
+			{ type: "p", class: "-url", text: index.mon.url },
+			content
+		]
+	};
+
+	return main;
 };
 
 
-//  //
+
+// exports //
 
 export default { RootIndex };
 

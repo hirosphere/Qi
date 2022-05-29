@@ -6,47 +6,66 @@ import { ArrayModel, Leaf, next_ru } from "../../base/model.js";
 
 class Index
 {
-	constructor( src, composition = null )
+	constructor( src, composition = null, order )
 	{
 		this.type = src.type;
 		this.title = new Leaf( src.title );
-		this.name = new Leaf( src.name );
+		this.name = src.name;
 
 		this.has_part = new Leaf( src && src.parts && src.parts.length > 0 || false );
 		this.is_root = new Leaf( composition == null );
 
 		this.composition = composition;
-		composition && ( composition.names[ this.name.value ] = this );
+		
+		if( composition )
+		{
+			this.path = [ ... composition.path, this ];
+			composition.names[ this.name ] = this;
+		}
+
+		else
+		{
+			this.path = [ this ];
+		}
+
+		this.order = order;
 		
 		next_ru( this );
 	}
 
-	//  //	
+	//  structure  //
+
+	get path_mon()
+	{
+		return this.path.map( i => i.title.value );
+	}
 	
-	get path()
+	get link_path()
 	{
-		return ( this.composition && ( this.composition.path + "/" ) || "" ) + this.name;
+		const com_path = this.composition && this.composition.link_path || [];
+
+		return [ ... com_path, encodeURIComponent( this.name ) ];
 	}
 
-	async dyn_search( path )
+	async search( path )
 	{
-		if( ! path.length ) return null;
-		if( path.shift() !== this.name.v ) return null;
-		
+		if( path.length == 0 )  return { index: this, rem: [] };
+
 		await this.load_parts();
+		const rem = [ ... path ];
+		const name = path.shift();
+		const part = this.names[ name ];
 
-		const part = this.names[ path[ 0 ] ];
-		return  part && await part.dyn_search( path )  ||  { index: this, subpath: path, is_head: path.length > 0 };
+		if( part )  return await part.search( path, this );
+
+		return { index: this, rem };
 	}
 
-	search( path = [] )
-	{
-		if( ! path.length ) return null;
-		if( path.shift() !== this.name.v ) return null;
-		
-		const part = this.names[ path[ 0 ] ];
-		return  part && part.search( path )  ||  { index: this, subpath: path, is_head: path.length > 0 };
-	}
+	path = [];
+	names = {};
+	parts = new ArrayModel();
+
+	async load_parts() { return this.parts };
 
 
 	// query //
@@ -60,12 +79,10 @@ class Index
 		_test_query = "&param=" + Math.floor( Math.random() * 101 );
 
 
-	// parts //
+	// page def //
+	
+	get_content_def( location ) { return null; }
 
-	parts = new ArrayModel();
-	names = {};
-
-	async load_parts() { return this.parts };
 
 	//  //
 
@@ -84,9 +101,9 @@ class Tree
 		this.update_monitor();
 	}
 
-	new_selection()
+	new_locatiol()
 	{
-		return new Selection( this );
+		return new Location( this );
 	}
 
 	//  //
@@ -124,44 +141,22 @@ class Tree
 
 //  //
 
-class IndexView
-{
-	constructor( index, land )
-	{
-		this.index = index;
-		this.land = land;
-	}
-
-	// . link //
-
-	get_link( is_head = false )
-	{
-		return this.land.make_link( this.index, is_head );
-	}
-
-	//  //
-
-	select( is_head )
-	{
-		this.land.url.value = this.get_link( is_head );
-	}
-
-	selected = new Leaf( false );
-
-};
-
-class Selection
+class Location
 {
 	constructor( tree )
 	{
 		this.tree = tree;
-		this.url.moreview = url => this.set_url( url );
+		this.url.moreview = url => this.on_url_update( url );
 		this.curr_page.moreview = ( new_index, old_index ) => this.on_page_change( new_index, old_index );
 	}
 
 	//  //
 
 	url = new Leaf( null );
+	on_changed( url, index ) {}
+
+	//  //
+
 	curr_head = new Leaf( null );
 	curr_page = new Leaf( null );
 
@@ -169,35 +164,56 @@ class Selection
 
 	async load_url()
 	{
-		await this.set_url( location.search );
+		this.url.value = location.search;
 	}
 
-	async set_url( url )
+	select( index, is_head = false )
 	{
-		if( url == null )  return;
+		this.url.value = this.get_link( index, is_head );
+	}
 
-		const { index, subpath, is_head } = await this.search( url );
+	get_selected( index )
+	{
+		return  this.stats.selected[ index ] = this.stats.selected[ index ] || new Leaf( false );
+	}
+
+	get_link( index, is_head )
+	{
+		const path = index.link_path || [];
+		path.shift();
+		const head = ( ! index.is_root.v && is_head ) ? "/" : "";
+		const query = index.query;
+
+		return "?page=" + path.join( "/" ) + head + query;
+	}
+
+	//  //
+
+	async on_url_update()
+	{
+		if( this.url.value == null )  return;
+
+		const { index, is_head, rem } = await this.search( this.url.value );
 		
 		const head = index && ( is_head ? index : index.composition || index );
+		this.curr_head.value = head;
 		this.curr_page.value = index;
-		this.curr_head.value = head; 
+
+		this.on_changed( this.url.value, index );
 	}
 
 	async search( url )
 	{
 		const qs = this.decode_url( url );
-		const path_list = qs.page && qs.page.split( "/" ) || [];
+		const path = qs.page && qs.page.split( "/" ) || [];
+		
+		const is_head =  path.slice( -1 )[ 0 ] == "";
+		if( is_head )  path.pop();
 		
 		const root = this.tree.root;
-		const res = root && await root.dyn_search( path_list || [] );
+		const res = root && await root.search( path ) || {};
 
-		return res || { index: root, is_head: true };
-	}
-
-
-	make_link( index, is_head )
-	{
-		return "?page=" + index.path + ( is_head ? "/" : "" ) + index.query;
+		return { is_head, ... res };
 	}
 
 	decode_url( url )
@@ -217,30 +233,16 @@ class Selection
 	
 	// item pool //
 
-	rus = {};
+	stats = { selected: {} };
 	
 	on_page_change( new_index, old_index )
 	{
-		const old_item = this.get_item( old_index );
-		const new_item = this.get_item( new_index );
+		const old_item = this.get_selected( old_index );
+		const new_item = this.get_selected( new_index );
 
-		if( old_item ) old_item.selected.v = false;
-		if( new_item ) new_item.selected.v = true;
+		if( old_item ) old_item.value = false;
+		if( new_item ) new_item.value = true;
 	}
-
-	get_item( index )
-	{
-		return this.rus[ index ] || this.new_item( index );
-	}
-
-	new_item( index )
-	{
-		if( ! index ) return null;
-
-		const item = this.rus[ index ] = new IndexView( index, this );
-		return item;
-	}
-
 };
 
 //  //

@@ -3,42 +3,56 @@ import { Tree } from "./navi-index.js";
 import { Navi } from "./navi-ui.js";
 
 import { Top } from "./page/top/top.js";
+import Train from "./page/train/train.js";
 import { Eval } from "./page/eval/eval.js"
+import UIskt from "./page/ui-sketch/ui-sketch-1.js";
 import Eki from "./page/eki.js";
 
-//  //
 
-const Content = args =>
+// page content //
+
+const DefaultContent = args =>
 {
 	const { index } = args;
+
+	const path = index.path.slice( 0, -1 );
 
 	const parts =
 	[
 		{ type: "h1", text: index.title, },
-		{ type: "p", text: index.path },
+		{ type: "p", text: path.map( i => i.title.value ).join( " > " ) },
+		{ type: "p", text: "-- default content --", style: { color: "hsl( 50, 3%, 75% )" } },
 	];
 
 	return { type: "div", class: "content", parts };
 };
 
-
 const content_types =
 {
-	Top: Top,
+	"Top": Top,
+	"Eval": Eval,
+	"Train": Train.Main,
+	"UI-Sketch": UIskt.Main,
 };
 
-
-const create_content_def = index =>
+const get_named_content_def = index =>
 {
-	if( ! index ) return null;
-
-	const type = content_types[ index.type ];
-	console.log( type && type.name || "", index && index.title.value, content_types );
-	if( type ) return { type, index };
-	
-	return index && { type: Content, index };
+	const type = content_types[ index.type ] || DefaultContent;
+	return { type, index };	
 };
 
+const get_content_def = ( index, location ) =>
+{
+	return index &&
+	(
+		index.get_content_def( location ) ||
+		get_named_content_def( index )
+	)
+	|| null;
+};
+
+
+// index //
 
 const index_types =
 {
@@ -46,20 +60,21 @@ const index_types =
 };
 
 
+// main //
+
 const Book = args =>
 {
 	const { index_src } = args;
 	const tree = new Tree( index_src, index_types );
-	const sel = tree.new_selection();
+	const location = tree.new_locatiol();
 
-	( async () => await sel.load_url() )();
+	location.load_url();
 
 	//
 
-	sel.curr_page.moreview = index =>
+	location.on_changed = ( url, index ) =>
 	{
-		history.replaceState( null, "", sel.url.value );
-
+		history.replaceState( null, "", url );
 		document.title = ( index && index.title + " - " || "" ) + "Book";
 	};
 
@@ -68,7 +83,7 @@ const Book = args =>
 	const side =
 	{
 		type: "div", class: "side",
-		parts: [ { type: Navi, sel }, ]
+		parts: [ { type: Navi, location }, ]
 	};
 
 	const contents =
@@ -76,8 +91,8 @@ const Book = args =>
 		type: "div", class: "contents",
 		parts:
 		{
-			key: sel.curr_page,
-			def: create_content_def
+			key: location.curr_page,
+			def: index => get_content_def( index, location )
 		},
 	};
 
@@ -85,7 +100,7 @@ const Book = args =>
 };
 
 
-//  //
+// exports //
 
 export { Book };
 

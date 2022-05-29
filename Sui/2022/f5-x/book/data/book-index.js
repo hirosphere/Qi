@@ -6,55 +6,49 @@ const api =
 	parts:
 	[
 		{
-			title: "Navi",
+			title: "Navi モジュール",
 			name: "navi",
 			parts:
 			[
 				{
-					title: "Index",
+					title: "Index クラス",
 					name: "index",
 					parts:
 					[
-						{
-							title: "値",
-							name: "value"
-						},
-						{
-							title: "構造",
-							name: "struct"
-						}
+						{ title: "title", name: "title" },
+						{ title: "name", name: "name" },
+						{ title: "path", name: "path" },
+						{ title: "composition", name: "composition" },
+						{ title: "parts", name: "parts" },
+						{ title: "load_parts()", name: "load_parts()" },
 					],
 				},
 				{
-					title: "Tree",
+					title: "Tree クラス",
 					name: "tree",
 					parts:
 					[
-						{
-							title: "値",
-							name: "value"
-						},
-						{
-							title: "構造",
-							name: "struct"
-						}
+						{ title: "new_selection()", name: "new_selection()" },
+						{ title: "create_index()", name: "create_index()" },
 					],
 				},
 				{
-					title: "IndexView",
+					title: "IndexView クラス",
 					name: "index-view",
 					parts:
 					[
+						{ title: "index", name: "index" },
 						{ title: "selected : Leaf", name: "selected" },
-						{ title: "index", name: "" },
+						{ title: "select()", name: "select()" },
 					],
 				},
 				{
-					title: "Selection",
+					title: "Selection クラス",
 					name: "selection",
 					parts:
 					[
 						{ title: "load_url()", name: "load_url" },
+						{ title: "set_url()", name: "set_url" },
 						{ title: "url : Leaf<string>", name: "url" },
 						{ title: "curr_page : Leaf<Index>", name: "curr_page" },
 						{ title: "curr_head : Leaf<Index>", name: "curr_head" },
@@ -76,19 +70,24 @@ const api =
 
 export const index_src =
 {
-	title: "Top", name: "top", type: "Top",
+	title: "Vite DHTML", name: "top", type: "Top",
 	parts:
 	[
-		{ title: "運転", name: "train", type: "Train", parts: [
+		{ title: "Nゲージ列車制御", name: "train", type: "Train", parts: [
 			{ title: "動力の設定", name: "motor" },
 			{ title: "走路の設定", name: "section" },
 			{ title: "編成の管理", name: "group" },
 		]},
-		{ title: "Eval", name: "eval", type: "Eval" },
+		{ title: "Eval", name: "eval", type: "Eval", parts:
+		[
+			{ title: "シリアル", name: "serial" },
+		] },
 		{ title: "気象", name: "wether", type: "Wether" },
-		{ title: "UIスケッチ", name: "sketch", type: "UI-Sketch" },
+		{ title: "UIスケッチ", name: "sketch", type: "UI-Sketch", parts:
+		[
+			{ title: "HSL", name: "hsl" },
+		] },
 		api,
-		{ title: "Dyndex", name: "dyndex", type: "Dyndex" },
 		{ title: "路線", name: "rail", type: "Eki" },
 	]
 };

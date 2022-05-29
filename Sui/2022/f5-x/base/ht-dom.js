@@ -45,19 +45,20 @@ class Component
 
 	create_element( def, ce )
 	{
-		const { type = "div", class: cname, name, clist, text, attrs, style, events, parts } = def;
-	
-		// log( "create", type );
+		const { type = "div", class: cname, name, clist, text } = def;
 	
 		const e = document.createElement( type );
 	
-		if( cname != null )  attach_value( e, "className", cname );
+		if( cname != null )  attach_prop( e, "className", cname );
 		if( clist ) class_list( e, clist );
-		if( text !== undefined )  attach_value( e, "innerText", text );
+		if( text !== undefined )  attach_prop( e, "innerText", text );
 		if( name != null ) this.es[ name ] = e;
 		
+		const { props, attrs, style, events, parts } = def;
+	
+		if( props )  for( let name in props )  attach_prop( e, name, props[ name ] );
 		if( attrs )  for( let name in attrs )  attach_attr( e, name, attrs[ name ] );
-		if( style )  for( let name in style )  attach_value( e.style, name, style[ name ] );
+		if( style )  for( let name in style )  attach_prop( e.style, name, style[ name ] );
 		if( events )  for( let name in events )  e.addEventListener( name, events[ name ] );
 	
 		if( parts )  this.create_parts( parts, e );
@@ -101,7 +102,7 @@ const attach_attr = ( target, name, leafv ) =>
 	else   target.setAttribute( name, leafv );
 };
 
-const attach_value = ( target, name, leafv ) =>
+const attach_prop = ( target, name, leafv ) =>
 {
 	if( leafv && leafv.is_leaf  )  leafv.attach( target, name );
 	else target[ name ] = leafv;

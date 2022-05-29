@@ -3,7 +3,7 @@
 
 html
 {
-	height: 100%; color:hsl( 50, 4%, 14% );
+	height: 100%; color:hsl( 50, 4%, 30% );
 }
 
 body
@@ -13,9 +13,11 @@ body
 
 
 a { text-decoration: none;  color:hsl( 0, 0%, 7% );  }
+button { border-radius: 0.8ex; padding: 1.5ex 1.5em; }
 
+.col-flex { display: flex; flex-direction: column;  }
 
-/*  */
+/* book */
 
 .book
 {
@@ -29,23 +31,25 @@ a { text-decoration: none;  color:hsl( 0, 0%, 7% );  }
 
 .book .contents
 {
+	height: 100%;
 	background: hsl( 0, 0%, 100% );
 	background-image: linear-gradient( 180deg, hsl( 0, 0%, 100% ), hsl( 55, 10%, 94% ) );
 	flex-grow: 10;
 	min-width: 300px;
-	overflow: auto;
 }
 
 .book .content
 {
+	height: 100%;
+	overflow: auto;
 	padding: 20px;
 }
 
-/*  */
+/* Side, Navi */
 
 .book > .side
 {
-	background: hsl( 96, 55%, 67% );
+	background: hsl( 215, 75%, 75% );
 	min-width: 280px;
 	max-width: 280px;
 	padding: 16px 12px;
@@ -53,58 +57,139 @@ a { text-decoration: none;  color:hsl( 0, 0%, 7% );  }
 
 .book > .side > .navi
 {
-	border-radius: 15px;
+	border-radius: 10px;
 	height: 100%;
 	background: hsl( 55, 0%, 100% );
 	flex-grow: 2;
 	background: hsl( 0, 0%, 100% );
-	padding: 10px 0px;
+	padding: 10px 10px;
 }
 
 
-.navi .list { height: 100%; display: flex; flex-direction: column; }
+.navi .list { height: 100%; display: flex; flex-direction: column; font-size: 15px; }
 .navi .list > .-items { overflow: auto; }
 
 .navi ul { list-style: none; }
 
-.navi li.link.-head { margin: 0 10px 1.4px; border-bottom: 2px solid hsl( 50, 3%, 80% ); }
-.navi li.link.-part { margin: 0 10px 1.4px; border-bottom: 1px dotted hsl( 50, 4%, 80% ); }
+.navi .path { padding: 0 13px; text-align: center; }
+.navi li.link.-head { margin: 0 0px 1.4px; border-bottom: 2px solid hsl( 50, 3%, 80% ); }
+.navi li.link.-part { margin: 0 0px 1.4px; border-bottom: 1px dotted hsl( 50, 4%, 80% ); }
 
 .navi li.link a
 {
-	margin-bottom: 1.0px; border-radius: 0.7ex; padding: 0.7em;
+	margin-bottom: 1.0px; border-radius: 4px; padding: 2px;
 	display: grid;
 	grid-template-columns: 1fr auto;
-	grid-gap: 1px;
+	grid-gap: 1ex;  align-items: center;
+	color: hsl( 0, 0%, 30% );
 }
 
 .navi li.link:hover a { background:hsl( 50, 6%, 96% ); }
-.navi li.link._selected_ a { background:hsl( 210, 5%, 30% ); color:hsl( 0, 0%, 100% ); }
+.navi li.link._selected_ a { background:hsl( 215, 70%, 90% ); color:hsl( 0, 0%, 10% ); }
 
-.navi li.link a .-label { display: block; text-align: left; overflow: hidden; white-space: nowrap; }
-.navi li.link.-head a .-label { font-weight: bold; font-size: 135%; }
+.navi li.link a .-label { display: block; padding-left: 1ex; overflow: hidden; white-space: nowrap; }
+.navi li.link.-head a .-label { font-weight: bold; font-size: 130%; }
 
 .navi li.link a .-rel
 {
-	display: block; border-radius: 0.5ex;
-	width: 2em; height: 2em; line-height: 1;
+	display: block; border-radius: 3px;
+	width: 2.8em; height: 3.2em;
 	font-size: 80%;
 	display: flex; justify-content: center; align-items: center;
-	background:hsl( 70, 6%, 96% ); visibility: visible;
+	background:hsl( 70, 6%, 96% ); visibility: hidden;
 }
-.navi li.link:hover a .-rel { background:hsl( 0, 0%, 100% ); }
+.navi li.link:hover a .-rel { background:hsla( 50, 6%, 50%, 10% ); }
 .navi li.link._selected_ a .-rel { background:hsla( 70, 0%, 100%, 75% ); }
 .navi li.link.-head[ is_root = "false" ] a .-rel,
 .navi li.link.-part[ has_part = "true" ] a .-rel { visibility: visible; }
 
-/*  */
+/* Top */
 
-.top-page h1 { background:hsl( 50, 3%, 22% ); padding: 0.5em 0.7em; color:hsl( 50, 3%, 90% ); display: flex; justify-content: space-between; }
-.top-page h1 .clock { font-size: 100%; }
+.Top { background:hsl( 50, 6%, 96% ); }
+.Top h1 { background:hsl( 215, 60%, 65% ); padding: 0.5em 0.7em; color:hsl( 50, 3%, 100% ); display: flex; justify-content: space-between; }
+.Top h1 .clock { font-size: 100%; }
+.Top .Links { padding: 24px; display: flex; gap: 10px; flex-wrap: wrap; }
+.Top .Links .Block { border-radius: 8px;  border: 1px solid hsl( 50, 3%, 70% ); min-width: 200px; padding: 16px 28px 30px; }
+.Top .Links ul { list-style: none; padding: 6px 0px 0; }
+.Top .Links li { padding: 0.0ex 0; }
+.Top .Links a { margin-bottom: 0px; padding: 0 2px; line-height: 1.8; }
+.Top .Links a:hover { border-bottom: 2px dotted hsl( 50, 10%, 50% ); }
 
 
-/*  */
 
+/* Eval */
+
+.Eval { padding: 1px 20px; display: flex;  flex-direction: column; gap: 3px; }
+.Eval .Unit { display: grid; grid-template-rows: auto auto auto; grid-template-columns: auto 30%; gap: 1px; }
+.Eval .Unit textarea
+{
+	display: block;
+	border: 0px solid hsl( 50, 3%, 100% );
+	height: 120px;  padding: 1.0ex;
+	font-size: 16px;  font-family: 'Courier New', Courier, monospace;
+	tab-size: 4;
+}
+
+.Eval .Unit textarea { grid-column: 1 / 2; resize: vertical;  background:hsl( 180, 90%, 27% );  color:hsl( 0, 0%, 100% ); }
+.Eval .Unit .display { grid-column: 2 / 3; grid-row: 1 / 4; background:hsl( 215, 68%, 63% ); }
+
+/* train */
+
+.Train .Range
+{
+	width: 550px; height: 50px; margin-bottom: 1px;
+	border-radius: 7px; background: hsla( 50, 0%, 25%, 13% );
+	display: flex; gap: 6px; align-items: center; padding: 15px;
+}
+.Train .Range .-title { display: inline-block; width: 5em; }
+.Train .Range .-value-unit { display: inline-block; width: 5.0em; text-align: right; }
+.Train .Range .-range { flex-grow: 1; }
+.Train .Range .-unit { margin-left: 0.5ex; font-size: 80%; color:hsl( 50, 3%, 20% ); }
+
+
+
+/* Eki */
+
+.Eki { gap: 3px; }
+.Eki > * { background:hsla( 345, 5%, 50%, 0% );  }
+.Eki .-url { padding: 1ex 0; font: normal 16px courier; }
+.Eki .-content
+{
+	flex-grow: 1;
+	display: grid;  gap: 4px;  grid-template-columns: 1fr 330px;
+}
+.Eki .-list-wrapper
+{
+	display: flex;
+	overflow: scroll;
+
+	border: 2px solid hsl( 112, 75%, 30% ); padding: 20px;
+}
+.Eki .-list
+{
+	width: 100%;
+	display: flex;  justify-content: center;
+	gap: 2em 0.4ex;  flex-wrap: wrap;
+	list-style: none;
+}
+.Eki .-list .-item
+{
+	display: grid;
+	grid-template-rows: 18px auto;
+	row-gap: 18px;
+	min-height: 8em;
+	border: 1px solid hsl( 50, 12%, 55% );  border-radius: 0.12ex;
+	padding: 0.3ex 0.3ex 1.3em;
+	font-size: 15.5px;
+	color: hsl( 50, 7%, 45% );
+}
+.Eki .-list .-item .-nomble { 	 border: 1px solid hsl( 50, 2%, 85% ); font-size: 85%; text-align: center; }
+.Eki .-list .-item .-name {  writing-mode: vertical-rl;  text-orientation: upright;  letter-spacing: 0.7px; }
+.Eki .-list .-item:hover { background: hsla( 50, 5%, 50%, 10% );  color: hsl( 50, 0%, 30% ); }
+.Eki textarea.-monitor
+{
+	font: normal 14px courier;  tab-size: 3;
+}
 
 
 /*  */

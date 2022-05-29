@@ -20,11 +20,20 @@ const Range = args =>
 	const parts =
 	[
 		{ type: "label", class: "-title-", text: title },
-		{ type: "input", class: "-range-", attrs: { type: "range", max, step, value: model, oninput } },
+		{
+			type: "input",
+			class: "-range-",
+			props:
+			{
+				type: "range",
+				max, step, value: model,
+				oninput
+			}
+		},
 		{ type: "label", class: "-value-", parts: v_parts },
 	];
 
-	return { type: "div", class: "range", parts };
+	return { type: "div", class: "Range", parts };
 };
 
 
