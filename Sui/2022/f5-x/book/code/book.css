@@ -47,61 +47,84 @@ button { border-radius: 0.8ex; padding: 1.5ex 1.5em; }
 
 /* Side, Navi */
 
-.book > .side
+.book >.side
 {
-	background: hsl( 215, 75%, 75% );
+	background: hsl( 215, 70%, 85% );
 	min-width: 280px;
 	max-width: 280px;
 	padding: 16px 12px;
 }
 
-.book > .side > .navi
+.book >.side >.navi
 {
 	border-radius: 10px;
 	height: 100%;
 	background: hsl( 55, 0%, 100% );
 	flex-grow: 2;
 	background: hsl( 0, 0%, 100% );
-	padding: 10px 10px;
+	padding: 22px 2px;
 }
 
 
-.navi .list { height: 100%; display: flex; flex-direction: column; font-size: 15px; }
-.navi .list > .-items { overflow: auto; }
+.book >.side >.navi >.list { height: 100%; display: flex; flex-direction: column; font-size: 15px; gap: 20px; }
 
-.navi ul { list-style: none; }
-
-.navi .path { padding: 0 13px; text-align: center; }
-.navi li.link.-head { margin: 0 0px 1.4px; border-bottom: 2px solid hsl( 50, 3%, 80% ); }
-.navi li.link.-part { margin: 0 0px 1.4px; border-bottom: 1px dotted hsl( 50, 4%, 80% ); }
-
-.navi li.link a
+.book >.side >.navi >.list ul { list-style: none; }
+.book >.side >.navi >.list li
 {
-	margin-bottom: 1.0px; border-radius: 4px; padding: 2px;
+	display: grid; grid-template-columns: 1fr;
+	overflow: hidden; white-space: nowrap;
+}
+
+.book >.side >.navi >.list >.path { padding: 0; text-align: center; display: flex; flex-direction: column; gap: 0px; }
+.book >.side >.navi >.list >.path > li { line-height: 1.8em;  text-decoration: dotted; } 
+.book >.side >.navi >.list >.path > li:first-child { font-size: 100%; }
+.book >.side >.navi >.list >.path > li:last-child  { font-weight: bold; font-size: 100%; } 
+
+.book >.side >.navi >.list >.path > li > a > .label { border-bottom: 1px dotted hsl( 50, 4%, 60% ); border-radius: 3px; padding: 0 1.0em; }
+
+
+.book >.side >.navi >.list >.colls { overflow: auto; padding: 0px 4px; }
+.book >.side >.navi >.list >.colls > li
+{
+	height: 2.8em;
+	margin: 0 0px 1.4px;
+	border-bottom: 1px dotted hsl( 50, 4%, 70% );
+}
+
+.book >.side >.navi >.list >.colls > li > a
+{
+	margin-bottom: 1.0px;
+	border-radius: 4px;
+	padding: 3px;
 	display: grid;
 	grid-template-columns: 1fr auto;
-	grid-gap: 1ex;  align-items: center;
-	color: hsl( 0, 0%, 30% );
+	grid-gap: 1ex;
+	align-items: stretch;
+	color: hsl( 0, 0%, 22% );
 }
+.book >.side >.navi >.list >.colls > li > a > .label { padding-left: 1em; display: flex; align-items: center; }
 
-.navi li.link:hover a { background:hsl( 50, 6%, 96% ); }
-.navi li.link._selected_ a { background:hsl( 215, 70%, 90% ); color:hsl( 0, 0%, 10% ); }
-
-.navi li.link a .-label { display: block; padding-left: 1ex; overflow: hidden; white-space: nowrap; }
-.navi li.link.-head a .-label { font-weight: bold; font-size: 130%; }
-
-.navi li.link a .-rel
+.book >.side >.navi >.list >.colls > li > a > .-rel
 {
-	display: block; border-radius: 3px;
-	width: 2.8em; height: 3.2em;
+	border-radius: 3px;
+	width: 2.8em;
 	font-size: 80%;
 	display: flex; justify-content: center; align-items: center;
 	background:hsl( 70, 6%, 96% ); visibility: hidden;
 }
-.navi li.link:hover a .-rel { background:hsla( 50, 6%, 50%, 10% ); }
-.navi li.link._selected_ a .-rel { background:hsla( 70, 0%, 100%, 75% ); }
-.navi li.link.-head[ is_root = "false" ] a .-rel,
-.navi li.link.-part[ has_part = "true" ] a .-rel { visibility: visible; }
+
+.book >.side >.navi >.list >.path  > li:hover a > .label,
+.book >.side >.navi >.list >.colls > li:hover a { background:hsl( 50, 6%, 96% ); }
+.book >.side >.navi >.list >.colls > li:hover  a.-rel { background:hsla( 50, 6%, 50%, 10% ); }
+.book >.side >.navi >.list >.colls > li[ selected = "true" ]  a.-rel { background:hsla( 70, 0%, 100%, 75% ); }
+.book >.side >.navi >.list >.colls > li[ has_part = "true" ] a .-rel { visibility: visible; }
+
+
+.book >.side >.navi >.list >.path > li[ selected = "true" ] > a > .label ,
+.book >.side >.navi >.list >.colls > li[ selected = "true" ] > a
+{
+	background: hsl( 210, 1%, 10% ); color: hsl( 50, 0%, 90% );
+}
 
 /* Top */
 

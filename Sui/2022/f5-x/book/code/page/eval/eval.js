@@ -1,11 +1,15 @@
+import { Leaf } from "../../../../base/model.js";
+import { create } from "../../../../base/ht-dom.js";
+
+
+//  //
 
 const Unit = ( args, self, dec ) =>
 {
 	dec.init = () =>
 	{
-//		console.log( self.es.input.value = "Xxx" );
 		self.es.input.setAttribute( "value", "Yyyy Yyy" );
-	}
+	};
 
 	const keydown = ev =>
 	{

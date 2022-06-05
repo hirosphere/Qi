@@ -8,9 +8,9 @@ const baseurl = "https://express.heartrails.com/api/json?method=";
 
 class Index extends Navi.Index
 {
-	constructor( src, composition, order )
+	constructor( args )
 	{
-		super( src, composition, order );
+		super( args );
 		this.has_part.value = this._has_part;
 	}
 
@@ -18,12 +18,12 @@ class Index extends Navi.Index
 
 	parts_loaded = false;
 
-	async load_parts()
+	async fetch()
 	{
 		if( this.parts_loaded )  return;
 		this.parts_loaded = true;
 
-		console.log( "load_parts", this.title.value );
+		// console.log( "fetch", this.title.value );
 
 		const url = baseurl + this.url();
 		const res = await fetch( url );
@@ -36,7 +36,7 @@ class Index extends Navi.Index
 		for( const p_data of this.list( data ) )
 		{
 			const p_src = this.part_src( p_data );
-			parts.push( new this.Part( p_src, this, order ++ ) );
+			parts.push( new this.Part( { src: p_src, composition: this, order: order ++ } ) );
 		}
 
 		this.parts.add( parts );
@@ -61,6 +61,11 @@ class Index extends Navi.Index
 
 class StationIndex extends Navi.Index
 {
+	get_content_def()
+	{
+		return { type: Station, index: this };
+	}
+
 	_has_part = false;
 }
 
@@ -71,7 +76,7 @@ class LineIndex extends Index
 	list( data ) { return data.station };
 	Part = StationIndex;
 
-	part_src( data ) { return { name: data.name, title: data.name }; }
+	part_src( data ) { return { name: data.name, title: data.name, data }; }
 }
 
 
@@ -106,7 +111,53 @@ class RootIndex extends Index
 
 // HTML DOM //
 
-const Item = args =>
+// Station Page //
+
+const row = ( name, value ) =>
+{
+	const parts =
+	[
+		{ type: "td", text: name },
+		{ type: "td", text: value },
+	];
+
+	return { type: "tr", parts };
+};
+
+const Station = args =>
+{
+	const { index, location } = args;
+
+	const table =
+	{
+		type: "table",
+		parts:
+		[
+			row( "郵便番号", "〒" + index.data.postal.slice( 0, 3 ) + "-" + index.data.postal.slice( 3 ) ),
+			row( "北緯", index.data.y ),
+			row( "東経", index.data.x ),
+			row( "前駅", index.data.prev ),
+			row( "次駅", index.data.next ),
+		]
+	};
+
+	const main =
+	{
+		type: "div", class: "Eki content col-flex",
+		parts:
+		[
+			{ type: "h1", text: index.title },
+			{ type: "p", class: "-url", text: index.path.slice( -5 ).map( i => i.title.v ).join( " - " ) },
+			table,
+		]
+	};
+
+	return main;
+};
+
+// List Page //
+
+const ListItem = args =>
 {
 	const { index, location } = args;
 
@@ -136,7 +187,7 @@ const Frame = args =>
 {
 	const { index, location } = args;
 
-	index.load_parts();
+	index.fetch();
 
 	//  //
 	
@@ -146,9 +197,12 @@ const Frame = args =>
 		parts:
 		{
 			model: index.parts,
-			def: index => { return { type: Item, index, location }; },
+			def: index => { return { type: ListItem, index, location }; },
 		}
 	};
+
+
+	//  //
 
 	const content =
 	{
@@ -162,6 +216,9 @@ const Frame = args =>
 			{ type: "textarea", class: "-monitor", props:{ value: index.mon.json }, },
 		]
 	};
+
+
+	//  //
 
 	const main =
 	{

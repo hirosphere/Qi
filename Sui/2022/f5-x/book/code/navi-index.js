@@ -4,19 +4,17 @@ import { ArrayModel, Leaf, next_ru } from "../../base/model.js";
 
 //  //
 
-class Index
+class Node
 {
-	constructor( src, composition = null, order )
+	constructor( args )
 	{
-		this.type = src.type;
-		this.title = new Leaf( src.title );
-		this.name = src.name;
+		const { tree, composition = null, name, order } = args; 
 
-		this.has_part = new Leaf( src && src.parts && src.parts.length > 0 || false );
-		this.is_root = new Leaf( composition == null );
-
+		this.tree = ( composition && composition.tree ) || tree;
 		this.composition = composition;
-		
+		this.name = name;
+		this.order = order;
+
 		if( composition )
 		{
 			this.path = [ ... composition.path, this ];
@@ -27,10 +25,79 @@ class Index
 		{
 			this.path = [ this ];
 		}
-
-		this.order = order;
 		
 		next_ru( this );
+	}
+
+	//  //
+
+	path = [];
+	names = {};
+	parts = new ArrayModel();
+	has_part = new Leaf( false );
+	is_root = new Leaf( true );
+
+	//  //
+
+	get next() { return this.composition && this.composition.parts[ this.order + 1 ] || null; }
+	get prev() { return this.composition && this.composition.parts[ this.order - 1 ] || null; }
+
+	async search( path )
+	{
+		if( path.length == 0 )  return { index: this, rem: [] };
+
+		await this.fetch();
+		const rem = [ ... path ];
+		const name = path.shift();
+		const part = this.names[ name ];
+
+		if( part )  return await part.search( path, this );
+
+		return { index: this, rem };
+	}
+
+	async fetch() { return this.parts };
+
+	//  //
+
+	toString() { return this.ru; }
+}
+
+
+//  //
+
+class Index extends Node
+{
+	constructor( args )
+	{
+		const { src = {}, composition } = args;
+		const { name = "" } = src;
+
+		super( { name, ... args } );
+
+		this.type = src.type;
+		this.title = new Leaf( src.title );
+
+		this.has_part.value = ( src.parts && src.parts.length > 0 || false );
+		this.is_root.value = ( composition == null );
+
+		this.data = src.data;
+	}
+
+	// variables //
+
+	selected = new Leaf( false );
+
+	// link //
+
+	get_link( is_head )
+	{
+		return this.tree.location.get_link( this, is_head );
+	}
+
+	select( is_head )
+	{
+		this.tree.location.select( this, is_head );
 	}
 
 	//  structure  //
@@ -47,27 +114,6 @@ class Index
 		return [ ... com_path, encodeURIComponent( this.name ) ];
 	}
 
-	async search( path )
-	{
-		if( path.length == 0 )  return { index: this, rem: [] };
-
-		await this.load_parts();
-		const rem = [ ... path ];
-		const name = path.shift();
-		const part = this.names[ name ];
-
-		if( part )  return await part.search( path, this );
-
-		return { index: this, rem };
-	}
-
-	path = [];
-	names = {};
-	parts = new ArrayModel();
-
-	async load_parts() { return this.parts };
-
-
 	// query //
 
 	get query()
@@ -83,10 +129,6 @@ class Index
 	
 	get_content_def( location ) { return null; }
 
-
-	//  //
-
-	toString() { return this.ru; }
 }
 
 
@@ -98,26 +140,23 @@ class Tree
 	{
 		this.types = types;
 		this.root = this.create_index( src, null );
+		this.location = new Location( this );
 		this.update_monitor();
-	}
-
-	new_locatiol()
-	{
-		return new Location( this );
 	}
 
 	//  //
 
-	create_index( src, composition )
+	create_index( src, composition, order = 0 )
 	{
 		if( ! src ) return null;
 
 		const type = this.types[ src.type ] || Index;
-		const index = new type( src, composition, this );
+		const index = new type( { src, composition, tree: this, order } );
 
+		let part_order = 0;
 		if( src.parts ) for( const psrc of src.parts )
 		{
-			index.parts.push( this.create_index( psrc, index ) );
+			index.parts.push( this.create_index( psrc, index, part_order ++ ) );
 		}
 
 		return index;
@@ -146,21 +185,24 @@ class Location
 	constructor( tree )
 	{
 		this.tree = tree;
-		this.url.moreview = url => this.on_url_update( url );
+		this.url.moreview = url => this.on_url_change( url );
 		this.curr_page.moreview = ( new_index, old_index ) => this.on_page_change( new_index, old_index );
 	}
-
-	//  //
-
-	url = new Leaf( null );
-	on_changed( url, index ) {}
 
 	//  //
 
 	curr_head = new Leaf( null );
 	curr_page = new Leaf( null );
 
-	//  //
+	// public //
+
+	url = new Leaf( null );
+	on_changed( url, index ) {}
+
+	new_location()
+	{
+		return this;
+	}
 
 	async load_url()
 	{
@@ -187,9 +229,9 @@ class Location
 		return "?page=" + path.join( "/" ) + head + query;
 	}
 
-	//  //
+	// private //
 
-	async on_url_update()
+	async on_url_change()
 	{
 		if( this.url.value == null )  return;
 
@@ -231,18 +273,25 @@ class Location
 	}
 
 	
-	// item pool //
+	// .item pool //
 
 	stats = { selected: {} };
 	
 	on_page_change( new_index, old_index )
 	{
+		if( new_index ) new_index.selected.value = true;
+		if( old_index ) old_index.selected.value = false;
+
 		const old_item = this.get_selected( old_index );
 		const new_item = this.get_selected( new_index );
 
 		if( old_item ) old_item.value = false;
 		if( new_item ) new_item.value = true;
 	}
+
+	//  //
+
+	get urlstr() { return decodeURIComponent( this.url.value ) };
 };
 
 //  //

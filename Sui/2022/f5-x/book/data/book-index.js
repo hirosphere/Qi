@@ -33,22 +33,12 @@ const api =
 					],
 				},
 				{
-					title: "IndexView クラス",
-					name: "index-view",
-					parts:
-					[
-						{ title: "index", name: "index" },
-						{ title: "selected : Leaf", name: "selected" },
-						{ title: "select()", name: "select()" },
-					],
-				},
-				{
-					title: "Selection クラス",
-					name: "selection",
+					title: "Location クラス",
+					name: "location",
 					parts:
 					[
 						{ title: "load_url()", name: "load_url" },
-						{ title: "set_url()", name: "set_url" },
+						{ title: "get_link( index )", name: "get_link" },
 						{ title: "url : Leaf<string>", name: "url" },
 						{ title: "curr_page : Leaf<Index>", name: "curr_page" },
 						{ title: "curr_head : Leaf<Index>", name: "curr_head" },
@@ -88,7 +78,7 @@ export const index_src =
 			{ title: "HSL", name: "hsl" },
 		] },
 		api,
-		{ title: "路線", name: "rail", type: "Eki" },
+		{ title: "HeartRails 路線と駅", name: "HeartRails", type: "Eki" },
 	]
 };
 

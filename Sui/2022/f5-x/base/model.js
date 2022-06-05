@@ -11,6 +11,8 @@ class Leaf
 
 	//  //
 
+	set view( view ) { this.moreview = view; }
+
 	set moreview( view )
 	{
 		this.priv.views.push( view );
