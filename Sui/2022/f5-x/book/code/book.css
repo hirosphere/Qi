@@ -1,9 +1,17 @@
 
 * { margin: 0; border: 0; padding: 0; box-sizing: border-box; }
 
+:root
+{
+	--theme-color: hsl( 215, 73%, 76% );
+	--theme-color: hsl( 30, 70%, 63% );
+	--theme-color: hsl( 50, 70%, 80% );
+	--theme-color: hsl( 100, 70%, 75% );
+}
+
 html
 {
-	height: 100%; color:hsl( 50, 4%, 30% );
+	height: 100%; color:hsl( 50, 4%, 10% );
 }
 
 body
@@ -49,41 +57,55 @@ button { border-radius: 0.8ex; padding: 1.5ex 1.5em; }
 
 .book >.side
 {
-	background: hsl( 215, 70%, 85% );
+	background: var( --theme-color );
 	min-width: 280px;
 	max-width: 280px;
-	padding: 16px 12px;
+	padding: 8px 7px;
 }
 
 .book >.side >.navi
 {
-	border-radius: 10px;
+	border-radius: 12px;
 	height: 100%;
 	background: hsl( 55, 0%, 100% );
 	flex-grow: 2;
 	background: hsl( 0, 0%, 100% );
-	padding: 22px 2px;
+	padding: 22px 12px 8px;
 }
 
 
-.book >.side >.navi >.list { height: 100%; display: flex; flex-direction: column; font-size: 15px; gap: 20px; }
+.book >.side >.navi >.list { height: 100%; display: flex; flex-direction: column; font-size: 15px; gap: 13px; }
 
 .book >.side >.navi >.list ul { list-style: none; }
 .book >.side >.navi >.list li
 {
+	width: 100%;
 	display: grid; grid-template-columns: 1fr;
-	overflow: hidden; white-space: nowrap;
+	overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
 }
 
-.book >.side >.navi >.list >.path { padding: 0; text-align: center; display: flex; flex-direction: column; gap: 0px; }
-.book >.side >.navi >.list >.path > li { line-height: 1.8em;  text-decoration: dotted; } 
-.book >.side >.navi >.list >.path > li:first-child { font-size: 100%; }
-.book >.side >.navi >.list >.path > li:last-child  { font-weight: bold; font-size: 100%; } 
+.book >.side >.navi >.list >.path { padding: 0 12px; text-align: center; display: flex; flex-direction: column; gap: 0px; }
+.book >.side >.navi >.list >.path > li { margin-bottom: 1px; border-bottom: 1px dotted hsl( 50, 4%, 60% ); }
+.book >.side >.navi >.list >.path > li:nth-last-child( 2 ) { margin-bottom: 13px; }
+.book >.side >.navi >.list >.path > li:last-child { margin-bottom: 0; border-bottom: 2px solid hsl( 50, 4%, 60% ); }
 
-.book >.side >.navi >.list >.path > li > a > .label { border-bottom: 1px dotted hsl( 50, 4%, 60% ); border-radius: 3px; padding: 0 1.0em; }
+.book >.side >.navi >.list >.path > li > a
+{
+	margin-bottom: 1px;
+	border-radius: 6px;
+	padding: 0.2em 0em 0;
+	line-height: 1.3em;
+}
+.book >.side >.navi >.list >.path > li:first-child > a { font-size: 100%; }
+.book >.side >.navi >.list >.path > li:last-child > a
+{
+	margin-bottom: 13px;
+	line-height: 2.0em; padding-top: 0.2ex;
+	font-weight: bold; font-size: 130%;
+}
 
 
-.book >.side >.navi >.list >.colls { overflow: auto; padding: 0px 4px; }
+.book >.side >.navi >.list >.colls { overflow: auto; padding: 0px 0px; }
 .book >.side >.navi >.list >.colls > li
 {
 	height: 2.8em;
@@ -102,7 +124,7 @@ button { border-radius: 0.8ex; padding: 1.5ex 1.5em; }
 	align-items: stretch;
 	color: hsl( 0, 0%, 22% );
 }
-.book >.side >.navi >.list >.colls > li > a > .label { padding-left: 1em; display: flex; align-items: center; }
+.book >.side >.navi >.list >.colls > li > a > .label { padding-left: 0.5em; display: flex; align-items: center; }
 
 .book >.side >.navi >.list >.colls > li > a > .-rel
 {
@@ -113,14 +135,14 @@ button { border-radius: 0.8ex; padding: 1.5ex 1.5em; }
 	background:hsl( 70, 6%, 96% ); visibility: hidden;
 }
 
-.book >.side >.navi >.list >.path  > li:hover a > .label,
+.book >.side >.navi >.list >.path  > li:hover a,
 .book >.side >.navi >.list >.colls > li:hover a { background:hsl( 50, 6%, 96% ); }
 .book >.side >.navi >.list >.colls > li:hover  a.-rel { background:hsla( 50, 6%, 50%, 10% ); }
 .book >.side >.navi >.list >.colls > li[ selected = "true" ]  a.-rel { background:hsla( 70, 0%, 100%, 75% ); }
 .book >.side >.navi >.list >.colls > li[ has_part = "true" ] a .-rel { visibility: visible; }
 
 
-.book >.side >.navi >.list >.path > li[ selected = "true" ] > a > .label ,
+.book >.side >.navi >.list >.path > li[ selected = "true" ] > a ,
 .book >.side >.navi >.list >.colls > li[ selected = "true" ] > a
 {
 	background: hsl( 210, 1%, 10% ); color: hsl( 50, 0%, 90% );
@@ -128,8 +150,8 @@ button { border-radius: 0.8ex; padding: 1.5ex 1.5em; }
 
 /* Top */
 
-.Top { background:hsl( 50, 6%, 96% ); }
-.Top h1 { background:hsl( 215, 60%, 65% ); padding: 0.5em 0.7em; color:hsl( 50, 3%, 100% ); display: flex; justify-content: space-between; }
+.Top { background:hsl( 50, 6%, 96% ); margin: 0 18px; }
+.Top h1 { background:var( --theme-color ); padding: 0.8em 0.7em; color:hsl( 50, 3%, 100% ); display: flex; justify-content: space-between; }
 .Top h1 .clock { font-size: 100%; }
 .Top .Links { padding: 24px; display: flex; gap: 10px; flex-wrap: wrap; }
 .Top .Links .Block { border-radius: 8px;  border: 1px solid hsl( 50, 3%, 70% ); min-width: 200px; padding: 16px 28px 30px; }

@@ -159,19 +159,19 @@ const Station = args =>
 
 const ListItem = args =>
 {
-	const { index, location } = args;
+	const { index } = args;
 
 	const click = ev =>
 	{
 		ev.preventDefault();
-		location.select( index );
+		index.select();
 	};
 
 	const con = 
 	{
 		type: "a",
 		class: "-item",
-		attrs: { href: location.get_link( index ) },
+		attrs: { href: index.get_link() },
 		parts:
 		[
 			{ type: "span", class: "-nomble", text: index.order + 1 },
@@ -185,7 +185,7 @@ const ListItem = args =>
 
 const Frame = args =>
 {
-	const { index, location } = args;
+	const { index } = args;
 
 	index.fetch();
 
@@ -197,7 +197,7 @@ const Frame = args =>
 		parts:
 		{
 			model: index.parts,
-			def: index => { return { type: ListItem, index, location }; },
+			def: index => { return { type: ListItem, index }; },
 		}
 	};
 

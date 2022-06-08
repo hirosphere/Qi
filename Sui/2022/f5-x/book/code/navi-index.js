@@ -92,7 +92,7 @@ class Index extends Node
 
 	get_link( is_head )
 	{
-		return this.tree.location.get_link( this, is_head );
+		return this.tree.location.make_link( this, is_head );
 	}
 
 	select( is_head )
@@ -211,7 +211,7 @@ class Location
 
 	select( index, is_head = false )
 	{
-		this.url.value = this.get_link( index, is_head );
+		this.url.value = this.make_link( index, is_head );
 	}
 
 	get_selected( index )
@@ -219,7 +219,7 @@ class Location
 		return  this.stats.selected[ index ] = this.stats.selected[ index ] || new Leaf( false );
 	}
 
-	get_link( index, is_head )
+	make_link( index, is_head )
 	{
 		const path = index.link_path || [];
 		path.shift();
