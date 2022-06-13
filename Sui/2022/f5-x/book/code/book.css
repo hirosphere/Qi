@@ -7,6 +7,14 @@
 	--theme-color: hsl( 30, 70%, 63% );
 	--theme-color: hsl( 50, 70%, 80% );
 	--theme-color: hsl( 100, 70%, 75% );
+	--theme-hue: 100;
+	--theme-hue: 215;
+	--theme-hue: 333;
+	--theme-hue: 25;
+	--theme-hue: 55;
+	--theme-hue: 180;
+	--theme-hue: 230;
+	--theme-hue: 218;
 }
 
 html
@@ -22,19 +30,50 @@ body
 
 a { text-decoration: none;  color:hsl( 0, 0%, 7% );  }
 button { border-radius: 0.8ex; padding: 1.5ex 1.5em; }
+table { background: hsl( 50, 0%, 100% ); }
+td { background: hsl( 50, 4%, 91% ); padding: 0 0.6ex; }
+tr:nth-of-type( 2n ) > td { background:hsl( 50, 4%, 96% ); }
 
-.col-flex { display: flex; flex-direction: column;  }
+.col-flex { display: flex; flex-direction: column; }
+
+/* UI */
+
+ul.Tabs
+{
+	list-style: none;
+	display: flex; height: 3em; background:hsl( 100, 70%, 75% ); align-items: stretch; gap: 3px;
+}
+ul.Tabs > li
+{
+	cursor: default; background:hsl( 0, 0%, 100% );
+	border: 2px solid hsl( 0, 0%, 40% ); padding: 0 1em;
+}
+ul.Tabs > li > .label
+{
+}
+ul.Tabs > li::after { content: ""; margin: 0 1px; }
+
+.Controls { display: flex; flex-direction: column; gap: 1.5px; }
+
+.Range
+{
+	width: 500px; height: 50px;
+	border-radius: 0.6ex; border: 1px solid hsla( 0, 0%, 100%, 40% );
+	background: hsla( 0, 2%, 100%, 25% ); color: hsl( 0, 0%, 93% );
+	padding: 15px; display: grid; grid-template-columns: 6ex 1fr 4ex 1ex; column-gap: 0.3ex;
+	align-items: center;
+}
 
 /* book */
 
 .book
 {
 	height: 100%;
-	padding: 1.5px;
+	padding: 2px 6px 1px 2px;
 	
 	display: flex;
 	align-items: stretch;
-	gap: 1px;
+	gap: 2px;
 }
 
 .book .contents
@@ -46,31 +85,42 @@ button { border-radius: 0.8ex; padding: 1.5ex 1.5em; }
 	min-width: 300px;
 }
 
-.book .content
+.book .page
 {
 	height: 100%;
 	overflow: auto;
-	padding: 20px;
+	padding: 0;
+	display: flex;  flex-direction: column;  gap: 2px;
 }
+
+.book .page h1
+{
+	border-bottom: 1px solid hsl( var( --theme-hue ), 67%, 63% );
+	padding: 0.35em 0.9em;
+	color:hsl( var( --theme-hue ), 65%, 65% );
+	font-size: 20px;
+}
+
+.book .page .page-content { padding: 20px; }
 
 /* Side, Navi */
 
 .book >.side
 {
-	background: var( --theme-color );
+	background: hsl( var( --theme-hue ), 75%, 80% );
 	min-width: 280px;
 	max-width: 280px;
-	padding: 8px 7px;
+	padding: 14px 8px;
 }
 
 .book >.side >.navi
 {
-	border-radius: 12px;
+	border-radius: 6px;
 	height: 100%;
 	background: hsl( 55, 0%, 100% );
 	flex-grow: 2;
 	background: hsl( 0, 0%, 100% );
-	padding: 22px 12px 8px;
+	padding: 18px 2px 8px;
 }
 
 
@@ -79,12 +129,14 @@ button { border-radius: 0.8ex; padding: 1.5ex 1.5em; }
 .book >.side >.navi >.list ul { list-style: none; }
 .book >.side >.navi >.list li
 {
-	width: 100%;
 	display: grid; grid-template-columns: 1fr;
 	overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
 }
 
-.book >.side >.navi >.list >.path { padding: 0 12px; text-align: center; display: flex; flex-direction: column; gap: 0px; }
+.book >.side >.navi >.list >.path
+{
+	padding: 0 16px; text-align: center; display: flex; flex-direction: column; gap: 0px;
+}
 .book >.side >.navi >.list >.path > li { margin-bottom: 1px; border-bottom: 1px dotted hsl( 50, 4%, 60% ); }
 .book >.side >.navi >.list >.path > li:nth-last-child( 2 ) { margin-bottom: 13px; }
 .book >.side >.navi >.list >.path > li:last-child { margin-bottom: 0; border-bottom: 2px solid hsl( 50, 4%, 60% ); }
@@ -109,7 +161,7 @@ button { border-radius: 0.8ex; padding: 1.5ex 1.5em; }
 .book >.side >.navi >.list >.colls > li
 {
 	height: 2.8em;
-	margin: 0 0px 1.4px;
+	margin: 0 1px 1.4px 12px;
 	border-bottom: 1px dotted hsl( 50, 4%, 70% );
 }
 
@@ -145,13 +197,13 @@ button { border-radius: 0.8ex; padding: 1.5ex 1.5em; }
 .book >.side >.navi >.list >.path > li[ selected = "true" ] > a ,
 .book >.side >.navi >.list >.colls > li[ selected = "true" ] > a
 {
-	background: hsl( 210, 1%, 10% ); color: hsl( 50, 0%, 90% );
+	background: hsl( 210, 1%, 24% ); color: hsl( 50, 0%, 90% );
 }
 
 /* Top */
 
-.Top { background:hsl( 50, 6%, 96% ); margin: 0 18px; }
-.Top h1 { background:var( --theme-color ); padding: 0.8em 0.7em; color:hsl( 50, 3%, 100% ); display: flex; justify-content: space-between; }
+.Top { background:hsl( 50, 6%, 96% ); }
+.book .Top h1 { background: hsl( var( --theme-hue ), 65%, 65% ); padding: 0.8em 0.7em; color:hsl( 50, 3%, 100% ); display: flex; justify-content: space-between; }
 .Top h1 .clock { font-size: 100%; }
 .Top .Links { padding: 24px; display: flex; gap: 10px; flex-wrap: wrap; }
 .Top .Links .Block { border-radius: 8px;  border: 1px solid hsl( 50, 3%, 70% ); min-width: 200px; padding: 16px 28px 30px; }
@@ -192,10 +244,15 @@ button { border-radius: 0.8ex; padding: 1.5ex 1.5em; }
 .Train .Range .-unit { margin-left: 0.5ex; font-size: 80%; color:hsl( 50, 3%, 20% ); }
 
 
+/* UI-Sketch */
+
+.Sk-HSL .page-content { flex-grow: 1; background:hsl( 0, 0%, 40% ); gap: 6px; }
+.Sk-HSL .display { flex-grow: 1; border: 1px solid hsl( 0, 0%, 94% ); }
 
 /* Eki */
 
 .Eki { gap: 3px; }
+.book .Eki h1 { background:hsl( 20, 2%, 38% );  color:hsl( 0, 0%, 100% );  padding: 0.7em 1.3em; font-size: 24px; }
 .Eki > * { background:hsla( 345, 5%, 50%, 0% );  }
 .Eki .-url { padding: 1ex 0; font: normal 16px courier; }
 .Eki .-content
@@ -235,6 +292,8 @@ button { border-radius: 0.8ex; padding: 1.5ex 1.5em; }
 {
 	font: normal 14px courier;  tab-size: 3;
 }
+
+.Eki table { width: 400px; }
 
 
 /*  */

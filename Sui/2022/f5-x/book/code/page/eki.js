@@ -143,7 +143,7 @@ const Station = args =>
 
 	const main =
 	{
-		type: "div", class: "Eki content col-flex",
+		type: "div", class: "content Eki ",
 		parts:
 		[
 			{ type: "h1", text: index.title },

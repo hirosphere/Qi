@@ -89,7 +89,7 @@ const CollItem = args =>
 	{
 		type: Link,
 		class: "-rel",
-		text: "↓",
+		text: "⇒",
 		is_head: true,
 		location,
 		index, tabIndex

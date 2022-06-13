@@ -1,5 +1,7 @@
 import { Leaf } from "../../../../base/model.js";
 import { Range } from "../../ui.js";
+import HSL from "./hsl.js";
+import Switch from "./switch.js";
 
 const Caption = args =>
 {
@@ -11,17 +13,12 @@ const Caption = args =>
 	return { type: "p", text };
 };
 
-const Main = args =>
+const UISketch = args =>
 {
-	return {
-		type: "div",
-		class: "content",
-		parts:
-		[
-			{ type: Caption },
-			{ type: Range, title: "Range", value: new Leaf( 50 ) },
-		]
-	}
+	const h1 = { type: "h1", text: args.index.title };
+	const content = { type: "div", class: "page-content" };
+	return { type: "div", class: "page", parts: [ h1, content ] };
 };
 
-export default { Main };
+
+export default { Main: UISketch, HSL, Switch };

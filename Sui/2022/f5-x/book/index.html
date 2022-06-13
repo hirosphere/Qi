@@ -14,11 +14,77 @@ import { create } from "../base/ht-dom.js";
 import { Book } from "./code/book.js";
 import { index_src } from "./data/book-index.js";
 
-//  //
+import Eki       from "./code/page/eki.js";
+import { Top }   from "./code/page/top/top.js";
+import Train     from "./code/page/train/train.js";
+import { Eval }  from "./code/page/eval/eval.js"
+import UISketch     from "./code/page/ui-sketch/ui-sketch-1.js";
+
+
+// page content //
+
+const DefaultContent = args =>
+{
+	const { index } = args;
+
+	const path = index.path.slice( 0, -1 );
+
+	const parts =
+	[
+		{ type: "h1", text: index.title, },
+		{ type: "div", class: "page-content", parts: [
+			{ type: "p", text: path.map( i => i.title.value ).join( " > " ) },
+			{ type: "p", text: "-- Content --", style: { color: "hsl( 50, 3%, 60% )" } },
+		] },
+	];
+
+	return { type: "div", class: "page", parts };
+};
+
+
+const content_types =
+{
+	"Top": Top,
+	"Eval": Eval,
+	"Train": Train.Main,
+	"UISketch": UISketch.Main,
+	"UISketch.HSL": UISketch.HSL,
+	"UISketch.Switch": UISketch.Switch,
+};
+
+
+const get_named_content_def = index =>
+{
+	const type = content_types[ index.type ] || DefaultContent;
+	console.log( "*", type && type.name || "", index.type );
+	return { type, index };	
+};
+
+
+const contentDef = ( index ) =>
+{
+	return index &&
+	(
+		index.get_content_def() ||
+		get_named_content_def( index )
+	)
+	|| null;
+};
+
+
+// index //
+
+const index_types =
+{
+	"Eki": Eki.RootIndex,
+};
+
+
+// main //
 
 const main = () =>
 {
-	create( { type: Book, index_src }, "body" );
+	create( { type: Book, index_src, index_types, contentDef }, "body" );
 };
 
 

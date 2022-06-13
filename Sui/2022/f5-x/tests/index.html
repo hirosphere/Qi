@@ -51,7 +51,6 @@ const Index = args =>
 
 	const stat = {};
 	const muted = Leaf.make( args.muted, true );
-	const i_view = sel.get_item( index );
 
 	//
 
@@ -61,7 +60,7 @@ const Index = args =>
 		ev.stopPropagation();
 	};
 
-	const select = ev => i_view.select();
+	const select = ev => index.select();
 
 	//
 
@@ -70,7 +69,7 @@ const Index = args =>
 	const label =
 	{
 		type: "div", class: "-label-",
-		clist: { _selected_: i_view.selected },
+		clist: { _selected_: index.selected },
 		events: { mousedown: select },
 		parts:
 		[
@@ -96,6 +95,7 @@ const Index = args =>
 const TreePane = args =>
 {
 	const { tree, sel } = args;
+	console.log( tree.root && tree.root.title.value );
 	const root = { type: Index, index: tree.root, sel, muted: false };
 	return { type: "div", class: "item tree", parts: [ root ] };
 };
@@ -146,16 +146,15 @@ const index_src = args =>
 
 const App = args =>
 {
-	const tree = new Tree( index_src() );
-	const sel = tree.new_selection();
+	const tree = new Tree( { src: index_src() } );
+	const sel = tree.location;
 	sel.load_url();
 
 	//
 
-	sel.url.moreview = url =>
+	sel.on_changed = ( url, index ) =>
 	{
 		history.replaceState( "", null, url );
-		const index = sel.curr_page.value;
 		document.title = index && index.title.value || "Tree";
 	};
 
@@ -177,7 +176,6 @@ const App = args =>
 
 	const parts =
 	[
-		// { type: "h1", text: "Index, Dyn Path, Array, Tree, Selection, Hiliting" },
 		{ type: "div", class: "body", parts: contents },
 	];
 

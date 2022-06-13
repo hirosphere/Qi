@@ -43,6 +43,7 @@ const links_block_2 =
 	[
 		{ title: "秋月電子", url: "https://akizukidenshi.com/catalog/" },
 		{ title: "Top", url: "http://localhost/Home/#?Top" },
+		{ title: "", url: "" },
 	]
 };
 

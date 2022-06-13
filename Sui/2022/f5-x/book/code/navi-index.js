@@ -125,10 +125,11 @@ class Index extends Node
 		_test_query = "&param=" + Math.floor( Math.random() * 101 );
 
 
-	// page def //
+	// page //
 	
-	get_content_def( location ) { return null; }
+	get_content_def() { return null; }
 
+	get pageId() { return this.ru; }
 }
 
 
@@ -136,7 +137,8 @@ class Index extends Node
 
 class Tree
 {
-	constructor( src, types = {} )
+	// constructor( src, types = {} )
+	constructor( { src, types = {} } )
 	{
 		this.types = types;
 		this.root = this.create_index( src, null );

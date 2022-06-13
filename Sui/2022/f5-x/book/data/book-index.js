@@ -57,6 +57,7 @@ const api =
 	]
 };
 
+//  //
 
 export const index_src =
 {
@@ -72,10 +73,11 @@ export const index_src =
 		[
 			{ title: "シリアル", name: "serial" },
 		] },
-		{ title: "気象", name: "wether", type: "Wether" },
-		{ title: "UIスケッチ", name: "sketch", type: "UI-Sketch", parts:
+		{ title: "UIスケッチ", name: "sketch", type: "UISketch", parts:
 		[
-			{ title: "HSL", name: "hsl" },
+			{ title: "HSL", name: "hsl", type: "UISketch.HSL" },
+			{ title: "Switch", name: "switch", type: "UISketch.Switch" },
+			{ title: "ADSR", name: "adsr" },
 		] },
 		api,
 		{ title: "HeartRails 路線と駅", name: "HeartRails", type: "Eki" },
