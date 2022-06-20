@@ -31,11 +31,11 @@ class Node
 
 	//  //
 
-	path = [];
+	path = []							// +
 	names = {};
-	parts = new ArrayModel();
-	has_part = new Leaf( false );
-	is_root = new Leaf( true );
+	parts = new ArrayModel();			// +
+	has_part = new Leaf( false );		// +
+	is_root = new Leaf( true );			// +
 
 	//  //
 

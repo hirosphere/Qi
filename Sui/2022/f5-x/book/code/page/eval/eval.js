@@ -32,11 +32,23 @@ const Unit = ( args, self, dec ) =>
 		catch( exc ) { output.value = exc; }
 	};
 
+	const eval_button = { type: "button", text: "Eval", events: { click: ev => execute() } };
+	const bar = { type: "div", class: "bar", parts: [ eval_button ] };
+
+	const sample = `const r = [];
+for( let i = 0; i <= 12; i ++ )
+{
+	r[ i ] = Math.pow( 2, i / 12 ) * 440;
+}
+r.join( "\\n" );
+`;
+
 	const parts =
 	[
-		{ type: "textarea", name: "code", props: { value: "Math.pow( 2, 5 / 12 ) * 440" }, events: { keydown } },
+		bar,
+		{ type: "textarea", name: "code", props: { value: sample }, events: { keydown } },
 		{ type: "textarea", name: "output" },
-		{ type: "textarea", name: "input", props: { value: "Aaa\tBbb\t11.222" } },
+		{ type: "textarea", name: "input", props: { value: "\t" } },
 		{ type: "div", class: "display", name: "display", },
 	];
 
@@ -51,7 +63,7 @@ const post = async( path, args, failv ) =>
 	try
 	{
 		const res = await fetch( path, { method: "post", headers: { "Content-Type": "application/json" }, body: JSON.stringify( args ) } );
-		return res.ok ? res.json() : failv;
+		return res.ok ? await res.json() : failv;
 	}
 	catch( err )
 	{
