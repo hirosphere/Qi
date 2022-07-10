@@ -7,7 +7,7 @@ export const CompoA = ( { model } ) =>
 
 	return (
 		<li>
-			<span onMouseEnter ={ () => model.count.value ++ } >{ model.name }で{ count }つ,</span>
+			<span onMouseMove ={ () => model.count.value ++ } >{ model.name }で{ count }つ,</span>
 		</li>
 	)
 };

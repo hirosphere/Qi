@@ -31,7 +31,7 @@
 ul { list-style: none; display: flex; gap: 1em; cursor: default; }
 li { }
 
-.HSLView { width: 400px; height: 30px; color: white; }
+.HSLView { width: 600px; height: 60px; color: white; }
 .HSLControl .title { display: inline-block; width: 6ex; }
 .HSLControl input[ type="range" ] { width: 300px }
 .HSLControl .value { display: inline-block; width: 4ex; text-align: right; }
