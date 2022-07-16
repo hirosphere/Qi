@@ -1,28 +1,82 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Leaf, Rel } from "../Leaf";
 
-export const CompoA = ( { model } ) =>
+//  //
+
+export const Tokyo = class
 {
-	const [ count ] = model.count.shot = useState( model.count.value );
+	constructor( { title, points } )
+	{
+		this.title = title;
+		points.forEach( point => this.addPoint( point ) );
+	}
+
+	addPoint( name )
+	{
+		this.points.push( { name, count: Leaf.new( 0, this.total ) } );
+	}
+
+	get_total()
+	{
+		let acc = 0;
+		this.points.forEach( item => acc += item.count.value );
+		return acc;
+	}
+
+	points = [];
+	total = new Rel( { calc: () => this.get_total() } );
+};
+
+//  //
+
+export const Point = ( { model } ) =>
+{
+	const [ count, setcount ] = useState( model.count.value );
+
+	useEffect( () => { model.count.view = setcount; }, [] );
 
 	return (
 		<li>
-			<span onMouseMove ={ () => model.count.value ++ } >{ model.name }で{ count }つ,</span>
+			<span
+				onTouchStart = { ev => { ev.preventDefault(); } }
+				onMouseMove = { ev => model.count.value += ev.movementX }
+				onTouchMove = { ev => { ev.preventDefault(); } }
+				onClick = { ev => model.count.value = 100 }
+			>{ model.name }で{ count }つ,</span>
 		</li>
 	)
 };
+
+//  //
+
+export const TokyoView = ( { model } ) =>
+{
+	const [ total, settotal ] = useState( model.total.value );
+
+	useEffect( () => { model.total.view = settotal; }, [] );
+
+	return (
+		<div>
+			<h2>{ model.title }で{ total }つ。</h2>
+			<ul>{ model.points.map( point => <Point model={ point } /> ) }</ul>
+		</div>
+	)
+};
+
 
 //
 
 export const Range = ( { title, model, unit, max } ) =>
 {
-	model.shot = useState( model.value );
+	const [ value, setvalue ] = useState( model.value );
+
+	useEffect( () => { model.view = setvalue }, [] );
 
 	return (
 		<div className="Range">
 			<label className="title">{ title }</label>
-			<input type="range" max={ max } value={ model.value } onInput={ ev => model.value = ev.target.value } />
-			<span className="value">{ model.value }</span>
+			<input type="range" max={ max } value={ value } onInput={ ev => model.value = ev.target.value - 0 } />
+			<span className="value">{ value }</span>
 			<span className="unit">{ unit }</span>
 		</div>
 	);
@@ -42,7 +96,8 @@ export const HSLControl = ( { model } ) =>
 
 export const HSLView = ( { model } ) =>
 {
-	const [ color ] = model.css.shot = useState( model.css.value );
+	const [ color, setcolor ] = useState( model.css.value );
+	useEffect( () => { model.css.view = setcolor }, [] );
 	return <div className="HSLView" style={ { background: color } } >{ model.css.value }</div>
 };
 

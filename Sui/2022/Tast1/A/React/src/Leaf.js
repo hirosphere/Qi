@@ -18,14 +18,19 @@ export const Leaf = class
 
 	//
 
+	set shot( shot )
+	{
+		this.priv.shots.push( shot );
+	}
+
+	set view( view )
+	{
+		this.priv.views.push( view );
+	}
+
 	set rel( rel )
 	{
 		this.priv.rels.push( rel );
-	}
-
-	set shot( [ state, setstate ] )
-	{
-		this.priv.shots.push( setstate );
 	}
 
 	get value()
@@ -36,6 +41,7 @@ export const Leaf = class
 	set value( new_value )
 	{
 		this.priv.value = new_value;
+		this.priv.views.forEach( view => view( new_value ) );
 		this.priv.rels.forEach( rel => rel.update() );
 		this.priv.shots.forEach( shot => shot( new_value ) );
 		this.priv.shots = [];
@@ -43,7 +49,7 @@ export const Leaf = class
 
 	// 
 
-	priv = { shots: [], rels: [] };
+	priv = { shots: [], rels: [], views: [] };
 };
 
 export const Rel = class extends Leaf
