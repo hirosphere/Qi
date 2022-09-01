@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>🐑 Meh.22.1 🐑</title>
+	<link rel="stylesheet" href="./common.css" />
+
+<style>
+
+body { gap: 18px; font-family: "Comic Sans MS"; }
+
+.Tabs { padding: 0.2ex; display: flex; gap: 1px; }
+.Tab { padding: 0.8ex 1.2em; background:hsl( 20, 3%, 90% ); }
+.Tab.selected { background:hsl( 20, 3%, 0% ); color:hsl( 20, 3%, 100% ); }
+
+.Range
+{
+	width: 500px;
+	background: hsl( 20, 3%, 70% );
+	border-radius: 1ex;
+	padding: 0.8em;
+	display: flex;
+	gap: 1ex;
+}
+.Range > .label { width: 5ex; }
+.Range > input[ type="range" ] { flex-grow: 1; }
+.Range > .vu { width: 6ex; text-align: right; }
+
+.HSLCtrl { display: flex; flex-direction: column; gap: 1px; }
+.HSLDisp { height: 200px; border-radius: 1ex; display: flex; justify-content: center; align-items: center; color:hsl( 20, 3%, 100% ); }
+.HSLApp { display: flex; flex-direction: column; gap: 6px; }
+.HSLPage { display: flex; flex-direction: column; gap: 16px; text-align: center; }
+
+.OrderSwitch .selected { background:hsl( 20, 3%, 90% ) }
+
+.App > .Contents { margin-top: 1.5em; }
+
+</style>
+		
+
+</head>
+<body>
+	<h1>🐑 Meh.22.1 🐑</h1>
+
+	<ui class="links" style="display: none;">
+		<h2>要素開発</h2>
+		<li><a href="./AutoReload.html">Auto Reload</a></li>
+		<li><a href="./Delete.html">Delete</a></li>
+		<li><a href="./SSR.html">SSR</a></li>
+		<li><a href="">ArrayModel</a></li>
+		<li><a href="">Tabs</a></li>
+
+		<ui class="links">
+			<h3>ナビゲーション・Index</h3>
+			<li><a href="./index.html">URL Param</a></li>
+		</ul>
+	</ul>
+
+
+	<ui class="links">
+		<h2>応用</h2>
+		<li><a href="./HSL.html">HSL</a></li>
+		<li>駅名CSSアニメーション</li>
+		<li>駅順音階</li>
+		<li>CSS プロパティギャラリー</li>
+	</ul>
+
+
+<script type="module">
+
+import Meh, { DOM, Navi, Leaf } from "../../Meh/vanil/meh.js";
+import Tabs from "./Tabs.js";
+import { HSLPage, HSL } from "./HSL.js";
+import Audio from "./Audio.js";
+import Swt from "./PartSw.js";
+
+const app =
+{
+	tabs2: Navi.fromTitles( [ "山手線", "京浜東北線", "中央線", "総武線", "常磐線快速", "埼京線", "京葉線" ] ),
+	list3: [ "101系", "103系", "201系", "205系", "E231系", "E233系" ],
+	hsl:
+	{
+		color1: new HSL( { hue: 205, sat: 55, light: 55 } ),
+		color2: new HSL( { hue: 100, sat: 60, light: 60 } ),
+		color3: new HSL( { hue: 330, sat: 60, light: 60 } ),
+	}
+};
+
+const TabContentA = ( { list } ) =>
+{
+	return {
+		type: "div",
+		parts:[
+			{ type: Tabs, model: list, },
+		]
+	};
+};
+
+const Page = ( { index } ) =>
+{
+	return {
+		type: "div", class: "Page",
+		parts:[
+			{ type: "h2", text: index.title },
+		]
+	};
+};
+
+const App = args =>
+{
+	const list =
+	[
+		{ title: "Switches", content: { type: Swt.StatOrd }, selected: true },
+		{ title: "HSL", content: { type: HSLPage, model: app.hsl } },
+		{ title: "Audio", content: { type: Audio.Pane } },
+		{ title: "Delete", },
+		{ title: "SSR" },
+		{ title: "ArrayModel" },
+		{ title: "駅名CSS" }
+	];
+
+	const sel = new Navi.Selection ( { listSrc: { parts: list } } );
+
+	return {
+		type: "div", class: "App",
+		parts:[
+			{ type: Tabs, model: sel, },
+			{ type: "div", class: "Contents",
+				parts: {
+					model: sel.rootIndex.parts,
+					createPart( index ) { return index.content || { type: "div", parts: [ index.title ] }; }
+				},
+				partSw: sel.currentIndex,
+			},
+		]
+	}
+};
+
+DOM.create( { type: App }, "body" );
+
+
+const f = async () =>
+{
+	const res = await fetch( "/API/Long-Poll" );
+	console.log( await res.json() );
+};
+
+f();
+
+</script>
+
+</body>
+</html>

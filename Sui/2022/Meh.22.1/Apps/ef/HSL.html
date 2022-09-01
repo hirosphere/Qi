@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>HSL</title>
+	<link rel="stylesheet" href="./common.css" />
+<style>
+
+body { gap: 18px; }
+
+.Range
+{
+	width: 500px;
+	background: hsl( 20, 3%, 70% );
+	border-radius: 1ex;
+	padding: 0.8em;
+	display: flex;
+	gap: 1ex;
+}
+.Range > .label { width: 5ex; }
+.Range > input[ type="range" ] { flex-grow: 1; }
+.Range > .vu { width: 6ex; text-align: right; }
+
+.HSLCtrl { display: flex; flex-direction: column; gap: 1px; }
+.HSLDisp { height: 100px; border-radius: 1ex; padding: 1em; text-align: center; }
+.HSLApp { display: flex; flex-direction: column; gap: 2px; }
+.HSLPage { display: flex; flex-direction: column; gap: 10px; text-align: center; }
+
+</style>
+</head>
+<body>
+
+<script type="module">
+
+import Meh, { DOM } from "../../Meh.22.1/vanil/meh.js";
+import { HSLPage, HSL } from "./HSL.js";
+
+const app =
+{
+	hsl:
+	{
+		color1: new HSL( { hue: 120, sat: 55, light: 55 } ),
+		color2: new HSL( { hue: 90, sat: 61, light: 59 } )
+	}
+};
+
+DOM.create( { type: HSLPage, model: app.hsl }, "body" );
+
+
+const f = async () =>
+{
+	const res = await fetch( "/API/Long-Poll" );
+	console.log( await res.json() );
+};
+
+f();
+
+
+
+
+</script>
+
+</body>
+</html>
