@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Meh.22.1.B</title>
+
+<style>
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+	height: 100%; background: hsl( 22, 30%, 97% );
+	overflow: auto scroll;
+}
+
+body
+{
+	margin: 0 13%;
+	padding: 1em 0 7.5em;
+	min-height: 100%;
+	background:hsl( 22, 30%, 100% );
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.Range
+{
+	width: 400px;
+	display: grid; gap: 0.5ex;
+	grid-template-columns: 4em 1fr 4ex 1ex;
+	align-items: center;
+}
+
+.Tabs
+{
+	list-style: none;
+	display: flex;
+	gap: 1px;
+}
+
+.Tabs > li
+{
+	border-radius: 0.5ex;
+	min-width: 5em;
+	padding: 1ex 1em;
+	cursor: pointer;
+	text-align: center;
+}
+
+.Tabs > li.selected
+{
+	color:hsl( 22, 30%, 98% );
+	background:hsl( 22, 0%, 26% );
+}
+
+</style>
+
+</head>
+<body>
+
+	<h1>🐏Meh.22.1.B🐏</h1>
+
+<script type="module">
+
+import Meh from "../../Meh/meh.js";
+const { Leaf, Branch, UI, Selector } = Meh;
+const { List, ListItem } = UI;
+
+const main = () =>
+{
+	const app = new App();
+
+	const mainList =
+	{
+		"Aa": { title: "Aa", content: { type: "div", text: "Aa" } },
+		"Bb": { title: "Bb", content: { type: "div", text: "Bb" } },
+		"Cc": { title: "Cc", content: { type: "div", text: "Cc" } },
+		"Ddd": { title: "Ddd", content: { type: "div", text: "Ddd" } },
+	};
+	
+	const mainSel = new Selector( { srcValue: { parts: mainList } } );
+	
+	Meh.HTDom.create( { type: AppPane, model: app, mainSel }, "body" );
+};
+
+// Model //
+
+const App = Branch.newType
+(
+	{
+		
+	}
+);
+
+
+// UI //
+
+const Range = ( args, { refs } ) =>
+{
+	const value = refs.addLeaf( args.value );
+
+	return {
+		type: "div", class: "Range",
+		parts:[
+			{ type: "span", text: "Range" },
+			{
+				type: "input",
+				attrs: { type: "range" },
+				props: { value: value },
+				acts: { input: ev => { value.set( ev.target.value - 0 ); } },
+			},
+			{ type: "span", text: value }
+		]
+	};
+};
+
+const AppPane = args =>
+{
+	return {
+		type: "div", class: "App",
+		parts:[
+			//{ type: "input", attrs: { value: value1 } },
+			{ type: List, class: "Tabs", index: args.mainSel.root },
+			{ type: Range, value: new Leaf( { value: 33 } ) },
+		]
+	};
+};
+
+main();
+
+</script>
+
+
+</body>
+</html>
