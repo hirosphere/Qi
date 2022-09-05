@@ -43,10 +43,11 @@ const createElement = ( def, component ) =>
 {
 	const { refs } = component;
 
-	const { type, class: cname, attrs, props, acts } = def;	
+	const { type, class: cname, classSw, attrs, props, acts } = def;	
 	const e = document.createElement( type );
 
 	if( cname !== undefined ) bindAttr( e, "class", cname, refs );
+	if( classSw ) for( let name in classSw ) bindClassSw( e, name, classSw[ name ], refs );
 	if( attrs ) for( let name in attrs ) bindAttr( e, name, attrs[ name ], refs );
 	if( props ) for( let name in props ) bindProp( e, name, props[ name ], refs );
 	if( acts ) for( let name in acts ) e.addEventListener( name, acts[ name ] );
@@ -59,6 +60,11 @@ const createElement = ( def, component ) =>
 
 	return e;
 };
+
+const bindClassSw = ( e, name, state, refs ) =>
+{
+	refs.addLeaf( state, state => e.classList.toggle( name, state ) );
+}
 
 const bindProp = ( target, name, value, refs ) =>
 {
@@ -93,18 +99,11 @@ class Parts
 	{
 		const { arrayModel, create } = def;
 
-		l( arrayModel , create )
-
 		if( arrayModel && create )
 		{
 			arrayModel.forEach
 			(
 				item => component.createNode( create( item ), e )
-			);
-
-			arrayModel.forEach
-			(
-				item =>l( create( item ), item )
 			);
 		}
 	}

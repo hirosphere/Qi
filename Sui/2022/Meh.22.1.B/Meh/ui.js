@@ -8,8 +8,15 @@ const ListItem = ( args, { refs } ) =>
 
 	return {
 		type: "li",
-		class: "selected",
-		text: index.priv.id
+		class: "ListItem",
+		classSw: { selected: index.selected },
+		text: index.title,
+		acts: {
+			mousedown( ev )
+			{
+				index.select();
+			}
+		}
 	};
 };
 

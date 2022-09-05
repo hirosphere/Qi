@@ -24,6 +24,7 @@ body
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	gap: 2em;
 }
 
 .Range
@@ -48,6 +49,7 @@ body
 	padding: 1ex 1em;
 	cursor: pointer;
 	text-align: center;
+	background:hsl( 42, 12%, 93% );
 }
 
 .Tabs > li.selected
@@ -55,6 +57,8 @@ body
 	color:hsl( 22, 30%, 98% );
 	background:hsl( 22, 0%, 26% );
 }
+
+.SampleA { display: flex; flex-direction: column; align-items: center; gap: 2em; }
 
 </style>
 
@@ -69,22 +73,6 @@ import Meh from "../../Meh/meh.js";
 const { Leaf, Branch, UI, Selector } = Meh;
 const { List, ListItem } = UI;
 
-const main = () =>
-{
-	const app = new App();
-
-	const mainList =
-	{
-		"Aa": { title: "Aa", content: { type: "div", text: "Aa" } },
-		"Bb": { title: "Bb", content: { type: "div", text: "Bb" } },
-		"Cc": { title: "Cc", content: { type: "div", text: "Cc" } },
-		"Ddd": { title: "Ddd", content: { type: "div", text: "Ddd" } },
-	};
-	
-	const mainSel = new Selector( { srcValue: { parts: mainList } } );
-	
-	Meh.HTDom.create( { type: AppPane, model: app, mainSel }, "body" );
-};
 
 // Model //
 
@@ -117,10 +105,10 @@ const Range = ( args, { refs } ) =>
 	};
 };
 
-const AppPane = args =>
+const SampleA = args =>
 {
 	return {
-		type: "div", class: "App",
+		type: "div", class: "SampleA",
 		parts:[
 			//{ type: "input", attrs: { value: value1 } },
 			{ type: List, class: "Tabs", index: args.mainSel.root },
@@ -128,6 +116,27 @@ const AppPane = args =>
 		]
 	};
 };
+
+
+//  //
+
+const main = () =>
+{
+	const app = new App();
+
+	const mainList =
+	{
+		"Aa": { title: "Aa", content: { type: "div", text: "Aa" }, selected: true },
+		"Bb": { title: "Bb", content: { type: "div", text: "Bb" } },
+		"Cc": { title: "Cc", content: { type: "div", text: "Cc" } },
+		"Ddd": { title: "Ddd", content: { type: "div", text: "Ddd" } },
+	};
+	
+	const mainSel = new Selector( { srcValue: { parts: mainList } } );
+	
+	Meh.HTDom.create( { type: SampleA, model: app, mainSel }, "body" );
+};
+
 
 main();
 
