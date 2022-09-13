@@ -1,0 +1,53 @@
+@startuml
+
+scale 1.1
+!theme plain
+
+object "RangeComponent" as compo {
+	e : HTMLElement
+	refs
+}
+
+object "e : HTMLDivElement" as mainElement
+object refs{
+	releaseAll()
+}
+
+object "range :HTMLInputElement" as input {
+	value
+}
+object "measure : HTMLSpanElement" as measure {
+	innerText
+}
+
+object "ref" as input_ref {
+	src
+	update()
+}
+object "ref" as measure_ref {
+	src
+	update()
+}
+
+
+object Leaf {
+	value
+}
+
+
+
+compo *-- mainElement
+compo *-- refs
+
+mainElement *-- input
+mainElement *-- measure
+
+refs *--- input_ref
+refs *--- measure_ref
+
+input <..o input_ref
+measure <..o measure_ref
+
+input_ref o...o Leaf
+measure_ref o...o Leaf
+

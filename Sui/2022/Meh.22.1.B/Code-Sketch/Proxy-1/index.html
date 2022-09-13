@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Proxy-1</title>
+</head>
+<body>
+
+<script>
+
+const l = console.log;
+
+
+//  //
+
+class Branch
+{
+	constructor( value )
+	{
+		return setup( this, value );
+	}
+}
+
+//   set { rel } -> set { var, var, .. }
+//   set { var, .. } -> update { rel }
+
+class Handlers
+{
+	constructor( target )
+	{
+		this.rels = target.constructor?.rels || {};
+		this.verLeafs = {};
+		this.relLeafs = {};
+	}
+
+	set( target, prop, value, receiver )
+	{
+		const rel = this.rels[ prop ];
+		return rel ? this.setRel( target, prop, value, rel, receiver ) : this.setVar( target, prop, value, receiver );
+	}
+
+	get( target, prop, receiver )
+	{
+		const rel = this.rels[ prop ];
+		return rel ? this.getRel( target, prop, rel, receiver ) : this.getVar( target, prop, receiver );
+	}
+
+	// Vars //
+
+	setVar( target, prop, value, receiver )
+	{
+		l( "setVar", prop, value );
+		target[ prop ] = value;
+		this.updateRels( target, receiver )
+		return true;
+	}
+
+	getVar( target, prop, receiver )
+	{
+		l( "getVar", prop, target[ prop ] );
+		return target[ prop ];
+	}
+
+	// Rels //
+
+	setRel( target, prop, value, rel, proxy )      //   { rel } -> { var, var, .. }   //
+	{
+		l( "setRel", prop, value );
+		if( ! rel.set ) return false;
+
+		const vars = rel.set( value );
+		for( let prop in vars ) target[ prop ] = vars[ prop ];
+
+		target[ prop ] = value;
+		return true;
+	}
+
+	getRel( target, prop, rel, receiver )             //   { rel } <- { var, var, .. }   //
+	{
+		if( target[ prop ] === undefined && rel.update ) target[ prop ] = rel.update( target );
+		l( "getRel", prop, target[ prop ] );
+		return target[ prop ];
+	}
+
+	updateRels( target, proxy )
+	{
+		for( let prop in this.rels )
+		{
+			const rel = this.rels[ prop ];
+			if( rel.update ) target[ prop ] = rel.update( target );
+		}
+	}
+}
+
+const setup = ( origin, value ) =>
+{
+	const proxy = new Proxy( origin, new Handlers( origin ) );
+
+	return proxy;
+};
+
+
+//  //
+
+class HSL extends Branch
+{
+	// vars //
+
+	hue = 180;   // Number
+	sat = 60;    // Number
+	light = 60;   // Number
+
+
+	// rels //
+
+	value;   // Object
+	css;     // String
+
+
+	// def //
+
+	static rels =
+	{
+		value: {
+			set( value ) { return value; }
+		},
+		
+		css:
+		{
+			update( { hue, sat, light } )
+			{
+				return `hsl( ${ hue }, ${ sat }%, ${ light }% )`;
+			}
+		}
+	}
+}
+
+const b = new HSL();
+
+b.value = { hue: 100, sat: 65, light: 65 };
+//b.hue = 18;
+// l( b.hue, b.sat, b.light );
+l( b.css );
+
+
+
+
+
+
+
+</script>
+	
+</body>
+</html>

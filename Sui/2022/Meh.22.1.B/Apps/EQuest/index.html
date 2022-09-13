@@ -55,7 +55,7 @@ body
 .Tabs > li.selected
 {
 	color:hsl( 22, 30%, 98% );
-	background:hsl( 22, 0%, 26% );
+	background:hsl( 22, 0%, 12% );
 }
 
 .SampleA { display: flex; flex-direction: column; align-items: center; gap: 2em; }
@@ -76,19 +76,37 @@ const { List, ListItem } = UI;
 
 // Model //
 
-const App = Branch.newType
-(
+class App extends Branch
+{
+	color1 = new HSL();
+}
+
+class HSL extends Branch
+{
+	hue = new Leaf.Number();
+	sat = new Leaf.Number();
+	light = new Leaf.Number();
+
+	value = new Leaf.Object();
+	css = new Leaf.String();
+
+	static sets =
 	{
-		
-	}
-);
+		value: v => v,
+	};
+
+	static updates =
+	{
+		css: ( { hue, sat, light } ) => `hsl()`,
+	};
+}
 
 
 // UI //
 
-const Range = ( args, { refs } ) =>
+const Range = ( args, { rems } ) =>
 {
-	const value = refs.addLeaf( args.value );
+	const value = rems.bind( args.value );
 
 	return {
 		type: "div", class: "Range",
@@ -132,7 +150,7 @@ const main = () =>
 		"Ddd": { title: "Ddd", content: { type: "div", text: "Ddd" } },
 	};
 	
-	const mainSel = new Selector( { srcValue: { parts: mainList } } );
+	const mainSel = new Selector( { parts: mainList } );
 	
 	Meh.HTDom.create( { type: SampleA, model: app, mainSel }, "body" );
 };
@@ -142,6 +160,7 @@ main();
 
 </script>
 
+<a href="../../Code-Sketch/Proxy-1/">Proxy-1</a>
 
 </body>
 </html>

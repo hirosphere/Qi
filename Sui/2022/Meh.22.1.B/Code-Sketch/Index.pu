@@ -1,0 +1,28 @@
+@startuml
+
+scale 1.4
+!theme reddress-darkgreen
+
+skinparam {
+	fontName Courier
+}
+
+class Node {
+	id : String
+	name : Leaf.String
+	path : Array<String>
+	..
+	com : Node
+	parts : Node[]
+}
+
+class Index {
+	viewId : String
+	title : Leaf.String
+	content : Index => CDef
+	value : any
+	..
+	select( option )
+}
+
+Index -|> Node

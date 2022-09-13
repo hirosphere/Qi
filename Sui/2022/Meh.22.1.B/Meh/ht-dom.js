@@ -1,5 +1,5 @@
 const l = console.log;
-import { Leaf, Refs } from "./model/model.js";
+import { Leaf, Rems } from "./model/model.js";
 
 //  //
 
@@ -8,7 +8,7 @@ class Component
 	constructor( args, ce )
 	{
 		this.es = {};
-		this.refs = new Refs();
+		this.rems = new Rems();
 		this.node = this.createNode( args, ce );
 	}
 
@@ -17,8 +17,8 @@ class Component
 		const { type } = args;
 		if( type?.constructor != Function ) return args;
 
-		const { es, refs } = this;
-		const def = type( args, { es, refs } );
+		const { es, rems } = this;
+		const def = type( args, { es, rems } );
 		return this.expandDef( def );
 	}
 
@@ -35,46 +35,51 @@ class Component
 
 	terminate()
 	{
-		this.refs.clear();
+		this.rems.clear();
 	}
 };
 
 const createElement = ( def, component ) =>
 {
-	const { refs } = component;
+	const { rems } = component;
 
 	const { type, class: cname, classSw, attrs, props, acts } = def;	
 	const e = document.createElement( type );
 
-	if( cname !== undefined ) bindAttr( e, "class", cname, refs );
-	if( classSw ) for( let name in classSw ) bindClassSw( e, name, classSw[ name ], refs );
-	if( attrs ) for( let name in attrs ) bindAttr( e, name, attrs[ name ], refs );
-	if( props ) for( let name in props ) bindProp( e, name, props[ name ], refs );
+	if( cname !== undefined ) bindAttr( e, "class", cname, rems );
+	if( classSw ) for( let name in classSw ) bindClassSw( e, name, classSw[ name ], rems );
+	if( attrs ) for( let name in attrs ) bindAttr( e, name, attrs[ name ], rems );
+	if( props ) for( let name in props ) bindProp( e, name, props[ name ], rems );
 	if( acts ) for( let name in acts ) e.addEventListener( name, acts[ name ] );
 
 	//
 
 	const { text, parts } = def;
-	bindProp( e, "innerText", text, refs );
+	bindProp( e, "innerText", text, rems );
 	parts && new Parts( parts, e, component );
 
 	return e;
 };
 
-const bindClassSw = ( e, name, state, refs ) =>
+const bindClassSw = ( e, name, state, rems ) =>
 {
-	refs.addLeaf( state, state => e.classList.toggle( name, state ) );
+	rems.bind( state, state => e.classList.toggle( name, state ) );
 }
 
-const bindProp = ( target, name, value, refs ) =>
+const bindProp = ( target, name, value, rems ) =>
 {
 	if( value === undefined ) return;
-	refs.addLeaf( value, value => { target[ name ] = value }, false );
+	rems.bind( value, value => { target[ name ] = value }, false );
 };
 
-const bindAttr = ( e, name, value, refs ) =>
+const bindAttr = ( e, name, value, rems ) =>
 {
-	refs.addLeaf( value, value =>{ e.setAttribute( name, value ?? "" ) }, false );
+	const update = value =>
+	{
+		e.setAttribute( name, value ?? "" );
+	};
+
+	rems.bind( value, update, false );
 };
 
 //  //

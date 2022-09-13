@@ -1,12 +1,20 @@
 const l = console.log;
 const log = console.log;
 
+const deffn = x => x;
+
 //  //
 
-class Notable
+class Ref
+{
+	set source( value ) {}
+}
+
+class Notable extends Ref
 {
 	constructor( expriv )
 	{
+		super();
 		this.priv =
 		{
 			id: "*" + Notable.nextId ++,
@@ -25,14 +33,14 @@ class Leaf extends Notable
 {
 	constructor( args = {} )
 	{
-		const expriv =
+		const priv =
 		{
 			value: args.value,
 			rel: args.rel,
 			source: args.source,
 			refUpdate: args.refUpdate,
 		};
-		super( expriv );
+		super( priv );
 
 		this._refUpdate();
 	}
@@ -86,16 +94,63 @@ class Leaf extends Notable
 	//  
 }
 
+Leaf.String = Leaf;
+Leaf.Number = Leaf;
+Leaf.Boolean = Leaf;
+Leaf.Object = Leaf;
+
+Leaf.Ref = class
+{
+	constructor( args = {} )
+	{
+		const { update = deffn, toRef = deffn, toModel = deffn } = args;
+		this.priv =
+		{
+			source: null,
+		};
+	}
+
+	set source( leaf )
+	{
+		this.priv.source = leaf;
+	}
+
+	update( args )
+	{
+		const { toRef, toModel, update } = this.priv;
+	}
+
+	get value() { return this.source?.value; }
+
+	set value( value )
+	{
+		if( this.source )  this.source.value = value;
+		return value;
+	}
+}
+
 
 //  //
 
-class Refs
+class Rems
 {
-	addLeaf( value, update, make = true )
+	refs = [];
+
+	bind( value, update, make = true )
 	{
 		if( make ) value = Leaf.make( value );
-		if( value instanceof Leaf ) return value.createRef( update );
+		if( value instanceof Leaf )
+		{
+			const ref = value.createRef( update );
+			this.refs.push( ref );
+			return ref;
+		}
 		update( value );
+	}
+
+	release()
+	{
+		;
 	}
 }
 
@@ -104,11 +159,6 @@ class Refs
 
 class Branch
 {
-	static newType( def )
-	{
-		const newType = class extends Branch {};
-		return newType;
-	}
 }
 
 
@@ -124,12 +174,16 @@ class ArrayModel extends Array
 
 class Tree
 {
-	constructor( { srcValue } )
+	constructor()
 	{
-		this.root = new this.Node( srcValue, { tree: this } );
+		this.priv =
+		{
+			root: null,
+		};
 	}
 
-	get Node() { return Node; }
+	get root() { return this.priv.root; }
+
 }
 
 
@@ -137,7 +191,7 @@ class Tree
 
 class Node
 {
-	constructor( args = {}, { tree, comNode, name } )
+	constructor( srcValue = {}, { tree, comNode, name } )
 	{
 		this.priv =
 		{
@@ -155,26 +209,25 @@ class Node
 
 		if( comNode )
 		{
-			name = args.name ?? name;
-			comNode.priv.names[ name ] = this;
+			name = srcValue.name ?? name;
+			if( name != null ) comNode.priv.names[ name ] = this;
 			comNode.priv.parts.push( this );
 		}
-
-
-		const { parts } = args;
-		
 	}
 
 	//  //
 
-	get PartClass() { return this.priv.tree.Node; }
-	get parts() { return this.priv.parts; }
+	get tree() { return this.priv.tree; }
 
-	createPart( args )
+	get PartClass() { return Node; }
+
+	createPart( srcValue )
 	{
 		const PartClass = this.PartClass;
-		return new PartClass( args, { tree : this.priv.tree, comNode : this } );
+		return new PartClass( srcValue, { tree : this.priv.tree, comNode : this } );
 	}
+
+	get parts() { return this.priv.parts; }
 
 	//  //
 
@@ -184,6 +237,6 @@ class Node
 
 //  //
 
-export { Leaf, Refs, Branch, Tree, Node };
-export default { Leaf, Refs, Branch, Tree, Node }
+export { Leaf, Rems, Branch, Tree, Node };
+export default { Leaf, Rems, Branch, Tree, Node }
 

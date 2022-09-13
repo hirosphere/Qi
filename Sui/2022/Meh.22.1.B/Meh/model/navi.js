@@ -6,19 +6,21 @@ import { Tree, Node, Leaf } from "./model.js";
 
 class Index extends Node
 {
-	constructor( args = {}, work )
+	constructor( src = {}, work )
 	{
-		super( args, work );
+		super( src, work );
 
-		this.tree = work.tree;
-
-		this.title = new Leaf( { value: args.title } );
+		this.title = new Leaf( { value: src.title } );
 		this.selected = new Leaf( { value: false } );
 
-		if( args.parts ) this.priv.buildParts( args.parts );
+		if( src.parts ) this.priv.buildParts( src.parts );
 
-		//if( args.selected ) this.select();
+		if( src.selected ) this.select();
 	}
+
+	//  //
+
+	get PartClass() { return Index; }
 
 	//  //
 
@@ -32,12 +34,11 @@ class Index extends Node
 
 class Selector extends Tree
 {
-	constructor( args )
+	constructor( src )
 	{
-		super( args );
-
+		super();
 		this.current = new Leaf( { value: null, rel: ( n, o ) => this.oncurrchange( n, o ) } );
-
+		this.priv.root = this.createNode( src );
 	}
 
 	terminate()
@@ -45,7 +46,9 @@ class Selector extends Tree
 		;
 	}
 
-	get Node() { return Index; }
+	//  //
+
+	createNode( src ) { return new Index( src, { tree: this } ) }
 
 	//  //
 
