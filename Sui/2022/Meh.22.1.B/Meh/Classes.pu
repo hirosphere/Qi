@@ -1,0 +1,20 @@
+@startuml
+
+!theme plain
+
+class Component
+class Parts
+
+class Notable
+class Leaf
+class Ref
+
+class ArrayModel
+
+class Node
+class Tree
+
+class Index
+class Selector
+class Navi
+

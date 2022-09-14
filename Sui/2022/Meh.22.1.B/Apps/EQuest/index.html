@@ -69,6 +69,34 @@ body
 
 <script type="module">
 
+/*
+盛り込み
+	モデル
+		ブランチ
+			リレーション
+	ビュー
+		Ref アップデート
+		Mirror コンバート
+
+	ページスイッチ
+	インデックス・ナビゲーション
+
+Model
+	Notable
+		Leaf
+			* Ref
+			* View
+		Act
+Model.Navi
+	Node
+		Index
+	Tree
+		Selector
+			Navi
+
+*/
+
+
 import Meh from "../../Meh/meh.js";
 const { Leaf, Branch, UI, Selector } = Meh;
 const { List, ListItem } = UI;
@@ -144,10 +172,10 @@ const main = () =>
 
 	const mainList =
 	{
-		"Aa": { title: "Aa", content: { type: "div", text: "Aa" }, selected: true },
-		"Bb": { title: "Bb", content: { type: "div", text: "Bb" } },
-		"Cc": { title: "Cc", content: { type: "div", text: "Cc" } },
-		"Ddd": { title: "Ddd", content: { type: "div", text: "Ddd" } },
+		"aa": { title: "霞ヶ関", content: { type: "div", text: "Aa" }, selected: true },
+		"bbb": { title: "鶴ヶ島", content: { type: "div", text: "Bb" } },
+		"cccc": { title: "若葉", content: { type: "div", text: "Cc" } },
+		"ddddd": { title: "坂戸", content: { type: "div", text: "Dd" } },
 	};
 	
 	const mainSel = new Selector( { parts: mainList } );

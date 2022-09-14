@@ -5,16 +5,10 @@ const deffn = x => x;
 
 //  //
 
-class Ref
-{
-	set source( value ) {}
-}
-
-class Notable extends Ref
+class Notable
 {
 	constructor( expriv )
 	{
-		super();
 		this.priv =
 		{
 			id: "*" + Notable.nextId ++,
