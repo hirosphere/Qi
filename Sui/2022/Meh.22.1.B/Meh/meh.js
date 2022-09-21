@@ -1,16 +1,32 @@
 
-import Model from "./model/model.js";
-import Navi from "./model/navi.js";
-import HTDom from "./ht-dom.js";
-import UI from "./ui.js";
+import Model from "./model.js";
+import HTDOM from "./ht-dom.js";
+import GUI from "./gui.js";
+import Navi from "./navi.js";
 
-const { Leaf, Rems, Branch } = Model;
-const { Selector } = Navi;
+const { Leaf, Branch, Tree, Node } = Model;
+const { Selector, Index } = Navi;
+const DOM = HTDOM;
+const { create } = DOM;
+const { Range } = GUI;
+
+//  //
+
+const log = console.log;
+
+export
+{
+	Model, Leaf, Branch,
+	HTDOM, DOM, create,
+	GUI, Range,
+	log
+}
 
 export default
 {
-	Model, Leaf, Rems, Branch,
-	Navi, Selector,
-	HTDom,
-	UI,
-};
+	Model, Leaf, Branch, Tree, Node,
+	Navi, Selector, Index,
+	HTDOM, DOM, create,
+	GUI, Range,
+	log
+}

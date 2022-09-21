@@ -24,15 +24,22 @@ body
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 2em;
+	gap: 4em;
 }
+
+.Ranges { display: flex; flex-direction: column; gap: 1px; }
 
 .Range
 {
-	width: 400px;
+	width: 600px; height: 2.8em;
+	border-radius: 0.5ex;
+	padding: 0 1em;
 	display: grid; gap: 0.5ex;
-	grid-template-columns: 4em 1fr 4ex 1ex;
+	grid-template-columns: 4em 1fr 6ex 15ex;
 	align-items: center;
+	background:hsl( 42, 3%, 90% );
+	font-family: "Yu Gothic";
+	font-size: 15px;
 }
 
 .Tabs
@@ -55,10 +62,15 @@ body
 .Tabs > li.selected
 {
 	color:hsl( 22, 30%, 98% );
-	background:hsl( 22, 0%, 12% );
+	background:hsl( 22, 4%, 18% );
 }
 
-.SampleA { display: flex; flex-direction: column; align-items: center; gap: 2em; }
+.App { display: flex; flex-direction: column; gap: 3em; }
+
+.Applet { display: flex; flex-direction: column; gap: 1em; }
+
+.HSLAppletA {  }
+.HSLAppletA .display { width: 600px; height: 200px; border-radius: 1ex; padding: 1em; }
 
 </style>
 
@@ -79,13 +91,21 @@ body
 		Mirror コンバート
 
 	ページスイッチ
-	インデックス・ナビゲーション
+		DOMオーダー式
+			source : Leaf.Number
+		Key式
+			Index式
+	インデックス・ナビゲーション・URL対応
+		URL <--> Index 互いに得られたい
+		URLパラメータ
+		Index
+			focus
+
 
 Model
 	Notable
 		Leaf
 			* Ref
-			* View
 		Act
 Model.Navi
 	Node
@@ -98,97 +118,80 @@ Model.Navi
 
 
 import Meh from "../../Meh/meh.js";
-const { Leaf, Branch, UI, Selector } = Meh;
-const { List, ListItem } = UI;
+const { Leaf, Selector, GUI, log } = Meh;
+import Synthe from "./applets/synthe.js";
+import HSL from "./applets/hsl.js";
 
+//  //
 
-// Model //
-
-class App extends Branch
+const TabSample = args =>
 {
-	color1 = new HSL();
-}
-
-class HSL extends Branch
-{
-	hue = new Leaf.Number();
-	sat = new Leaf.Number();
-	light = new Leaf.Number();
-
-	value = new Leaf.Object();
-	css = new Leaf.String();
-
-	static sets =
-	{
-		value: v => v,
-	};
-
-	static updates =
-	{
-		css: ( { hue, sat, light } ) => `hsl()`,
-	};
-}
-
-
-// UI //
-
-const Range = ( args, { rems } ) =>
-{
-	const value = rems.bind( args.value );
-
 	return {
-		type: "div", class: "Range",
+		type: "div", class: "Applet",
 		parts:[
-			{ type: "span", text: "Range" },
-			{
-				type: "input",
-				attrs: { type: "range" },
-				props: { value: value },
-				acts: { input: ev => { value.set( ev.target.value - 0 ); } },
-			},
-			{ type: "span", text: value }
+			{ type: "h2", text: "Tab" },
+			{ type: GUI.List, class: "Tabs", index: args.selector.root },
 		]
 	};
 };
 
-const SampleA = args =>
-{
-	return {
-		type: "div", class: "SampleA",
-		parts:[
-			//{ type: "input", attrs: { value: value1 } },
-			{ type: List, class: "Tabs", index: args.mainSel.root },
-			{ type: Range, value: new Leaf( { value: 33 } ) },
-		]
-	};
-};
 
 
 //  //
 
+const App = args =>
+{
+	const eg = new Synthe.Model.EG;
+	const hsl = new HSL.Model.HSL();
+
+	const listSrc =
+	{
+		"chuo": { title: "中央線", selected: true },
+		"sobu": { title: "総武線" },
+		"yamanote": { title: "山手線" },
+		"keihin-tohoku": { title: "京浜東北線" },
+		"joban-rapid": { title: "常磐線快速" },
+	};
+
+	const selector = new Selector( { parts: listSrc } );
+
+	return { type: "div", class: "App",
+		parts:[
+			{ type: TabSample, selector },
+			{ type: Synthe.UI.SyntheA },
+			{ type: HSL.UI.AppletA, model: hsl },
+		]
+	};
+};
+
+
 const main = () =>
 {
-	const app = new App();
-
-	const mainList =
-	{
-		"aa": { title: "霞ヶ関", content: { type: "div", text: "Aa" }, selected: true },
-		"bbb": { title: "鶴ヶ島", content: { type: "div", text: "Bb" } },
-		"cccc": { title: "若葉", content: { type: "div", text: "Cc" } },
-		"ddddd": { title: "坂戸", content: { type: "div", text: "Dd" } },
-	};
-	
-	const mainSel = new Selector( { parts: mainList } );
-	
-	Meh.HTDom.create( { type: SampleA, model: app, mainSel }, "body" );
+	Meh.DOM.create( { type: App }, "body" );
 };
 
 
 main();
 
-</script>
 
-<a href="../../Code-Sketch/Proxy-1/">Proxy-1</a>
+/*
+
+* HTMLコンポーネントライブラリをつくろう
+
+  -- 駄菓子屋コード基地 --
+
+** モデル・ビュー 連携のしくみを
+
+
+
+** インデックス
+. カスタムインデックス
+. 動的追加・フェッチ
+
+
+*/
+
+</script>
 
 </body>
 </html>

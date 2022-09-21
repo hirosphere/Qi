@@ -2,19 +2,65 @@
 
 !theme plain
 
-class Component
-class Parts
+package model{
 
-class Notable
-class Leaf
-class Ref
+	class Leaf {
+		value
+		refs
+	}
 
-class ArrayModel
+	class Ref {
+		source : Leaf
+		set value
+		update()
+	}
 
-class Node
-class Tree
+	Leaf *-- Ref
+	Refs o-- Ref
 
-class Index
-class Selector
-class Navi
+	class ArrayModel
 
+	class Node {
+		id
+		tree
+		name
+		com
+		Parts
+	}
+
+	class Tree {
+		root
+	}
+
+	Tree *-- Node
+	Tree --o Node
+	Node *-- Node
+}
+
+package model.navi {
+
+	class Index
+	
+	class Selector {
+		root
+		current
+	}
+
+	class Navi {
+		url
+		setUrl()
+	}
+
+	Selector *-- Index
+	Selector --o Index
+	Index *- Index
+	Navi -|> Selector
+}
+
+package htdom {
+
+	class Component
+	class Parts
+
+	Component *-- Parts
+}

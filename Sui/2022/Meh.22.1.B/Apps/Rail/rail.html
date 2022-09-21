@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Rail</title>
+
+<style>
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { padding: 0; display: flex; flex-direction: column;; align-items: center; background:hsl( 338, 60%, 17% ); }
+html { background:hsl( 255, 55%, 37% ); }
+body { margin: 0; width: 750px; padding: 2em 3em; min-height: 100vh; background: hsl( 0, 0%, 100% ); }
+
+.Range {
+	border-radius: 1ex;
+	padding: 1ex;
+	background:hsl( 255, 0%, 80% );
+	display: flex;
+	gap: 1ex;
+}
+
+.Range input { width: 350px; }
+
+
+</style>
+
+</head>
+<body>
+	
+<ul style="display:none">
+	<li>速度計測</li>
+	<li>パラメータ周回</li>
+	<li>Bluetooth 遅れ除去</li>
+</ul>
+
+<script type="module">
+
+import { DOM, Leaf, GUI } from "../../Meh/meh.js";
+const { Range } = GUI;
+
+import RailModels from "./classes/model.js";
+import {  } from "./classes/gui.js";
+
+//  //
+
+const App = () =>
+{
+	// const text = "Rail application";
+	const text = new Leaf.String( { value: "Rail application" } );
+	const number = new Leaf.Number( { value: 80 } );
+
+	return { type: "div", class: "App",
+	parts:[
+		{ type: "h1", text },
+		{ type: Range, title: "Attack", model: number },
+	]
+	};
+};
+
+//  //
+
+const main = () =>
+{
+	const train = new RailModels.Train;
+	DOM.create( { type: App }, "body" );
+};
+
+
+main();
+
+</script>
+
+
+</body>
+</html>
