@@ -47,6 +47,7 @@ Action.Ref = class
 
 	do()
 	{
+		log( "do")
 		this.action();
 	}
 
@@ -332,5 +333,5 @@ class Tree
 
 //  //
 
-export { Leaf, Branch, ArrayModel, Tree, Node }
-export default { Leaf, Branch, ArrayModel, Tree, Node }
+export { Action, Leaf, Branch, ArrayModel, Tree, Node }
+export default { Action, Leaf, Branch, ArrayModel, Tree, Node }

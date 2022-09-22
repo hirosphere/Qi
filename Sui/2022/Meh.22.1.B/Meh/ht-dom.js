@@ -50,12 +50,13 @@ class Component
 		if( className ) refs.bind( e, "className", className );
 		if( classSw )  for( let name in classSw )  refs.bindClassSw( e, name, classSw[ name ] );
 
-		const { attrs, props, style, acts } = def;
+		const { attrs, props, style, acts, focus } = def;
 
 		if( props ) for( let name in props )  refs.bind( e, name, props[ name ] );
 		if( attrs ) for( let name in attrs )  refs.bindAttr( e, name, attrs[ name ] );
 		if( style ) for( let name in style )  refs.bind( e.style, name, style[ name ] );
 		if( acts  ) for( let name in acts  )  e.addEventListener( name, acts[ name ] );
+		if( focus ) refs.action( focus, () => { e.focus() } );
 
 		const { text, parts } = def;
 		if( text !== undefined ) refs.bind( e, "innerText", text );
@@ -137,6 +138,12 @@ class Parts
 
 class Refs
 {
+	action( action, act )
+	{
+		const ref = action.createRef( act );
+		this.refs.push( ref );
+	}
+
 	bind( target, name, value, convs )
 	{
 		const update = value => target[ name ] = value;

@@ -1,5 +1,5 @@
 
-import { Tree, Node, Leaf } from "./model.js";
+import { Tree, Node, Leaf, Action } from "./model.js";
 const log = console.log;
 
 //  //
@@ -12,6 +12,7 @@ class Index extends Node
 
 		this.title = new Leaf.String( srcValue.title ?? "" );
 		this.selected = new Leaf.Boolean( false );
+		this.focus = new Action;
 
 		const { tree } = this.priv;
 		srcValue?.selected && tree.select( this );
@@ -68,6 +69,7 @@ class Selector extends Tree
 		this.current.value = index;
 
 		const { focus } = options;
+		focus && index?.focus.do();
 	}
 
 	getNext( option )
