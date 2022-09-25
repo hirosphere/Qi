@@ -24,7 +24,7 @@ body
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 4em;
+	gap: 1em;
 }
 
 .Ranges { display: flex; flex-direction: column; gap: 1px; }
@@ -32,7 +32,7 @@ body
 .Range
 {
 	width: 600px; height: 2.8em;
-	border-radius: 0.5ex;
+	border-radius: 0.8ex;
 	padding: 0 1em;
 	display: grid; gap: 0.5ex;
 	grid-template-columns: 4em 1fr 6ex 15ex;
@@ -44,9 +44,7 @@ body
 
 .Tabs
 {
-	list-style: none;
-	display: flex;
-	gap: 1px;
+	list-style: none; display: flex; justify-content: center; gap: 2px;
 }
 
 .Tabs > li
@@ -72,6 +70,8 @@ body
 .HSLAppletA {  }
 .HSLAppletA .display { width: 600px; height: 200px; border-radius: 1ex; padding: 1em; }
 
+.Main { display: flex; flex-direction: column; gap: 1em; }
+
 </style>
 
 </head>
@@ -86,13 +86,14 @@ body
 	モデル
 		ブランチ
 			リレーション
+		値初期化機構
 	ビュー
 		Ref アップデート
 		Mirror コンバート
 
 	ページスイッチ
 		DOMオーダー式
-			source : Leaf.Number
+			order : Leaf.Number
 		Key式
 			Index式
 	インデックス・ナビゲーション・URL対応
@@ -120,22 +121,40 @@ Model.Navi
 import Meh from "../../Meh/meh.js";
 const { Leaf, Selector, GUI, log } = Meh;
 import Synthe from "./applets/synthe.js";
+import { RailAppletA } from "./applets/rail.js";
 import HSL from "./applets/hsl.js";
 
 //  //
 
-const TabSample = args =>
+const Main = args =>
 {
+	const partSw = args.selector.current;
+	const index = args.selector.root;
+
+	const part = index => ( index.content?.( index ) || { type: Main.Content , index } );
+
 	return {
-		type: "div", class: "Applet",
+		type: "div", class: "Main",
 		parts:[
-			{ type: "h2", text: "Tab" },
 			{ type: GUI.List, class: "Tabs", index: args.selector.root },
+			{ type: "div", class: "content", parts: { model: index.parts, part }, partSw },
 		]
 	};
 };
 
+Main.Content = args =>
+{
+	const { index } = args;
+	const { title } = index;
 
+	return {
+		type: "div",
+		parts:[
+			{ type: "h3", text: title },
+			{ type: "p", text: title }
+		]
+	};
+};
 
 //  //
 
@@ -146,20 +165,28 @@ const App = args =>
 
 	const listSrc =
 	{
-		"chuo": { title: "中央線", selected: true },
-		"sobu": { title: "総武線" },
-		"yamanote": { title: "山手線" },
-		"keihin-tohoku": { title: "京浜東北線" },
-		"joban-rapid": { title: "常磐線快速" },
+		"hsl":
+		{
+			title: "HSL Color", selected: true,
+			content: index => ( { type: HSL.UI.AppletA, model: hsl } )
+		},
+		"synthe":
+		{
+			title: "Synthe",
+			content: index => ( { type: Synthe.UI.SyntheA } )
+		},
+		"rail":
+		{
+			title: "Rail",
+			content: index => ( { type: RailAppletA } )
+		},
 	};
 
 	const selector = new Selector( { parts: listSrc } );
 
 	return { type: "div", class: "App",
 		parts:[
-			{ type: TabSample, selector },
-			{ type: Synthe.UI.SyntheA },
-			{ type: HSL.UI.AppletA, model: hsl },
+			{ type: Main, selector },
 		]
 	};
 };

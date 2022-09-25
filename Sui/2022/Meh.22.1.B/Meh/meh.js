@@ -16,7 +16,8 @@ const log = console.log;
 
 export
 {
-	Model, Leaf, Branch,
+	Model, Leaf, Branch, Tree, Node,
+	Navi, Selector, Index,
 	HTDOM, DOM, create,
 	GUI, Range,
 	log

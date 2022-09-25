@@ -7,10 +7,7 @@ class Action
 {
 	constructor()
 	{
-		this.priv =
-		{
-			refs: {},
-		};	
+		this.priv = { refs: {}, };	
 	}
 
 	//  //
@@ -18,7 +15,7 @@ class Action
 	do()
 	{
 		const { refs } = this.priv;
-		for( let id in refs ) refs[ id ].do();
+		for( let id in refs ) refs[ id ].action();
 	}
 
 	// refs //
@@ -47,8 +44,7 @@ Action.Ref = class
 
 	do()
 	{
-		log( "do")
-		this.action();
+		this.source?.do();
 	}
 
 	release()
@@ -80,7 +76,7 @@ class Leaf
 
 	createRef( opers )
 	{
-		const ref = new Ref( this, opers );
+		const ref = new Leaf.Ref( this, opers );
 
 		this.priv.refs[ ref.id ] = ref;
 		ref.update( this.priv.value, undefined, {} );
@@ -93,6 +89,10 @@ class Leaf
 		delete this.priv.refs[ ref.id ];
 	}
 
+	static makeRef( leaf, opers )
+	{
+		return leaf instanceof Leaf ? leaf.createRef( opers ) : new Leaf.Ref();
+	}
 
 	// value //
 
@@ -120,20 +120,37 @@ Leaf.Number = class extends Leaf {}
 Leaf.Boolean = class extends Leaf {}
 Leaf.Object = class extends Leaf {}
 
-class Ref
+Leaf.Ref = class
 {
-	constructor( source, opers )
+	constructor( source, opers = {} )
 	{
-		this.id = "lr-" + Ref.nextId ++;
+		this.id = "lr-" + Leaf.Ref.nextId ++;
 		this.source = source;
 		this.opers = opers;
 	}
 
 	update( newValue, oldValue )
 	{
-		const { toRef, update } = this.opers;
-		toRef ? update?.( toRef( newValue ), toRef( oldValue ) ) : update?.( newValue, oldValue );
+		const { update } = this.opers;
+		update?.( this.toRef( newValue ), this.toRef( oldValue ) );
 	}
+
+	toRef( value )
+	{
+		const { toRef } = this.opers;
+		return toRef ? toRef( value ) : value;
+	}
+
+	set value( value )
+	{
+		if( ! this.source )  return;
+
+		const { toModel } = this.opers;
+		
+		this.source.set( toModel ? toModel( value ) : value, this );
+	}
+
+	get value() { return this.source?.value; }
 
 	release()
 	{
@@ -142,8 +159,6 @@ class Ref
 
 	static nextId = 1;
 }
-
-Ref.String = class extends Ref {};
 
 //  //
 
@@ -218,6 +233,10 @@ class ArrayModel extends Array
 	}
 
 	//  //
+
+	get first() { return this[ 0 ] || null; }
+	get last() { return this[ this.length - 1 ] || null; }
+
 }
 
 class ArrayRef
@@ -335,3 +354,4 @@ class Tree
 
 export { Action, Leaf, Branch, ArrayModel, Tree, Node }
 export default { Action, Leaf, Branch, ArrayModel, Tree, Node }
+

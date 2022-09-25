@@ -6,13 +6,14 @@ const log = console.log;
 
 class Index extends Node
 {
-	constructor( srcValue, inits = {} )
+	constructor( srcValue = {}, inits = {} )
 	{
 		super( srcValue, inits );
 
 		this.title = new Leaf.String( srcValue.title ?? "" );
 		this.selected = new Leaf.Boolean( false );
 		this.focus = new Action;
+		this.content = srcValue.content;
 
 		const { tree } = this.priv;
 		srcValue?.selected && tree.select( this );
@@ -21,6 +22,8 @@ class Index extends Node
 	//  //
 
 	get tree() { return this.priv.tree; }
+	
+	get pageKey() { return "p + " + this.id; }
 	
 	//  //
 
@@ -31,8 +34,12 @@ class Index extends Node
 
 	getNext( option )
 	{
-		log( this.next + "" )
 		return this.next;
+	}
+
+	getPrev( option )
+	{
+		return this.prev;
 	}
 
 	//  //
@@ -57,12 +64,12 @@ class Selector extends Tree
 		this.build( srcValue );
 	}
 
-	//  //
+	// type //
 
 	get defaultNode() { return Index; }
 
 
-	//  //
+	// select //
 
 	select( index, options = {} )
 	{
@@ -72,13 +79,7 @@ class Selector extends Tree
 		focus && index?.focus.do();
 	}
 
-	getNext( option )
-	{
-		return this.next;
-	}
-
-
-	//  //
+	// protected //
 
 	#onCurrChange( newIndex, oldIndex )
 	{

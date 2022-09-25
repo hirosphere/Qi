@@ -8,16 +8,16 @@ import { Leaf, ArrayModel } from "./model.js";
 
 class Component
 {
-	constructor( args, ce )
+	constructor( args, ce, mute )
 	{
 		if( ! args ) return;
 
 		this.refs = new Refs();
 
-		this.e = this.createNode
+		this.mainNode = this.createNode
 		(
 			this.expandDef( args ),
-			ce
+			ce, mute
 		);
 	}
 
@@ -28,39 +28,51 @@ class Component
 		return args;
 	}
 
-	createNode( def, ce )
+	createNode( def, ce, mute )
 	{
 		const node =
-			this.createElement( def );
-
+			this.createTextNode( def ) ||
+			this.createElement( def, mute );
 
 		if( ce ) ce.appendChild( node );
 		return node;
 	}
 
-	createElement( def )
+	createTextNode( def )
+	{
+		if( def?.constructor == String )
+		{
+			const node = document.createTextNode();
+			node.nodeValue = def;
+			return node;
+		}
+	}
+
+	createElement( def, mute )
 	{
 		const { type } = def;
 		const { refs } = this;
 
 		const e = document.createElement( type );
 
+		if( mute ) e.style.display = "none";
+
 		const { class: className, classSw } = def;
 
-		if( className ) refs.bind( e, "className", className );
+		if( className ) refs.bindProp( e, "className", className );
 		if( classSw )  for( let name in classSw )  refs.bindClassSw( e, name, classSw[ name ] );
 
 		const { attrs, props, style, acts, focus } = def;
 
-		if( props ) for( let name in props )  refs.bind( e, name, props[ name ] );
+		if( props ) for( let name in props )  refs.bindProp( e, name, props[ name ] );
 		if( attrs ) for( let name in attrs )  refs.bindAttr( e, name, attrs[ name ] );
-		if( style ) for( let name in style )  refs.bind( e.style, name, style[ name ] );
+		if( style ) for( let name in style )  refs.bindProp( e.style, name, style[ name ] );
 		if( acts  ) for( let name in acts  )  e.addEventListener( name, acts[ name ] );
-		if( focus ) refs.action( focus, () => { e.focus() } );
+		if( focus ) refs.bindAction( focus, () => { e.focus() } );
 
-		const { text, parts } = def;
-		if( text !== undefined ) refs.bind( e, "innerText", text );
-		if( parts ) new Parts( this, e, parts );
+		const { text, parts, partSw } = def;
+		if( text !== undefined ) refs.bindProp( e, "innerText", text );
+		if( parts ) new Parts( this, e, parts, partSw );
 		return e;
 	}
 
@@ -79,12 +91,15 @@ class Component
 
 class Parts
 {
-	constructor( compo, e, def )
+	keys = {};
+
+	constructor( compo, e, def, partSw )
 	{
 		compo.partsArray.push( this );
 
 		this.compo = compo;
 		this.e = e;
+		this.mute = partSw != null;
 
 		if( def instanceof Array )
 		{
@@ -95,6 +110,8 @@ class Parts
 		{
 			if( def.model instanceof ArrayModel )  this.setupDynamic( def );
 		}
+
+		this.makePartSw( partSw );
 	}
 
 	setupDynamic( def )
@@ -104,30 +121,64 @@ class Parts
 		
 		const bind = model =>
 		{
-			model.forEach( item => this.createNode( part( item ) ) );
+			for( const item of model )
+			{
+				const key = item?.pageKey ?? item;
+				const node = this.createNode( part( item ), key );
+			}
 		};
 		
 		refs.array( model, { bind } );
 		model;
 	}
 
-	createNode( def )
+	createNode( def, key )
 	{
 		if( ! def ) return;
 
 		const { compo, e } = this;
 
+		let node;
+
 		if( def.type instanceof Function )
 		{
-			const partCompo = new Component( def, e );
+			const partCompo = new Component( def, e, this.mute );
 			compo.partComponents.push( partCompo );
-			return partCompo.e;
+			
+			node = partCompo.mainNode;
 		}
 		
 		else
 		{
-			return compo.createNode( def, e );
+			node = compo.createNode( def, e, this.mute );
 		}
+		
+		if( key != null && node instanceof HTMLElement ) this.keys[ key ] = node;
+
+		return node;
+	}
+
+	makePartSw( leaf )
+	{
+		if( ! leaf ) return;
+
+		this.makeKeyPSw( leaf );
+	}
+
+	makeKeyPSw( leaf )
+	{
+		const { refs } = this.compo;
+		
+		const update = ( newKey, oldKey ) =>
+		{
+			const newE = this.keys[  newKey?.pageKey ?? newKey  ];
+			const oldE = this.keys[  oldKey?.pageKey ?? oldKey  ];
+
+			if( oldE ) oldE.style.display = "none";
+			if( newE ) newE.style.display = "";
+		};
+
+		refs.bindLeaf( leaf, null, update );
 	}
 
 	terminate() {}
@@ -138,16 +189,16 @@ class Parts
 
 class Refs
 {
-	action( action, act )
+	bindAction( action, act )
 	{
 		const ref = action.createRef( act );
 		this.refs.push( ref );
 	}
 
-	bind( target, name, value, convs )
+	bindProp( target, name, value, convs )
 	{
 		const update = value => target[ name ] = value;
-		this.leaf( value, convs, update );
+		this.bindLeaf( value, convs, update );
 	}
 
 	bindAttr( e, name, value, convs )
@@ -157,7 +208,7 @@ class Refs
 			e.setAttribute( name, value );
 		};
 		
-		this.leaf( value, convs, update );
+		this.bindLeaf( value, convs, update );
 	}
 
 	bindClassSw( e, name, value )
@@ -167,10 +218,10 @@ class Refs
 			e.classList.toggle( name, state );
 		};
 
-		this.leaf( value, null, update );
+		this.bindLeaf( value, null, update );
 	}
 
-	leaf( value, convs, update )
+	bindLeaf( value, convs, update )
 	{
 		if( value instanceof Array )
 		{

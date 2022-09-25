@@ -1,13 +1,14 @@
 const lg = console.log;
 const log = lg;
 
-import {  } from "./model.js";
+import { Leaf } from "./model.js";
 
 //  //
 
 const Range = ( args ) =>
 {
 	const { model, title, min, max, step, ex } = args;
+	const ref = Leaf.makeRef( model );
 
 	return {
 		type: "div",
@@ -18,7 +19,7 @@ const Range = ( args ) =>
 				attrs: { type: "range" },
 				props: { value: model, min, max, step },
 				acts: {
-					input( ev ) { model.set( ev.target.value - 0, ev.target ); }
+					input( ev ) { ref.value = ev.target.value - 0; }
 				}
 			},
 			{ type: "span", text: model },
@@ -40,12 +41,14 @@ const Item = args =>
 		// log( ev.key,  index.getNext( { round: true } ) );
 		switch( ev.key )
 		{
-			case "ArrowLeft": break;
+			case "ArrowLeft" : index.getPrev( { round: true } )?.select( { focus: true } ); break;
 			case "ArrowRight": index.getNext( { round: true } )?.select( { focus: true } ); break;
 			case "ArrowUp": break;
 			case "ArrowDown": break;
+			case "Escape": index.com?.select( { focus: true } ); break;
 			default: return;
 		}
+		ev.stopPropagation();
 		ev.preventDefault();
 		return;
 	};
@@ -59,20 +62,47 @@ const Item = args =>
 			mousedown( ev ){ index.select(); },
 			keydown,
 		},
+		focus: index.focus
 	};
 };
 
-const List = ( args, { refs } ) =>
+const List = args =>
 {
 	const { index } = args;
+	const { selected } = index;
 
-	const parts = args.parts || index &&
+	const keydown = ev =>
 	{
-		model: index.parts,
-		part( index ){ return { type: Item, index }; }, 
+		log( ev.key,  index.parts.first?.id );
+		switch( ev.key )
+		{
+			case " ":
+			case "Enter":
+			case "ArrowDown":
+			case "ArrowRight" : index.parts.first?.select( { focus: true } ); break;
+			case "ArrowUp":
+			case "ArrowLeft": index.parts.last?.select( { focus: true } ); break;
+			default: return;
+		}
+		ev.stopPropagation();
+		ev.preventDefault();
+		return;
 	};
 
-	return { type: "ul", class: args.class ?? "List", parts };
+	const tabIndex = [ selected, { toRef( state ) { return state ? 0 : -1 } } ];
+
+	return {
+		type: "ul",
+		class: args.class ?? "List",
+		props: { tabIndex: [ selected, { toRef( state ) { return state ? 0 : -1 } } ] },
+		acts: { keydown },
+		focus: index.focus,
+		parts: args.parts || index &&
+		{
+			model: index.parts,
+			part( index ){ return { type: Item, index }; }, 
+		},
+	};
 };
 
 List.Item = Item;

@@ -16,7 +16,6 @@ package model{
 	}
 
 	Leaf *-- Ref
-	Refs o-- Ref
 
 	class ArrayModel
 
@@ -25,7 +24,7 @@ package model{
 		tree
 		name
 		com
-		Parts
+		parts
 	}
 
 	class Tree {
@@ -34,7 +33,9 @@ package model{
 
 	Tree *-- Node
 	Tree --o Node
-	Node *-- Node
+	Node::parts *-- Nodes
+	Nodes -|> ArrayModel
+	Nodes *-- Node
 }
 
 package model.navi {
@@ -59,8 +60,25 @@ package model.navi {
 
 package htdom {
 
-	class Component
-	class Parts
+	class Component {
+		e
+		es
+		partsList
+		refs
+		createNode()
+		createElement()
+	}
 
-	Component *-- Parts
+	class Parts {
+		keys
+		createNode()
+	}
+
+	class Refs {
+		leaf
+		action
+	}
+
+	Component::refs *-- Refs
+	Component::partsList *-- Parts
 }
