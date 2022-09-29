@@ -136,7 +136,7 @@ const Main = args =>
 	return {
 		type: "div", class: "Main",
 		parts:[
-			{ type: GUI.List, class: "Tabs", index: args.selector.root },
+			{ type: GUI.List, class: "Tabs", index },
 			{ type: "div", class: "content", parts: { model: index.parts, part }, partSw },
 		]
 	};

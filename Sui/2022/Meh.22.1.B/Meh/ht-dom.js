@@ -162,6 +162,8 @@ class Parts
 	{
 		if( ! leaf ) return;
 
+		log( leaf );
+
 		this.makeKeyPSw( leaf );
 	}
 
