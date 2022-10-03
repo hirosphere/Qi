@@ -7,7 +7,7 @@ import { Leaf } from "./model.js";
 
 const Range = ( args ) =>
 {
-	const { model, title, min, max, step, ex } = args;
+	const { model, title, unit, min, max, step, ex } = args;
 	const ref = Leaf.makeRef( model );
 
 	return {
@@ -15,14 +15,15 @@ const Range = ( args ) =>
 		class: "Range",
 		parts:[
 			{ type: "label", class: "title", text: title },
-			{ type: "input",
+			{ type: "input", class: "input",
 				attrs: { type: "range" },
 				props: { value: model, min, max, step },
 				acts: {
 					input( ev ) { ref.value = ev.target.value - 0; }
 				}
 			},
-			{ type: "span", text: model },
+			{ type: "span", class: "value", text: model },
+			{ type: "span", class: "unit", text: unit },
 			ex && { type: "span", text: [ model, { toRef: ex } ] },
 		]
 	};

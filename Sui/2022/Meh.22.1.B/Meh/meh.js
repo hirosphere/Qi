@@ -3,6 +3,7 @@ import Model from "./model.js";
 import HTDOM from "./ht-dom.js";
 import GUI from "./gui.js";
 import Navi from "./navi.js";
+import Sound from "./sound.js";
 
 const { Leaf, Branch, Tree, Node } = Model;
 const { Selector, Index } = Navi;
@@ -29,5 +30,6 @@ export default
 	Navi, Selector, Index,
 	HTDOM, DOM, create,
 	GUI, Range,
+	Sound,
 	log
 }

@@ -31,16 +31,18 @@ body
 
 .Range
 {
-	width: 600px; height: 2.8em;
+	width: 700px; height: 2.8em;
 	border-radius: 0.8ex;
 	padding: 0 1em;
 	display: grid; gap: 0.5ex;
-	grid-template-columns: 4em 1fr 6ex 15ex;
+	grid-template-columns: 4em 1fr 6ex 15ex 10ex;
 	align-items: center;
 	background:hsl( 42, 3%, 90% );
 	font-family: "Yu Gothic";
 	font-size: 15px;
 }
+
+.Range .value { text-align: right; }
 
 .Tabs
 {
@@ -158,6 +160,26 @@ Main.Content = args =>
 
 //  //
 
+const TopPage = index =>
+{
+	const links =
+	[
+		{ title: "SLF", link: "../SLF/slf.html" },
+	];
+
+	const link = item => ( { type: "li", parts: [ { type: "a", text: item.title, attrs: { target: "_blank", href: item.link } } ] } );
+
+	return {
+		type: "div", class: "Applet",
+		parts:[
+			{ type: "h2", text: index.title },
+			{ type: "ul", parts: { model: links, part: link } },
+		]
+	};
+};
+
+//  //
+
 const App = args =>
 {
 	const eg = new Synthe.Model.EG;
@@ -165,9 +187,10 @@ const App = args =>
 
 	const listSrc =
 	{
+		top: { title: "Links", content: TopPage, selected: true },
 		"hsl":
 		{
-			title: "HSL Color", selected: true,
+			title: "HSL Color",
 			content: index => ( { type: HSL.UI.AppletA, model: hsl } )
 		},
 		"synthe":

@@ -23,7 +23,7 @@ class Index extends Node
 
 	get tree() { return this.priv.tree; }
 	
-	get pageKey() { return "p + " + this.id; }
+	get key() { return "key+" + this.id; }
 	
 	//  //
 
@@ -89,6 +89,12 @@ class Selector extends Tree
 
 
 }
+
+
+//  //
+
+class Location
+{}
 
 
 //  //

@@ -42,7 +42,7 @@ const Content = args =>
 		type: "div", class: "Applet",
 		parts:[
 			{ type: HSL.UI.RailAppletA, model, },
-			{ type: "p", text: index.title },
+			{ type: "h2", text: index.title },
 		]
 	};
 };

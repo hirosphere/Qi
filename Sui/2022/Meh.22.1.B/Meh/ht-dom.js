@@ -109,23 +109,31 @@ class Parts
 		else if( def instanceof Object )
 		{
 			if( def.model instanceof ArrayModel )  this.setupDynamic( def );
+			else if( def.model instanceof Array )  this.setupStatic( def );
 		}
 
 		this.makePartSw( partSw );
 	}
 
-	setupDynamic( def )
+	setupStatic( def )
 	{
 		const { model, part } = def;
+
+			for( const item of model )
+		{
+			const key = item?.key ?? item;
+			this.createNode( part( item ), key );
+		}
+	}
+
+	setupDynamic( def )
+	{
+		const { model } = def;
 		const { refs } = this.compo;
 		
 		const bind = model =>
 		{
-			for( const item of model )
-			{
-				const key = item?.pageKey ?? item;
-				const node = this.createNode( part( item ), key );
-			}
+			this.setupStatic( def );
 		};
 		
 		refs.array( model, { bind } );
@@ -161,9 +169,6 @@ class Parts
 	makePartSw( leaf )
 	{
 		if( ! leaf ) return;
-
-		log( leaf );
-
 		this.makeKeyPSw( leaf );
 	}
 
@@ -173,8 +178,8 @@ class Parts
 		
 		const update = ( newKey, oldKey ) =>
 		{
-			const newE = this.keys[  newKey?.pageKey ?? newKey  ];
-			const oldE = this.keys[  oldKey?.pageKey ?? oldKey  ];
+			const newE = this.keys[  newKey?.key ?? newKey  ];
+			const oldE = this.keys[  oldKey?.key ?? oldKey  ];
 
 			if( oldE ) oldE.style.display = "none";
 			if( newE ) newE.style.display = "";
