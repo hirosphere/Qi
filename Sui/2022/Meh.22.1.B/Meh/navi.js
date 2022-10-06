@@ -69,6 +69,13 @@ class Selector extends Tree
 	get defaultNode() { return Index; }
 
 
+	// URL , Location //
+
+	updateLocation( index )
+	{
+		;
+	}
+
 	// select //
 
 	select( index, options = {} )
@@ -86,18 +93,56 @@ class Selector extends Tree
 		if( oldIndex )  oldIndex.selected.value = false;
 		if( newIndex )  newIndex.selected.value = true;
 	};
+}
 
 
+//  //
+
+class Page
+{
+	constructor( args = {} )
+	{
+		this.title = new Leaf.String( args.title );
+		this.query = new Leaf.Object( null );
+	}
 }
 
 
 //  //
 
 class Location
-{}
+{
+	constructor( args = {} )
+	{
+		this.args = args;
+		this.priv =
+		{
+			title: "",
+			url: "",
+			timeout: null
+		};
+
+		this.index = new Leaf.Object( args.index, {} );
+		this.page = new Leaf.Object( args.page, {} );
+	
+		this.#update();
+	}
+
+	makeQuery( page )
+	{
+
+	}
+
+	#update()
+	{
+		const { title } = this.args?.update?.( { index: this.index.value, page: this.page.value } );
+
+		document.title = title;
+	}
+}
 
 
 //  //
 
-export { Selector, Index }
-export default { Selector, Index }
+export { Selector, Index, Location, Page }
+export default { Selector, Index, Location, Page }

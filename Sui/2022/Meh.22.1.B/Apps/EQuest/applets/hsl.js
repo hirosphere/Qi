@@ -28,6 +28,25 @@ HSL.Model.HSL = class extends Branch
 	};
 }
 
+HSL.Model.Grad2 = class extends Branch
+{
+	static vars =
+	{
+		start: HSL.Model.HSL,
+		end: HSL.Model.HSL,
+	};
+
+	static rels =
+	{
+		css: String
+	};
+
+	static update( { start, end } )
+	{
+		;
+	}
+};
+
 
 HSL.UI.Ranges = args =>
 {

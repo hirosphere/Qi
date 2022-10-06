@@ -6,7 +6,7 @@ import Navi from "./navi.js";
 import Sound from "./sound.js";
 
 const { Leaf, Branch, Tree, Node } = Model;
-const { Selector, Index } = Navi;
+const { Selector, Index, Location, Page } = Navi;
 const DOM = HTDOM;
 const { create } = DOM;
 const { Range } = GUI;
@@ -18,7 +18,7 @@ const log = console.log;
 export
 {
 	Model, Leaf, Branch, Tree, Node,
-	Navi, Selector, Index,
+	Navi, Selector, Index, Location, Page,
 	HTDOM, DOM, create,
 	GUI, Range,
 	log
@@ -27,7 +27,7 @@ export
 export default
 {
 	Model, Leaf, Branch, Tree, Node,
-	Navi, Selector, Index,
+	Navi, Selector, Index, Location, Page,
 	HTDOM, DOM, create,
 	GUI, Range,
 	Sound,

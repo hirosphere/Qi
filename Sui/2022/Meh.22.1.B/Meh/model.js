@@ -109,8 +109,10 @@ class Leaf
 		for( let id in refs ) refs[ id ].update( newValue, oldValue, { sender } );
 	}
 	
-	get value() { return this.priv.value; }
+	get() { return this.priv.value; }
+	
 	set value( value ) { this.set( value, null ); }
+	get value() { return this.priv.value; }
 	
 	//  //
 };

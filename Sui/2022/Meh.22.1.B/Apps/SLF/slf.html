@@ -4,7 +4,6 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>SLF</title>
 
 <style>
 
@@ -13,7 +12,7 @@
 html
 {
 	height: 100vh;
-	background: linear-gradient( 180deg, hsl( 0, 0%, 100% ) 0%, hsl( 30, 40%, 85% ) 100% );
+	background: linear-gradient( 180deg, hsl( 0, 0%, 100% ) 0%, hsl( 210, 60%, 90% ) 100% );
 	display: flex;
 	justify-content: center;
 }
@@ -28,9 +27,12 @@ body
 
 .App { gap: 1em; }
 
+.Ranges { gap: 1px; }
+
 .Range
 {
 	display: grid;
+	padding: 1ex 0;
 	grid-template-columns: 5em 400px 7ex 2ex;
 }
 .Range .value { margin-left: 1ex; text-align: right; }
@@ -43,13 +45,26 @@ body
 	
 <script type="module">
 
+const log = console.log;
+
 import Meh from "../../Meh/meh.js";
-const { HTDOM, Range, Leaf, Sound } = Meh;
+const { HTDOM, Range, Leaf, Branch, Sound, Location, Page } = Meh;
 
 class SLFModel
 {
 	volume = new Leaf.Number( 30 );
-	freq = new Leaf.Number( 40 );
+	freq = new Leaf.Number( 204 );
+	noiseLevel = new Leaf( 0 );
+}
+
+class SLF extends Branch
+{
+	vars =
+	{
+		volume: Number,
+		freq: Number,
+		noiseLevel: Number,
+	};
 }
 
 const CtrlA = args =>
@@ -57,10 +72,11 @@ const CtrlA = args =>
 	const { model } = args;
 
 	return {
-		type: "div", class: "Ranges",
+		type: "div", class: "Ranges v-flex-ct",
 		parts:[
-			{ type: Range, title: "音量", unit: "%", model: model.volume, min: 0, max: 100, step: 1, },
-			{ type: Range, title: "周波数", unit: "Hz", model: model.freq, min: 0, max: 300, step: 0.1, },
+			{ type: Range, title: "Volume", unit: "", model: model.volume, min: 0, max: 100, step: 1, },
+			{ type: Range, title: "Freq", unit: "Hz", model: model.freq, min: 0, max: 300, step: 0.1, },
+			{ type: Range, title: "Noise", unit: "", model: model.noiseLevel, min: 0, max: 100, step: 1, },
 		]
 	};
 };
@@ -69,18 +85,20 @@ const SGen = args =>
 {
 	const { model } = args;
 
+	const volumeOper = { value: value => value == 0 ? 0 : Math.pow( 2, value / 100 * 8 ) / 256 };
+
 	const def =
 	{
 		type: "gain",
-		params: { gain: [ model.volume, v => v == 0 ? 0 : Math.pow( 2, v / 10 ) - 10 ] },
+		inputs: [ "osc1Gain", "noiseGain" ],
+		params: { gain: [ model.volume, volumeOper ] },
 		parts:
 		{
-			osc1: { type: "noise" },
+			osc1Gain: { type: "gain", inputs: [ "osc1" ], params: { gain: 1 } },
+			osc1: { type: "osc", params: { frequency: model.freq } },
+			noiseGain: { type: "gain", params: { gain: [ model.noiseLevel, volumeOper ] } },
+			noise: { type: "noise" },
 		},
-		conns:
-		[
-			[ "osc1", "main" ],
-		]
 	};
 	return def;
 };
@@ -88,11 +106,15 @@ const SGen = args =>
 const App = args =>
 {
 	const model = new SLFModel;
+	const page = new Page( { title: "SLF v.2-1-1" } );
+	const location = new Location( { page, update( { page } ) { return { title: page.title.value } } } );
 
 	const sound = Sound.create( { type: SGen, model } );
+	const resume = () => sound.resume();
 
 	return {
 		type: "div", class: "App v-flex-ct",
+		acts: { mousedown: resume, keydown: resume },
 		parts:[
 			{ type: "h1", text: "SLF" },
 			{ type: CtrlA, model },

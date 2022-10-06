@@ -27,6 +27,8 @@ body
 	gap: 1em;
 }
 
+a { color:hsl( 22, 0%, 22% ); text-decoration:hsl( 22, 30%, 98% ); }
+
 .Ranges { display: flex; flex-direction: column; gap: 1px; }
 
 .Range
@@ -165,6 +167,7 @@ const TopPage = index =>
 	const links =
 	[
 		{ title: "SLF", link: "../SLF/slf.html" },
+		{ title: "駅名CSS", link: "" },
 	];
 
 	const link = item => ( { type: "li", parts: [ { type: "a", text: item.title, attrs: { target: "_blank", href: item.link } } ] } );
@@ -187,7 +190,7 @@ const App = args =>
 
 	const listSrc =
 	{
-		top: { title: "Links", content: TopPage, selected: true },
+		"top": { title: "Links", content: TopPage, selected: true },
 		"hsl":
 		{
 			title: "HSL Color",
