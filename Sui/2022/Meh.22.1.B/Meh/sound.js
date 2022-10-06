@@ -12,14 +12,12 @@ class AudioComponent
 
 	constructor( def = {}, context )
 	{
-		this.context = context || new AudioContext();
+		this.context = context;
 		this.refs = new Refs;
 
 		def = this.expandDef( def );
 		this.nodes.main = this.createNode( def );
 		this.connectNodes( "main", def );
-
-		if( ! context )  this.nodes.main.connect( this.context.destination );
 	}
 
 	expandDef( def )
@@ -154,9 +152,27 @@ class Refs
 
 //  //
 
-const  create = ( def, audioContext ) =>
+const test = async () =>
 {
-	return new AudioComponent( def, audioContext );
+	const context = new AudioContext;
+	try
+	{
+		await context.audioWorklet.addModule( "sound-proc.js" );
+	}
+	catch( ex ) { log( ex) }
+}
+
+const  create = ( def, context ) =>
+{
+	if( ! context )
+	{
+		context = new AudioContext;
+		//context.audioWorklet.addModule( "./sound-proc.js" );
+		const compo = new AudioComponent( def, context );
+		compo.nodes.main?.connect( context.destination );
+		return compo;
+	}
+	return new AudioComponent( def, context );
 };
 
-export default { create }
+export default { create, test }

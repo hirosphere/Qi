@@ -54,7 +54,7 @@ class SLFModel
 {
 	volume = new Leaf.Number( 30 );
 	freq = new Leaf.Number( 204 );
-	noiseLevel = new Leaf( 0 );
+	noiseLevel = new Leaf.Number( 0 );
 }
 
 class SLF extends Branch
@@ -109,6 +109,7 @@ const App = args =>
 	const page = new Page( { title: "SLF v.2-1-1" } );
 	const location = new Location( { page, update( { page } ) { return { title: page.title.value } } } );
 
+	Sound.test();
 	const sound = Sound.create( { type: SGen, model } );
 	const resume = () => sound.resume();
 
