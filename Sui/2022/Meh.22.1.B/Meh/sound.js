@@ -10,7 +10,7 @@ class AudioComponent
 	partComponents = {};
 	refs = new Refs;
 
-	constructor( def = {}, context )
+	constructor( def = {}, context, connectToDest )
 	{
 		this.context = context;
 		this.refs = new Refs;
@@ -18,6 +18,8 @@ class AudioComponent
 		def = this.expandDef( def );
 		this.nodes.main = this.createNode( def );
 		this.connectNodes( "main", def );
+
+		connectToDest && this.nodes.main?.connect( context.destination )
 	}
 
 	expandDef( def )
@@ -118,10 +120,19 @@ class Osc extends OscillatorNode
 	}
 }
 
+class Noise extends AudioWorkletNode
+{
+	constructor( context )
+	{
+		super( context, "Noise" );
+	}
+}
+
 const primitives =
 {
 	osc: Osc,
 	gain: GainNode,
+	Noise: Noise,
 };
 
 //  //
@@ -152,27 +163,21 @@ class Refs
 
 //  //
 
-const test = async () =>
-{
-	const context = new AudioContext;
-	try
-	{
-		await context.audioWorklet.addModule( "sound-proc.js" );
-	}
-	catch( ex ) { log( ex) }
-}
+let context = null;
 
-const  create = ( def, context ) =>
+const getContext = async ( { mehPath } ) =>
 {
-	if( ! context )
-	{
-		context = new AudioContext;
-		//context.audioWorklet.addModule( "./sound-proc.js" );
-		const compo = new AudioComponent( def, context );
-		compo.nodes.main?.connect( context.destination );
-		return compo;
-	}
-	return new AudioComponent( def, context );
+	if( context )  return context;
+
+	context = new AudioContext;
+	await context.audioWorklet.addModule( `${ mehPath }Meh/sound-proc.js` );
+
+	return context;
 };
 
-export default { create, test }
+const  create = ( def, context, connectToDest = true ) =>
+{
+	return new AudioComponent( def, context, connectToDest );
+};
+
+export default { create, getContext }

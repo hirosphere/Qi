@@ -48,7 +48,9 @@ body
 const log = console.log;
 
 import Meh from "../../Meh/meh.js";
-const { HTDOM, Range, Leaf, Branch, Sound, Location, Page } = Meh;
+import Sound from "../../Meh/sound.js";
+const { HTDOM, Range, Leaf, Branch, Location, Page } = Meh;
+
 
 class SLFModel
 {
@@ -96,8 +98,8 @@ const SGen = args =>
 		{
 			osc1Gain: { type: "gain", inputs: [ "osc1" ], params: { gain: 1 } },
 			osc1: { type: "osc", params: { frequency: model.freq } },
-			noiseGain: { type: "gain", params: { gain: [ model.noiseLevel, volumeOper ] } },
-			noise: { type: "noise" },
+			noiseGain: { type: "gain", params: { gain: [ model.noiseLevel, volumeOper ] }, inputs: [ "noise" ] },
+			noise: { type: "Noise" },
 		},
 	};
 	return def;
@@ -109,8 +111,9 @@ const App = args =>
 	const page = new Page( { title: "SLF v.2-1-1" } );
 	const location = new Location( { page, update( { page } ) { return { title: page.title.value } } } );
 
-	Sound.test();
-	const sound = Sound.create( { type: SGen, model } );
+	log( args.audioContext, args.d );
+
+	const sound = Sound.create( { type: SGen, model }, args.audioContext );
 	const resume = () => sound.resume();
 
 	return {
@@ -123,7 +126,13 @@ const App = args =>
 	};
 };
 
-HTDOM.create( { type: App }, "body" );
+const main = async () =>
+{
+	const audioContext = await Sound.getContext( { mehPath: "../../" } );
+	HTDOM.create( { type: App, audioContext, d: 111 }, "body" );
+};
+
+window.addEventListener( "load", main );
 
 </script>
 
