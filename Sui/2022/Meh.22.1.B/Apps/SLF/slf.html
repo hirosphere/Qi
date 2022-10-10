@@ -11,29 +11,25 @@
 
 html
 {
+	overflow: scroll; 
 	height: 100vh;
-	background: linear-gradient( 180deg, hsl( 0, 0%, 100% ) 0%, hsl( 210, 60%, 90% ) 100% );
-	display: flex;
-	justify-content: center;
+	background: linear-gradient( 180deg, hsl( 190, 75%, 95% ) 0%, hsl( 215, 60%, 80% ) 100% );
 }
 
 body
 {
-	width: 700px; height: 100%; background: hsl( 0, 0%, 100% );
+	margin: 0 auto;
+	width: 800px; height: 100%; background: hsl( 100, 45%, 55% );
 	padding: 1em 2em;
 }
 
-.v-flex-ct { display: flex; flex-direction: column;  }
-
-.App { gap: 1em; }
-
-.Ranges { gap: 1px; }
+.Ranges { gap: 1px; display: flex; flex-direction: column; justify-content: center; border: 1px solid hsl( 0, 0%, 20% ); }
 
 .Range
 {
 	display: grid;
 	padding: 1ex 0;
-	grid-template-columns: 5em 400px 7ex 2ex;
+	grid-template-columns: 12ex 400px 7ex 2ex;
 }
 .Range .value { margin-left: 1ex; text-align: right; }
 .Range .unit { margin-left: 0.2ex; color:hsl( 30, 0%, 25% ); font-size: 97%; }
@@ -41,7 +37,7 @@ body
 </style>
 
 </head>
-<body class="v-flex-ct">
+<body>
 	
 <script type="module">
 
@@ -54,8 +50,16 @@ const { HTDOM, Range, Leaf, Branch, Location, Page } = Meh;
 
 class SLFModel
 {
-	volume = new Leaf.Number( 30 );
-	freq = new Leaf.Number( 204 );
+	volume = new Leaf.Number( 80 );
+	
+	ringLevel = new Leaf.Number( 40 );
+	
+	osc1Level = new Leaf.Number( 40 );
+	osc1Freq = new Leaf.Number( 51 );
+	
+	osc2Level = new Leaf.Number( 30 );
+	osc2Freq = new Leaf.Number( 101 );
+	
 	noiseLevel = new Leaf.Number( 0 );
 }
 
@@ -69,40 +73,55 @@ class SLF extends Branch
 	};
 }
 
+const SGen = args =>
+{
+	const { model } = args;
+
+	const vopA = { value: value => value == 0 ? 0 : Math.pow( 2, value / 100 * 8 ) / 256 };
+	const vopB = { value: value => value / 100 };
+
+	const def =
+	{
+		parts:
+		{
+			main: { type: "Gain", inputs: [ "osc1Gain", "osc2Gain", "noiseGain" ], params: { gain: [ model.volume, vopA ] } },
+
+			ringGain: { type: "Gain", inputs: [ "ring" ], params: { gain: [ model.ringLevel, vopB ] } },
+			ring: { type: "Gain", inputs: [ "osc1" ], params: {} },
+
+			osc1Gain: { type: "Gain", inputs: [ "osc1" ], params: { gain: [ model.osc1Level, vopB ] } },
+			osc1: { type: "Osc", params: { frequency: model.osc1Freq } },
+			
+			osc2Gain: { type: "Gain", inputs: [ "osc2" ], params: { gain: [ model.osc2Level, vopB ] } },
+			osc2: { type: "Osc", params: { frequency: model.osc2Freq } },
+			
+			noiseGain: { type: "Gain", params: { gain: [ model.noiseLevel, vopB ] }, inputs: [ "noise" ] },
+			noise: { type: "Noise" },
+		},
+	};
+	return def;
+};
+
 const CtrlA = args =>
 {
 	const { model } = args;
 
 	return {
-		type: "div", class: "Ranges v-flex-ct",
+		type: "div", class: "Ranges",
 		parts:[
 			{ type: Range, title: "Volume", unit: "", model: model.volume, min: 0, max: 100, step: 1, },
-			{ type: Range, title: "Freq", unit: "Hz", model: model.freq, min: 0, max: 300, step: 0.1, },
-			{ type: Range, title: "Noise", unit: "", model: model.noiseLevel, min: 0, max: 100, step: 1, },
+
+			{ type: Range, title: "Ring Level", unit: "", model: model.ringLevel, min: 0, max: 100, step: 1, },
+
+			{ type: Range, title: "Osc1 Level", unit: "", model: model.osc1Level, min: 0, max: 100, step: 1, },
+			{ type: Range, title: "Osc1 Freq", unit: "Hz", model: model.osc1Freq, min: 0, max: 500, step: 0.1, },
+			
+			{ type: Range, title: "Osc2 Level", unit: "", model: model.osc2Level, min: 0, max: 100, step: 1, },
+			{ type: Range, title: "Osc2 Freq", unit: "Hz", model: model.osc2Freq, min: 0, max: 500, step: 0.1, },
+			
+			{ type: Range, title: "Noise Level", unit: "", model: model.noiseLevel, min: 0, max: 100, step: 1, },
 		]
 	};
-};
-
-const SGen = args =>
-{
-	const { model } = args;
-
-	const volumeOper = { value: value => value == 0 ? 0 : Math.pow( 2, value / 100 * 8 ) / 256 };
-
-	const def =
-	{
-		type: "gain",
-		inputs: [ "osc1Gain", "noiseGain" ],
-		params: { gain: [ model.volume, volumeOper ] },
-		parts:
-		{
-			osc1Gain: { type: "gain", inputs: [ "osc1" ], params: { gain: 1 } },
-			osc1: { type: "osc", params: { frequency: model.freq } },
-			noiseGain: { type: "gain", params: { gain: [ model.noiseLevel, volumeOper ] }, inputs: [ "noise" ] },
-			noise: { type: "Noise" },
-		},
-	};
-	return def;
 };
 
 const App = args =>
@@ -117,8 +136,8 @@ const App = args =>
 	const resume = () => sound.resume();
 
 	return {
-		type: "div", class: "App v-flex-ct",
-		acts: { mousedown: resume, keydown: resume },
+		type: "div", class: "App",
+		acts: { mousedown: resume, keydown: resume, touchstart: resume },
 		parts:[
 			{ type: "h1", text: "SLF" },
 			{ type: CtrlA, model },

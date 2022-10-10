@@ -6,7 +6,7 @@ import { Leaf } from "./model.js";
 
 class AudioComponent
 {
-	nodes = {};
+	parts = {};
 	partComponents = {};
 	refs = new Refs;
 
@@ -16,27 +16,32 @@ class AudioComponent
 		this.refs = new Refs;
 
 		def = this.expandDef( def );
-		this.nodes.main = this.createNode( def );
-		this.connectNodes( "main", def );
 
-		connectToDest && this.nodes.main?.connect( context.destination )
+		if( def.parts ) for( let name in def.parts )
+		{
+			this.createPart( name, def.parts[ name ] );
+		}
+
+		for( let name in this.parts )
+		{
+			this.connectInputs( name, def.parts[ name ] );
+		}
+
+		connectToDest && this.parts.main?.connect( context.destination )
 	}
 
 	expandDef( def )
 	{
-		const { type } = def;
-
-		if( type instanceof Function )
+		if( def?.type instanceof Function )
 		{
-			return this.expandDef( type( def ) );
+			return this.expandDef( def.type( def ) );
 		}
+
 		return def;
 	}
-
-	createNode( def )
+	
+	createPart( name, def )
 	{
-		const { refs } = this;
-		
 		const { type } = def;
 
 		const Type = primitives[ type ];
@@ -44,58 +49,48 @@ class AudioComponent
 
 		const node = new Type( this.context );
 
-	//	log( "Create", type )
+		log( "Create", type )
 
-		const { params, parts } = def;
+		const { params } = def;
 		if( params )  for( let name in params )  this.refs.bindParam( node, params[ name ], name );
-		if( parts )  for( let name in parts )  this.createPart( name, parts[ name ] );
 
-		return node;
+		this.parts[ name ] = node;
 	}
 
-	createPart( name, def )
+	connectInputs( name, def )
 	{
-		const { type } = def;
-		if( type instanceof Function )
-		{
-			this.partComponents[ name ] = new AudioComponent( def, this.context );
-		}
-		else
-		{
-			this.nodes[ name ] = this.createNode( def );
-	//		log( "Part", name )
-		}
-	}
+		const part = this.parts[ name ];
 
-	connectNodes( name, def )
-	{
-		const node = this.nodes[ name ];
+		log( part, name )
 
-		let { inputs, params, parts } = def;
-
-		if( inputs ) for( const srcName of inputs )
+		if( part instanceof AudioNode )
 		{
-			const source = this.getSource( srcName )
-			log( "Connect", `${ srcName } > ${ name }` );
-			source.connect( node );
-		}
+			let { inputs, params } = def;
 
-		if( parts ) for( let partName in parts )
-		{
-			this.connectNodes( partName, parts[ partName ] );
+			if( inputs ) for( const srcName of inputs )
+			{
+				this.connectInput( part, srcName );
+				log( "Connect", `${ srcName } > ${ name }` );
+			}	
 		}
 	}
 
-	getSource( name )
+	connectInput( object, srcName )
 	{
-		return this.nodes[ name ];
+		const source = this.getSource( srcName );
+		source?.connect( object );
+	}
+
+	getSource( srcName )
+	{
+		return this.parts[ srcName ];
 	}
 
 	terminate()
 	{
 		this.partComponents.forEach( part => part.terminate() );
 		this.refs.terminate();
-		this.nodes = null;
+		this.parts = null;
 	}
 
 	//  //
@@ -130,8 +125,8 @@ class Noise extends AudioWorkletNode
 
 const primitives =
 {
-	osc: Osc,
-	gain: GainNode,
+	Osc: Osc,
+	Gain: GainNode,
 	Noise: Noise,
 };
 
