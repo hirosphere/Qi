@@ -15,17 +15,14 @@ class AudioComponent
 		this.context = context;
 		this.refs = new Refs;
 
-		def = this.expandDef( def );
+		this.def = def = this.expandDef( def );
 
 		if( def.parts ) for( let name in def.parts )
 		{
 			this.createPart( name, def.parts[ name ] );
 		}
 
-		for( let name in this.parts )
-		{
-			this.connectInputs( name, def.parts[ name ] );
-		}
+		this.connectParts();
 
 		connectToDest && this.parts.main?.connect( context.destination )
 	}
@@ -49,7 +46,7 @@ class AudioComponent
 
 		const node = new Type( this.context );
 
-		log( "Create", type )
+		// log( "Create", name, type )
 
 		const { params } = def;
 		if( params )  for( let name in params )  this.refs.bindParam( node, params[ name ], name );
@@ -57,33 +54,13 @@ class AudioComponent
 		this.parts[ name ] = node;
 	}
 
-	connectInputs( name, def )
+	connectParts()
 	{
-		const part = this.parts[ name ];
-
-		log( part, name )
-
-		if( part instanceof AudioNode )
+		for( let name in this.parts )
 		{
-			let { inputs, params } = def;
-
-			if( inputs ) for( const srcName of inputs )
-			{
-				this.connectInput( part, srcName );
-				log( "Connect", `${ srcName } > ${ name }` );
-			}	
+			const part = this.parts[ name ];
+			ConnectPart( this, part, this.def.parts[ name ], name );
 		}
-	}
-
-	connectInput( object, srcName )
-	{
-		const source = this.getSource( srcName );
-		source?.connect( object );
-	}
-
-	getSource( srcName )
-	{
-		return this.parts[ srcName ];
 	}
 
 	terminate()
@@ -105,6 +82,51 @@ class AudioComponent
 	}
 
 }
+
+const ConnectPart = ( compo, part, def, name ) =>
+{
+	if( part instanceof AudioNode && def )  ConnectNode( compo, part, def, name );
+}
+
+const ConnectNode = ( compo, node, def, nodeName ) =>
+{
+	if( def.inputs ) for( const srcName of def.inputs )
+	{
+		// log( "Conn Node", `${ srcName } > ${ nodeName }` );
+
+		ConnectSource( node, compo, srcName );
+	}
+
+	if( def.paramSrcs ) for( let paramName in def.paramSrcs )
+	{
+		const param = node[ paramName ];
+		if( ! param instanceof AudioParam ) break;
+
+		ConnectParam( compo, param, def.paramSrcs[ paramName ], { nodeName, paramName } )
+	}
+}
+
+const ConnectParam = ( compo, param, srcList, { nodeName, paramName } ) =>
+{
+	if( ! ( srcList instanceof Array ) ) srcList = [ srcList ];
+
+	for( const srcSpec of srcList )
+	{
+	//	log( "Conn Param", `${ srcSpec } > ${ nodeName }.${ paramName }` );
+		ConnectSource( param, compo, srcSpec );
+	}
+}
+
+const ConnectSource = ( target, compo, srcSpec ) =>
+{
+	const source = compo.parts[ srcSpec ];
+
+	// log( "**", source?.constructor.name, target?.constructor.name );
+
+	if( source instanceof AudioNode ) source.connect( target );
+}
+
+// Node //
 
 class Osc extends OscillatorNode
 {
