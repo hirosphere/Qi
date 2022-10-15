@@ -54,23 +54,29 @@ import Meh from "../../Meh/meh.js";
 import Sound from "../../Meh/sound.js";
 const { HTDOM, Range, Leaf, Branch, Location, Page } = Meh;
 
+const Model = {}, SG = {}, GUI = {};
 
-class SLFModel
+Model.SLF = class
 {
 	volume = new Leaf.Number( 80 );
 	
 	ringLevel = new Leaf.Number( 0 );
 	
 	osc1Level = new Leaf.Number( 40 );
-	osc1Freq = new Leaf.Number( 51 );
+	osc1Freq = new Leaf.Number( 301 );
 	
 	osc2Level = new Leaf.Number( 30 );
-	osc2Freq = new Leaf.Number( 101 );
+	osc2Freq = new Leaf.Number( 503 );
 	
 	noiseLevel = new Leaf.Number( 0 );
 
 	MG1_Freq = new Leaf.Number( 0.2 );
 	MG1_Osc1_Freq = new Leaf.Number( 0 );
+
+	noiseGen = new class
+	{
+		cutOff = new Leaf.Number( 400 );
+	};
 }
 
 class SLF extends Branch
@@ -82,6 +88,44 @@ class SLF extends Branch
 		noiseLevel: Number,
 	};
 }
+
+
+SG.VU1 = args =>
+{
+	return {
+		inputs: { },
+		doMsg( msg )
+		{
+			;
+		},
+		parts:{
+			Osc: { type: "Osc" },
+			EGGain: { type: "Gain", inputs: "Osc", params: {  } },
+		}
+	};
+};
+
+SG.NoiseGen = args =>
+{
+	const { model } = args;
+
+	const def =
+	{
+		output: "Gain",
+		consts:
+		{
+			cutOff: [ model.cutOff, "linear" ],
+		},
+		parts:
+		{
+			Gain: { type: "Gain", inputs: "Filter" },
+			Filter: { type: "Filter", attrs: { type: "byQuadFilter" }, inputs: "Noise" },
+			Noise: { type: "Noise" },
+		}
+	};
+
+	return ;
+};
 
 const SGen = args =>
 {
@@ -107,6 +151,8 @@ const SGen = args =>
 			
 			noiseGain: { type: "Gain", params: { gain: [ model.noiseLevel, vopB ] }, inputs: [ "noise" ] },
 			noise: { type: "Noise" },
+
+			NoiseSyn: { type: SG.NoiseGen, model: model.noiseGen },
 			
 			MG1_Osc1_Freq: { type: "Gain", inputs: [ "MG1" ], params: { gain: [ model.MG1_Osc1_Freq, vopB ] } },
 			MG1: { type: "Osc", params: { frequency: model.MG1_Freq } },
@@ -115,7 +161,7 @@ const SGen = args =>
 	return def;
 };
 
-const CtrlA = args =>
+GUI.CtrlA = args =>
 {
 	const { model } = args;
 
@@ -141,9 +187,9 @@ const CtrlA = args =>
 	};
 };
 
-const App = args =>
+GUI.App = args =>
 {
-	const model = new SLFModel;
+	const model = new Model.SLF;
 	const page = new Page( { title: "SLF v.2-1-1" } );
 	const location = new Location( { page, update( { page } ) { return { title: page.title.value } } } );
 
@@ -157,7 +203,7 @@ const App = args =>
 		acts: { mousedown: resume, keydown: resume, touchstart: resume },
 		parts:[
 			{ type: "h1", text: "SLF" },
-			{ type: CtrlA, model },
+			{ type: GUI.CtrlA, model },
 		]
 	};
 };
@@ -165,7 +211,7 @@ const App = args =>
 const main = async () =>
 {
 	const audioContext = await Sound.getContext( { mehPath: "../../" } );
-	HTDOM.create( { type: App, audioContext, d: 111 }, "body" );
+	HTDOM.create( { type: GUI.App, audioContext, d: 111 }, "body" );
 };
 
 window.addEventListener( "load", main );
