@@ -33,13 +33,15 @@ body
 .Range
 {
 	border-radius: 0.43ex;
-	background:hsl( 50, 0%, 42% ); color:hsl( 50, 0%, 90% );
+	background:hsl( 270, 2%, 44% ); color:hsl( 50, 0%, 90% );
 	display: grid;
 	padding: 1.3ex 1.3ex;
-	grid-template-columns: 12ex 300px 7ex 2ex;
+	grid-template-columns: 12ex 400px 7ex 2ex;
 }
 .Range .value { margin-left: 1ex; text-align: right; }
 .Range .unit { margin-left: 0.2ex; color:hsl( 30, 0%, 90% ); font-size: 97%; }
+
+.App { display: flex; flex-direction: column; gap: 1em; }
 
 </style>
 
@@ -54,7 +56,10 @@ import Meh from "../../Meh/meh.js";
 import Sound from "../../Meh/sound.js";
 const { HTDOM, Range, Leaf, Branch, Location, Page } = Meh;
 
-const Model = {}, SG = {}, GUI = {};
+const Model = {}, SUI = {}, GUI = {};
+
+
+// Model //
 
 Model.SLF = class
 {
@@ -62,22 +67,32 @@ Model.SLF = class
 	
 	ringLevel = new Leaf.Number( 0 );
 	
-	osc1Level = new Leaf.Number( 40 );
-	osc1Freq = new Leaf.Number( 301 );
+	osc1Level = new Leaf.Number( 0 );
+	osc1Freq = new Leaf.Number( 80 );
 	
-	osc2Level = new Leaf.Number( 30 );
-	osc2Freq = new Leaf.Number( 503 );
+	osc2Level = new Leaf.Number( 0 );
+	osc2Freq = new Leaf.Number( 320 );
 	
-	noiseLevel = new Leaf.Number( 0 );
+	noiseLevel = new Leaf.Number( 80 );
+	noiseFreq = new Leaf.Number( 200 );
 
-	MG1_Freq = new Leaf.Number( 0.2 );
-	MG1_Osc1_Freq = new Leaf.Number( 0 );
-
-	noiseGen = new class
-	{
-		cutOff = new Leaf.Number( 400 );
-	};
+	LFO1_Osc1_Freq = new Leaf.Number( 0 );
+	LFO1_Freq = new Leaf.Number( 4 );
+	
+	noiseGen = new Model.Noise();
 }
+
+Model.Osc = class
+{
+	level = new Leaf.Number( 0 );
+	freq = new Leaf.Number( 400 );
+};
+
+Model.Noise = class
+{
+	level = new Leaf.Number( 0 );
+	freq = new Leaf.Number( 400 );
+};
 
 class SLF extends Branch
 {
@@ -90,7 +105,9 @@ class SLF extends Branch
 }
 
 
-SG.VU1 = args =>
+// SUI  sonic user interface //
+
+SUI.VU1 = args =>
 {
 	return {
 		inputs: { },
@@ -105,60 +122,116 @@ SG.VU1 = args =>
 	};
 };
 
-SG.NoiseGen = args =>
+SUI.Gain = args =>
+{
+	return {
+		input: "gain",
+		output: "gain",
+		params: { volume: "gain.gain" },
+		parts:
+		{
+			gain: { type: "gain" },
+		},
+	};
+};
+
+SUI.NoiseGen = args =>
 {
 	const { model } = args;
 
 	const def =
 	{
-		output: "Gain",
-		consts:
-		{
-			cutOff: [ model.cutOff, "linear" ],
-		},
 		parts:
 		{
-			Gain: { type: "Gain", inputs: "Filter" },
-			Filter: { type: "Filter", attrs: { type: "byQuadFilter" }, inputs: "Noise" },
-			Noise: { type: "Noise" },
+			output: { type: "Gain", inputs: "filter" },
+			filter: {
+				type: "Filter", inputs: "noise",
+				attrs: { type: "byQuadFilter" },
+				params: { frequency: { charge: model.frequency }, },
+			},
+			noise: { type: "Noise" },
 		}
 	};
 
 	return ;
 };
 
-const SGen = args =>
+SUI.Main = args =>
 {
 	const { model } = args;
 
 	const vopA = { value: value => value == 0 ? 0 : Math.pow( 2, value / 100 * 8 ) / 256 };
 	const vopB = { value: value => value / 100 };
 
+	const volume = { value: model.volume, conv: vopA };
+	const ringlevel = { charge: model.ringLevel, time: 0.01, conv: vopB };
+
+	const cnvA = value => ( value == 0 ? 0 : Math.pow( 2, value / 100 * 8 ) / 256 );
+	const cnvB = value => ( value / 100 );
+
 	const def =
 	{
+		ctrls:
+		{
+			master :    { src: model.volume, conv: cnvA },
+			RingLevel : { src: model.ringLevel, conv: cnvB },
+			Osc1_Level_Ctrl : { src: model.osc1Level, conv: cnvB },
+			osc1Freq :  { src: model.osc1Freq },
+			osc2Level : { src: model.osc2Level, conv: cnvB },
+			osc2Freq :  { src: model.osc2Freq },
+			Ct_LFO1_Osc1_Freq : { src: model.LFO1_Osc1_Freq },
+			LFO1_Freq :  { src: model.LFO1_Freq },
+		},
+
 		parts:
 		{
-			main: { type: "Gain", inputs: [ "osc1Gain", "osc2Gain", "noiseGain", "ringGain" ], params: { gain: [ model.volume, vopA ] } },
+			main: { type: "Gain", inputs: [ "osc1gain", "osc2gain", "noisegain", "ringout", "noiseGen" ], paramSrcs: { gain: "master" } },
 
-			ringGain: { type: "Gain", inputs: [ "ring" ], params: { gain: [ model.ringLevel, vopB ] } },
+			ringout: { type: "Gain", inputs: [ "ring" ], paramSrcs: { gain: "RingLevel" } },
 			ring: { type: "Gain", inputs: [ "osc1" ], paramSrcs: { gain: "osc2" } },
 
-			osc1Gain: { type: "Gain", inputs: [ "osc1" ], params: { gain: [ model.osc1Level, vopB ] } },
-			osc1: { type: "Osc", params: { frequency: model.osc1Freq } },
+			osc1gain: { type: "Gain", inputs: [ "osc1" ], paramSrcs: { gain: "Osc1_Level_Ctrl" } },
+			osc1: { type: "Osc", paramSrcs: { frequency: [ "osc1Freq", "LFO_1_Osc_1_Freq" ] } },
 			
-			osc2Gain: { type: "Gain", inputs: [ "osc2" ], params: { gain: [ model.osc2Level, vopB ] } },
+			osc2gain: { type: "Gain", inputs: [ "osc2" ], params: { gain: [ model.osc2Level, vopB ] } },
 			osc2: { type: "Osc", params: { frequency: model.osc2Freq } },
+
+			LFO_1_Osc_1_Freq: { type: "Gain", inputs: [ "LFO_1" ], paramSrcs: { gain: "Ct_LFO1_Osc1_Freq" } },
+			LFO_1: { type: "Osc", paramSrcs: { frequency: "LFO1_Freq" } },
 			
-			noiseGain: { type: "Gain", params: { gain: [ model.noiseLevel, vopB ] }, inputs: [ "noise" ] },
+			noisegain: { type: "Gain", inputs: [ "noiseFilter" ], params: { gain: [ model.noiseLevel, vopB ] } },
+			noiseFilter: { type: "BiquadFilter", inputs: [ "noise" ], attrs: { type: "lowpass" }, params: { frequency: model.noiseFreq } },
 			noise: { type: "Noise" },
 
-			NoiseSyn: { type: SG.NoiseGen, model: model.noiseGen },
-			
-			MG1_Osc1_Freq: { type: "Gain", inputs: [ "MG1" ], params: { gain: [ model.MG1_Osc1_Freq, vopB ] } },
-			MG1: { type: "Osc", params: { frequency: model.MG1_Freq } },
+			noiseGen: { type: SUI.NoiseGen, model: model.noiseGen },
 		},
 	};
 	return def;
+};
+
+// GUI //
+
+GUI.Noise = ( { model } ) =>
+{
+	return {
+		type: "div", class: "Ranges",
+		parts:[
+			{ type: "h2", text: "Noise" },
+			{ type: Range, title: "Level", unit: "", model: model.level, min: 0, max: 100, step: 1, },
+			{ type: Range, title: "Cutoff", unit: "Hz", model: model.cutoff, min: 0, max: 4000, step: 0.1, },
+		]
+	};
+};
+
+GUI.MG = ( { model, title = "MG" } ) =>
+{
+	return {
+		type: "div", class: "Ranges",
+		parts:[
+			{ type: "h2", text: title },
+			{ type: Range, title: "Freq", unit: "Hz", model: model.freq, min: 0, max: 4000, step: 0.1, },
+		]
+	};
 };
 
 GUI.CtrlA = args =>
@@ -171,18 +244,17 @@ GUI.CtrlA = args =>
 			{ type: Range, title: "Volume", unit: "", model: model.volume, min: 0, max: 100, step: 1, },
 
 			{ type: Range, title: "Ring Level", unit: "", model: model.ringLevel, min: 0, max: 100, step: 1, },
-
 			{ type: Range, title: "Osc1 Level", unit: "", model: model.osc1Level, min: 0, max: 100, step: 1, },
-			{ type: Range, title: "Osc1 Freq", unit: "Hz", model: model.osc1Freq, min: 0, max: 2000, step: 0.1, },
-			
 			{ type: Range, title: "Osc2 Level", unit: "", model: model.osc2Level, min: 0, max: 100, step: 1, },
+			{ type: Range, title: "Noise Level", unit: "", model: model.noiseLevel, min: 0, max: 100, step: 1, },
+
+			{ type: Range, title: "Osc1 Freq", unit: "Hz", model: model.osc1Freq, min: 0, max: 2000, step: 0.1, },
 			{ type: Range, title: "Osc2 Freq", unit: "Hz", model: model.osc2Freq, min: 0, max: 2000, step: 0.1, },
 			
-			{ type: Range, title: "Noise Level", unit: "", model: model.noiseLevel, min: 0, max: 100, step: 1, },
-			
-			{ type: "h2", text: "MG1" },
-			{ type: Range, title: "Osc1 Freq", unit: "", model: model.MG1_Osc1_Freq, min: 0, max: 100, step: 0.1, },
-			{ type: Range, title: "Freq", unit: "Hz", model: model.MG1_Freq, min: 0, max: 200, step: 0.02, },
+			{ type: Range, title: "Noise Freq", unit: "Hz", model: model.noiseFreq, min: 0, max: 8000, step: 1, },
+
+			{ type: Range, title: "LFO1 Osc1 F", unit: "Hz", model: model.LFO1_Osc1_Freq, min: 0, max: 2000, step: 1, },
+			{ type: Range, title: "LFO1 Freq", unit: "Hz", model: model.LFO1_Freq, min: 0, max: 200, step: 0.01, },
 		]
 	};
 };
@@ -193,9 +265,7 @@ GUI.App = args =>
 	const page = new Page( { title: "SLF v.2-1-1" } );
 	const location = new Location( { page, update( { page } ) { return { title: page.title.value } } } );
 
-	log( args.audioContext, args.d );
-
-	const sound = Sound.create( { type: SGen, model }, args.audioContext );
+	const sound = Sound.create( { type: SUI.Main, model }, args.audioContext );
 	const resume = () => sound.resume();
 
 	return {
@@ -204,6 +274,7 @@ GUI.App = args =>
 		parts:[
 			{ type: "h1", text: "SLF" },
 			{ type: GUI.CtrlA, model },
+			{ type: GUI.Noise, model: model.noiseGen },			
 		]
 	};
 };
@@ -211,7 +282,7 @@ GUI.App = args =>
 const main = async () =>
 {
 	const audioContext = await Sound.getContext( { mehPath: "../../" } );
-	HTDOM.create( { type: GUI.App, audioContext, d: 111 }, "body" );
+	HTDOM.create( { type: GUI.App, audioContext }, "body" );
 };
 
 window.addEventListener( "load", main );

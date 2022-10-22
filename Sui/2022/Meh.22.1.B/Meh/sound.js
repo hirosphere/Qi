@@ -4,6 +4,22 @@ import { Leaf } from "./model.js";
 
 //  //
 
+const starts = new class
+{
+	set item( item ) { this.items.push( item ) }
+	
+	go()
+	{
+		if( this.started ) return;
+		this.started = true;
+		this.items.forEach( item => item() );
+		log( "start !!", this.items.length )
+	}
+
+	items = [];
+	started = false;
+};
+
 class AudioComponent
 {
 	parts = {};
@@ -15,14 +31,26 @@ class AudioComponent
 		this.context = context;
 		this.refs = new Refs;
 
-		this.def = def = this.expandDef( def );
+		def = this.expandDef( def );
 
-		if( def.parts ) for( let name in def.parts )
+		const [ ctrldef, partsdef ] = [ def.ctrls, def.parts ];
+
+		if( ctrldef ) for( let name in ctrldef )
 		{
-			this.createPart( name, def.parts[ name ] );
+			this.createConst( name, ctrldef[ name ] );
 		}
 
-		this.connectParts();
+		if( partsdef ) for( let name in partsdef )
+		{
+			this.createPart( name, partsdef[ name ] );
+		}
+
+		for( let name in this.parts )
+		{
+			const part = this.parts[ name ];
+			const partdef = partsdef[ name ];
+			this.connectPart( part, partdef, name );
+		}
 
 		connectToDest && this.parts.main?.connect( context.destination )
 	}
@@ -36,6 +64,19 @@ class AudioComponent
 
 		return def;
 	}
+
+	// create //
+
+	createConst( name, constdef )
+	{
+		const node = new GainNode( this.context );
+		this.context.constSrc.connect( node );
+		this.refs.bindParam2( node.gain, constdef );
+
+		this.parts[ name ] = node;
+		
+		log( "const", name, node.gain.value )
+	}
 	
 	createPart( name, def )
 	{
@@ -46,20 +87,76 @@ class AudioComponent
 
 		const node = new Type( this.context );
 
-		// log( "Create", name, type )
-
-		const { params } = def;
-		if( params )  for( let name in params )  this.refs.bindParam( node, params[ name ], name );
+		const { attrs } = def;
+		if( attrs )  for( let name in attrs ) this.refs.bindAttr( node, name, attrs[ name ] );
 
 		this.parts[ name ] = node;
 	}
 
-	connectParts()
+	// connect //
+
+	connectPart( part, partdef, name )
 	{
-		for( let name in this.parts )
+		if( partdef && part instanceof AudioNode )  this.connectNodeInputs( part, partdef, name );
+	}
+	
+	connectNodeInputs( node, nodedef, nodeName )
+	{
+		const { inputs, params, paramSrcs } = nodedef;
+
+
+		if( inputs ) for( const srcName of inputs )
 		{
-			const part = this.parts[ name ];
-			ConnectPart( this, part, this.def.parts[ name ], name );
+			this.connectSource( node, srcName );
+		}
+
+		if( params ) for( let name in params )
+		{
+			this.refs.bindParam( node, name, params[ name ] );
+		}
+	
+		if( paramSrcs ) for( let paramName in paramSrcs )
+		{
+			const param = node[ paramName ];
+			if( ! param instanceof AudioParam ) break;
+
+			this.connectParamInputs( param, paramSrcs[ paramName ], { nodeName, paramName } )
+		}
+	}
+	
+	connectParamInputs( param, srcList, { nodeName, paramName } )
+	{
+		if( ! ( srcList instanceof Array ) ) srcList = [ srcList ];
+		
+		for( const srcspec of srcList ) this.connectParamInput( param, srcspec );
+	}
+
+	connectParamInput( param, srcspec )
+	{
+		if( srcspec?.constructor == String ) this.connectSource( param, srcspec );
+	}
+	
+	connectSource( target, srcspec )
+	{
+		const source = this.getSource( srcspec );
+
+		if( source instanceof AudioNode ) source.connect( target );
+	}
+
+	getSource( srcspec )
+	{
+		return this.parts[ srcspec ];
+	}
+
+	// public //
+
+	resume()
+	{
+		const state = this.context.state;
+		if( state == "suspended" || state == "interrupted" )
+		{
+			this.context.resume();
+			starts.go();
 		}
 	}
 
@@ -69,71 +166,24 @@ class AudioComponent
 		this.refs.terminate();
 		this.parts = null;
 	}
-
-	//  //
-
-	resume()
-	{
-		const state = this.context.state;
-		if( state == "suspended" || state == "interrupted" )
-		{
-			this.context.resume();
-		}
-	}
-
-}
-
-const ConnectPart = ( compo, part, def, name ) =>
-{
-	if( part instanceof AudioNode && def )  ConnectNode( compo, part, def, name );
-}
-
-const ConnectNode = ( compo, node, def, nodeName ) =>
-{
-	if( def.inputs ) for( const srcName of def.inputs )
-	{
-		// log( "Conn Node", `${ srcName } > ${ nodeName }` );
-
-		ConnectSource( node, compo, srcName );
-	}
-
-	if( def.paramSrcs ) for( let paramName in def.paramSrcs )
-	{
-		const param = node[ paramName ];
-		if( ! param instanceof AudioParam ) break;
-
-		ConnectParam( compo, param, def.paramSrcs[ paramName ], { nodeName, paramName } )
-	}
-}
-
-const ConnectParam = ( compo, param, srcList, { nodeName, paramName } ) =>
-{
-	if( ! ( srcList instanceof Array ) ) srcList = [ srcList ];
-
-	for( const srcSpec of srcList )
-	{
-	//	log( "Conn Param", `${ srcSpec } > ${ nodeName }.${ paramName }` );
-		ConnectSource( param, compo, srcSpec );
-	}
-}
-
-const ConnectSource = ( target, compo, srcSpec ) =>
-{
-	const source = compo.parts[ srcSpec ];
-
-	// log( "**", source?.constructor.name, target?.constructor.name );
-
-	if( source instanceof AudioNode ) source.connect( target );
 }
 
 // Node //
 
 class Osc extends OscillatorNode
 {
-	constructor( context )
+	constructor( context, values )
 	{
-		super( context );
-		this.start();
+		super( context, { ... values, frequency: values?.frequency ?? 0 } );
+		starts.item = () => this.start();
+	}
+}
+
+class Gain extends GainNode
+{
+	constructor( context, values )
+	{
+		super( context, { ... values, gain: values?.gain ?? 0 } );
 	}
 }
 
@@ -148,7 +198,8 @@ class Noise extends AudioWorkletNode
 const primitives =
 {
 	Osc: Osc,
-	Gain: GainNode,
+	BiquadFilter: BiquadFilterNode,
+	Gain: Gain,
 	Noise: Noise,
 };
 
@@ -156,13 +207,12 @@ const primitives =
 
 class Refs
 {
-	bindParam( node, value, name )
+	bindParam( node, name, value )
 	{
 		if( value == null ) return;
 
 		let opers;
 		if( value instanceof Array ) [ value, opers ] = value;
-	//	log( "Bind", { name, value, opers } )
 
 		const param = node[ name ];
 		if( ! param )  return;
@@ -170,8 +220,29 @@ class Refs
 		const update =
 			value => { param.value = opers?.value?.( value ) ?? value; };
 		
-		if( value instanceof Leaf )  value.createRef( { update } );
-		else update( value );
+		this.createRef( value, { update } );
+	}
+
+	bindParam2( param, constdef )
+	{
+		const { src, conv } = constdef;
+		if( src == null ) return;
+
+		const update =
+			value => { param.value = conv?.( value ) ?? value; };
+		
+		this.createRef( src, { update } );
+	}
+
+	bindAttr( node, name, value )
+	{
+		this.createRef( value, { update( value ) { node[ name ] = value; } } );
+	}
+
+	createRef( value, opers )
+	{
+		if( value instanceof Leaf ) this.refs.push( value.createRef( opers ) );
+		else opers?.update?.( value );
 	}
 
 	refs = [];
@@ -187,7 +258,10 @@ const getContext = async ( { mehPath } ) =>
 	if( context )  return context;
 
 	context = new AudioContext;
+	context.constSrc = new ConstantSourceNode( context );
 	await context.audioWorklet.addModule( `${ mehPath }Meh/sound-proc.js` );
+
+	starts.item = () => context.constSrc.start();
 
 	return context;
 };
