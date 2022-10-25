@@ -102,7 +102,7 @@ class AudioComponent
 	
 	connectNodeInputs( node, nodedef, nodeName )
 	{
-		const { inputs, params, paramSrcs } = nodedef;
+		const { inputs, params } = nodedef;
 
 
 		if( inputs ) for( const srcName of inputs )
@@ -110,17 +110,12 @@ class AudioComponent
 			this.connectSource( node, srcName );
 		}
 
-		if( params ) for( let name in params )
-		{
-			this.refs.bindParam( node, name, params[ name ] );
-		}
-	
-		if( paramSrcs ) for( let paramName in paramSrcs )
+		if( params ) for( let paramName in params )
 		{
 			const param = node[ paramName ];
 			if( ! param instanceof AudioParam ) break;
 
-			this.connectParamInputs( param, paramSrcs[ paramName ], { nodeName, paramName } )
+			this.connectParamInputs( param, params[ paramName ], { nodeName, paramName } )
 		}
 	}
 	
@@ -179,6 +174,14 @@ class Osc extends OscillatorNode
 	}
 }
 
+class BqFilter extends BiquadFilterNode
+{
+	constructor( context, values )
+	{
+		super( context, { ... values, frequency: values?.frequency ?? 0 } );
+	}
+}
+
 class Gain extends GainNode
 {
 	constructor( context, values )
@@ -198,7 +201,8 @@ class Noise extends AudioWorkletNode
 const primitives =
 {
 	Osc: Osc,
-	BiquadFilter: BiquadFilterNode,
+	BiquadFilter: BqFilter,
+	BQF: BqFilter,
 	Gain: Gain,
 	Noise: Noise,
 };

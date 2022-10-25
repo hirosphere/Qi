@@ -75,7 +75,9 @@ Model.SLF = class
 	
 	noiseLevel = new Leaf.Number( 80 );
 	noiseFreq = new Leaf.Number( 200 );
+	noiseQ = new Leaf.Number( 0 );
 
+	LFO1_Noise_Freq = new Leaf.Number( 0 );
 	LFO1_Osc1_Freq = new Leaf.Number( 0 );
 	LFO1_Freq = new Leaf.Number( 4 );
 	
@@ -160,12 +162,6 @@ SUI.Main = args =>
 {
 	const { model } = args;
 
-	const vopA = { value: value => value == 0 ? 0 : Math.pow( 2, value / 100 * 8 ) / 256 };
-	const vopB = { value: value => value / 100 };
-
-	const volume = { value: model.volume, conv: vopA };
-	const ringlevel = { charge: model.ringLevel, time: 0.01, conv: vopB };
-
 	const cnvA = value => ( value == 0 ? 0 : Math.pow( 2, value / 100 * 8 ) / 256 );
 	const cnvB = value => ( value / 100 );
 
@@ -175,32 +171,40 @@ SUI.Main = args =>
 		{
 			master :    { src: model.volume, conv: cnvA },
 			RingLevel : { src: model.ringLevel, conv: cnvB },
-			Osc1_Level_Ctrl : { src: model.osc1Level, conv: cnvB },
-			osc1Freq :  { src: model.osc1Freq },
-			osc2Level : { src: model.osc2Level, conv: cnvB },
-			osc2Freq :  { src: model.osc2Freq },
-			Ct_LFO1_Osc1_Freq : { src: model.LFO1_Osc1_Freq },
-			LFO1_Freq :  { src: model.LFO1_Freq },
+			Osc_1_Level_Ctrl : { src: model.osc1Level, conv: cnvB },
+			Osc_1_Freq_Ctrl :  { src: model.osc1Freq },
+			Osc_2_Level_Ctrl : { src: model.osc2Level, conv: cnvB },
+			Osc_2_Freq_Ctrl :  { src: model.osc2Freq },
+			LFO_1_Noise_Freq_Ctrl : { src: model.LFO1_Noise_Freq },
+			LFO_1_Osc1_Freq_Ctrl : { src: model.LFO1_Osc1_Freq },
+			LFO_1_Freq_Ctrl :  { src: model.LFO1_Freq },
+			Noise_Level_Ctrl: { src: model.noiseLevel, conv: cnvB },
+			Noise_Freq_Ctrl: { src: model.noiseFreq },
+			Noise_Q_Ctrl: { src: model.noiseQ },
 		},
 
 		parts:
 		{
-			main: { type: "Gain", inputs: [ "osc1gain", "osc2gain", "noisegain", "ringout", "noiseGen" ], paramSrcs: { gain: "master" } },
+			main: { type: "Gain", inputs: [ "osc1gain", "osc2gain", "noisegain", "ringout", "noiseGen" ], params: { gain: "master" } },
 
-			ringout: { type: "Gain", inputs: [ "ring" ], paramSrcs: { gain: "RingLevel" } },
-			ring: { type: "Gain", inputs: [ "osc1" ], paramSrcs: { gain: "osc2" } },
+			ringout: { type: "Gain", inputs: [ "ring" ], params: { gain: "RingLevel" } },
+			ring: { type: "Gain", inputs: [ "osc1" ], params: { gain: "osc2" } },
 
-			osc1gain: { type: "Gain", inputs: [ "osc1" ], paramSrcs: { gain: "Osc1_Level_Ctrl" } },
-			osc1: { type: "Osc", paramSrcs: { frequency: [ "osc1Freq", "LFO_1_Osc_1_Freq" ] } },
+			osc1gain: { type: "Gain", inputs: [ "osc1" ], params: { gain: "Osc_1_Level_Ctrl" } },
+			osc1: { type: "Osc", params: { frequency: [ "Osc_1_Freq_Ctrl", "LFO_1_Osc_1_Freq" ] } },
 			
-			osc2gain: { type: "Gain", inputs: [ "osc2" ], params: { gain: [ model.osc2Level, vopB ] } },
-			osc2: { type: "Osc", params: { frequency: model.osc2Freq } },
+			osc2gain: { type: "Gain", inputs: [ "osc2" ], params: { gain: "Osc_2_Level_Ctrl" } },
+			osc2: { type: "Osc", params: { frequency: "Osc_2_Freq_Ctrl" } },
 
-			LFO_1_Osc_1_Freq: { type: "Gain", inputs: [ "LFO_1" ], paramSrcs: { gain: "Ct_LFO1_Osc1_Freq" } },
-			LFO_1: { type: "Osc", paramSrcs: { frequency: "LFO1_Freq" } },
+			LFO_1_Noise_Freq: { type: "Gain", inputs: [ "LFO_1" ], params: { gain: "LFO_1_Noise_Freq_Ctrl" } },
+			LFO_1_Osc_1_Freq: { type: "Gain", inputs: [ "LFO_1" ], params: { gain: "LFO_1_Osc1_Freq_Ctrl" } },
+			LFO_1: { type: "Osc", params: { frequency: "LFO_1_Freq_Ctrl" } },
 			
-			noisegain: { type: "Gain", inputs: [ "noiseFilter" ], params: { gain: [ model.noiseLevel, vopB ] } },
-			noiseFilter: { type: "BiquadFilter", inputs: [ "noise" ], attrs: { type: "lowpass" }, params: { frequency: model.noiseFreq } },
+			noisegain: { type: "Gain", inputs: [ "noiseFilter" ], params: { gain: "Noise_Level_Ctrl" } },
+			noiseFilter: { type: "BiquadFilter",
+				inputs: [ "noise" ], attrs: { type: "lowpass" },
+				params: { frequency: [ "Noise_Freq_Ctrl", "LFO_1_Noise_Freq" ], Q: "Noise_Q_Ctrl" }
+			},
 			noise: { type: "Noise" },
 
 			noiseGen: { type: SUI.NoiseGen, model: model.noiseGen },
@@ -251,8 +255,10 @@ GUI.CtrlA = args =>
 			{ type: Range, title: "Osc1 Freq", unit: "Hz", model: model.osc1Freq, min: 0, max: 2000, step: 0.1, },
 			{ type: Range, title: "Osc2 Freq", unit: "Hz", model: model.osc2Freq, min: 0, max: 2000, step: 0.1, },
 			
+			{ type: Range, title: "Noise Q",   unit: "", model: model.noiseQ, min: 0, max: 100, step: 0.1, },
 			{ type: Range, title: "Noise Freq", unit: "Hz", model: model.noiseFreq, min: 0, max: 8000, step: 1, },
 
+			{ type: Range, title: "LFO1 Noise F", unit: "Hz", model: model.LFO1_Noise_Freq, min: 0, max: 2000, step: 1, },
 			{ type: Range, title: "LFO1 Osc1 F", unit: "Hz", model: model.LFO1_Osc1_Freq, min: 0, max: 2000, step: 1, },
 			{ type: Range, title: "LFO1 Freq", unit: "Hz", model: model.LFO1_Freq, min: 0, max: 200, step: 0.01, },
 		]

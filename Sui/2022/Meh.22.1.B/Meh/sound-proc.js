@@ -7,7 +7,7 @@ class Noise extends AudioWorkletProcessor
 
 		for( let i = 0; i < output.length; i ++ )
 		{
-			output[ i ] = randR( 2000 );
+			output[ i ] = Math.random() * 2 - 1;
 		}
 
 		return true;
