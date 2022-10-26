@@ -119,16 +119,17 @@ class AudioComponent
 		}
 	}
 	
-	connectParamInputs( param, srcList, { nodeName, paramName } )
+	connectParamInputs( param, srclist, { nodeName, paramName } )
 	{
-		if( ! ( srcList instanceof Array ) ) srcList = [ srcList ];
+		if( ! ( srclist instanceof Array ) ) srclist = [ srclist ];
 		
-		for( const srcspec of srcList ) this.connectParamInput( param, srcspec );
+		for( const srcspec of srclist ) this.connectParamInput( param, srcspec );
 	}
 
 	connectParamInput( param, srcspec )
 	{
 		if( srcspec?.constructor == String ) this.connectSource( param, srcspec );
+		else if( srcspec?.constructor == Number ) param.value = srcspec;
 	}
 	
 	connectSource( target, srcspec )
