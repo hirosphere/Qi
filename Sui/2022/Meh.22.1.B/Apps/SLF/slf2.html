@@ -273,7 +273,7 @@ GUI.CtrlA = args =>
 GUI.App = args =>
 {
 	const model = new Model.SLF;
-	const page = new Page( { title: "SLF" } );
+	const page = new Page( { title: "SLF2" } );
 	const location = new Location( { page, update( { page } ) { return { title: page.title.value } } } );
 
 	const sound = Sound.create( { type: SUI.Main, model }, args.audioContext );
@@ -283,7 +283,7 @@ GUI.App = args =>
 		type: "div", class: "App",
 		acts: { mousedown: resume, keydown: resume, touchstart: resume },
 		parts:[
-			{ type: "h1", text: "SLF" },
+			{ type: "h1", text: page.title },
 			{ type: GUI.CtrlA, model },
 			{ type: GUI.Noise, model: model.noiseGen },			
 		]
