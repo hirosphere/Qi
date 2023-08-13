@@ -74,7 +74,7 @@ let AppPane = class_def
 			let self = this;
 			let horiz = new HorizPane( com, { Width: 270, Height: -1 } );
 			new Pane( horiz, { Rel: 10 } );
-			this.SaveButton = CreateButtonAnc( horiz, "確定", function() { self.CureHash(); } );
+			this.SaveButton = CreateButtonAnc( horiz, "URL確定", function() { self.CureHash(); } );
 			this.TreetButton = CreateButtonAnc( horiz, "ツイート", function() { self.Tweet(); } );
 			// CreateSelect( horiz, [ [ "6" ], [ "7" ], [ "8" ], [ "9" ] ] )
 		};
