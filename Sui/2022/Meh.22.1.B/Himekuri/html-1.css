@@ -1,0 +1,41 @@
+/* 2022-11-23 .. 06:47  */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html
+{
+	height: 100%;
+	padding: 3px 0 5px;
+	background: hsl( 205, 90%, 88% );
+}
+
+body, button, a
+{
+	background: hsl( 205, 93%, 93% );
+	color: hsl( 203, 93%, 48% );
+}
+
+h1 { font-size: 180%; }
+
+a { text-decoration: none; }
+a:hover { background: hsla( 205, 0%, 40%, 10% ); }
+
+button
+{
+	border: 1px solid hsla( 205, 0%, 50%, 15% );
+	border-radius: 2px;
+	padding: 0.5ex 2ex;
+	font-weight: bolder;
+}
+button:hover { background: hsla( 0, 0%, 40%, 10% ); }
+button:active { background: hsl( 0, 0%, 14% ); color:hsl( 205, 0%, 90% ) }
+
+body
+{
+	height: calc( 100% );
+	padding: 50px;
+	display: flex;
+	justify-content: center;
+	align-items:flex-start;
+}
+

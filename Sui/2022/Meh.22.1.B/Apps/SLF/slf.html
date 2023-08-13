@@ -25,7 +25,7 @@ body
 
 .Ranges
 {
-	gap: 1px;
+	gap: 2px;
 	display: flex; flex-direction: column;
 	justify-content:end;
 }
@@ -33,7 +33,7 @@ body
 .Range
 {
 	border-radius: 0.43ex;
-	background:hsl( 50, 0%, 75% ); color:hsl( 50, 0%, 0% );
+	background:hsl( 50, 2%, 90% ); color:hsl( 50, 0%, 0% );
 	display: grid;
 	padding: 1.3ex 1.3ex;
 	grid-template-columns: 12ex 400px 7ex 2ex;
@@ -219,17 +219,6 @@ SUI.Main = args =>
 
 // GUI //
 
-GUI.FineInput = args =>
-{
-	return {
-		type: "div", class: "FineInput",
-		parts:[
-			{ type: "label", text: args.title },
-			{ type: "input", attrs: { type: "range" } },
-		]
-	};
-};
-
 GUI.Noise = ( { model } ) =>
 {
 	return {
@@ -268,7 +257,6 @@ GUI.CtrlA = args =>
 			{ type: Range, title: "Noise Level", unit: "", model: model.noiseLevel, min: 0, max: 100, step: 1, },
 
 			{ type: Range, title: "Osc1 Freq", unit: "Hz", model: model.osc1Freq, min: 0, max: 2000, step: 0.1, },
-			{ type: GUI.FineInput, title: "Osc1 Freq", unit: "Hz", model: model.osc1Freq },
 			{ type: Range, title: "Osc2 Freq", unit: "Hz", model: model.osc2Freq, min: 0, max: 2000, step: 0.1, },
 			
 			{ type: Range, title: "Noise Q",   unit: "", model: model.noiseQ, min: 0, max: 100, step: 0.1, },

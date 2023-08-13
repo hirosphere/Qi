@@ -17,7 +17,7 @@ let EQAudio = new function()
 		this.Playing = new BoolValue( false );
 
 		this.Volume = new NumberValue( 1 );
-		this.Rate = new NumberValue( 30 );
+		this.Rate = new NumberValue( 40 );
 
 		this.Compressor = new NumberValue( 1 );
 		this.Distortion = new NumberValue( 0 );
@@ -134,54 +134,37 @@ let EQAudio = new function()
 					this.Comp.knee = 0;
 					this.Comp.threshold.value = -80;
 				}
+
+				this.DistIn = context.createGain();
+				this.Dist = context.createWaveShaper();
+				this.Dist.curve = new Float32Array( [ -1, 0, 1 ] );
 				
-				this.Dist = context.createScriptProcessor( 0, 2, 2 );
-				{
-					this.Dist.onaudioprocess = ( ev )=>
-					{
-						const inp0 = ev.inputBuffer.getChannelData( 0 );
-						const out0 = ev.outputBuffer.getChannelData( 0 );
-						const inp1 = ev.inputBuffer.getChannelData( 1 );
-						const out1 = ev.outputBuffer.getChannelData( 1 );
-						
-						const gain = Math.pow( 10, this.model.Distortion.Get() / 10 );
-
-						for( let i = 0; i < inp0.length; i ++ )
-						{
-							out0[ i ] = Math.max( -1, Math.min( 1, inp0[ i ] * gain ) );
-							out1[ i ] = Math.max( -1, Math.min( 1, inp1[ i ] * gain ) );
-						}
-					}
-				}
-
 				this.Volume = context.createGain();
 
 				//  connects  //
 				
-				{
-					//const d = this.Volume;
-					const d = this.Comp;
+				const d = this.Comp;
+			
+				this.Splitter.connect( this.NS_Att, 0 );
+				this.NS_Att.connect( this.NS_Volume );
+				this.NS_Volume.connect( this.NS_Pan );
+				this.NS_Pan.connect( d );
 				
-					this.Splitter.connect( this.NS_Att, 0 );
-					this.NS_Att.connect( this.NS_Volume );
-					this.NS_Volume.connect( this.NS_Pan );
-					this.NS_Pan.connect( d );
-					
-					this.Splitter.connect( this.EW_Att, 1 );
-					this.EW_Att.connect( this.EW_Volume );
-					this.EW_Volume.connect( this.EW_Pan );
-					this.EW_Pan.connect( d );
-					
-					this.Splitter.connect( this.UD_Att, 2 );
-					this.UD_Att.connect( this.UD_Volume );
-					this.UD_Volume.connect( this.UD_Pan );
-					this.UD_Pan.connect( d );
+				this.Splitter.connect( this.EW_Att, 1 );
+				this.EW_Att.connect( this.EW_Volume );
+				this.EW_Volume.connect( this.EW_Pan );
+				this.EW_Pan.connect( d );
+				
+				this.Splitter.connect( this.UD_Att, 2 );
+				this.UD_Att.connect( this.UD_Volume );
+				this.UD_Volume.connect( this.UD_Pan );
+				this.UD_Pan.connect( d );
 
-					this.Comp.connect( this.Dist );
-					this.Dist.connect( this.Volume );
-					
-					this.Volume.connect( dest );
-				}
+				this.Comp.connect( this.DistIn );
+				this.DistIn.connect( this.Dist );
+				this.Dist.connect( this.Volume );
+				
+				this.Volume.connect( dest );
 
 				//   //
 				
@@ -244,6 +227,7 @@ let EQAudio = new function()
 				this.UD_Pan.pan.setTargetAtTime( this.model.UD_Pan.Get(), current, 0.01 );
 
 				this.Comp.ratio.setTargetAtTime( this.model.Compressor.Get(), current, 0.01 );
+				this.DistIn.gain.setTargetAtTime( Math.pow( 10, this.model.Distortion.Get() / 10 ), current, 0.01 );
 				
 				let volume = this.model.Volume.Get() * Math.sqrt( this.model.Compressor.Get() );
 				this.Volume.gain.setTargetAtTime( this.playing ? volume : 0, current, 0.01 );

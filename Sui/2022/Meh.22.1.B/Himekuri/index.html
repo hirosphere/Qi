@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ひめくり Code</title>
+	<link rel="stylesheet" href="./html-1.css"/>
+
+	<!-- 2022-11-23 .. 06:42 -->
+
+<style>
+
+.App {
+	display: flex; flex-direction: column;
+	gap: 2em;
+}
+
+.List {
+	border: 3px solid hsl( 205, 0%, 100% );
+	border-radius: 5px;
+	padding: 1em;
+	display: flex; flex-direction: column; gap: 1em;
+}
+
+.List ul {
+	list-style: none;
+	text-align: center;
+}
+
+
+
+</style>
+
+</head>
+<body>
+
+<script type="module">
+
+import { HTDOM, Leaf, Selector, Index } from "../Meh/Meh.js";
+
+const log = console.log;
+
+
+// Model //
+
+const Model = {};
+
+Model.List = class
+{
+	;
+};
+
+Model.Index = class extends Index
+{
+	constructor( srcValue = {}, inits = {} )
+	{
+		super( srcValue, inits );
+		this.link = new Leaf.String( "./" + ( srcValue.title ?? "" ) );
+
+	}
+};
+
+// GUI //
+
+const ListItem = ({ index }) =>
+{
+	log( index.link );
+
+	const anc = {
+		type: "a", text: index.title,
+		attrs: { href: index.link, title: index.title },
+	};
+
+	return {
+		type: "li",
+		parts: [ anc ],
+	};
+};
+
+const List = ( { index } ) =>
+{
+	const content = {
+		type: "ul",
+		parts: {
+			part( index ) { return { type: ListItem, index }; },
+			model: index.parts
+		}
+	};
+
+	const commands =
+	{
+		type: "div", class: "commands",
+		parts:[
+			{ type: "button", text: "New" }
+		]
+	};
+
+	return {
+		type: "div", class: "List",
+		parts:[
+			{ type: "h2", text: index.title },
+			content,
+			commands,
+		]
+	}
+};
+
+
+const App = ({ index }) =>
+{
+	const indexv =
+	{
+		title: "ブロック1",
+		parts:[
+			{ title: "2022-11-12-70" },
+			{ title: "2022-11-12-71" },
+			{ title: "2022-11-12-72" },
+			{ title: "2022-11-13-73" },
+		]
+	};
+
+	const list = [];
+	for( let name in index.items ) { const i = index.items[ name ];  list.push( { title: i.name, link: "./" + i.name } ); }
+
+	const indexv2 = { title: "すべて", parts: list };
+
+	const selector = new Selector( indexv2, { defaultNode: Model.Index } );
+
+	return {
+		type: "div", class: "App",
+		parts:[
+			{ type: "h1", text: "ひめくりHTML" },
+			{ type: "ul", parts: [ { type: List, index: selector.root } ] }
+		]
+	};
+};
+
+
+//  //
+
+const main = async () =>
+{
+	const index = await ( await fetch( "./index.json" ) ).json();
+
+	log( index );
+
+	HTDOM.create( { type: App, index }, "body" );
+};
+
+document.addEventListener( "DOMContentLoaded", main );
+
+</script>
+
+
+</body>
+</html>

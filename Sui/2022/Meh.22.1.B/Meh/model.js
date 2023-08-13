@@ -326,6 +326,13 @@ class Node
 
 class Tree
 {
+	constructor( options )
+	{
+		this.priv =
+		{
+			defaultNode: options?.defaultNode
+		};
+	}
 
 	build( srcValue )
 	{
@@ -338,7 +345,7 @@ class Tree
 		return new type( srcValue, inits )
 	}
 
-	get defaultNode() { return Node }
+	get defaultNode() { return this.priv.defaultNode || Node; }
 
 
 }

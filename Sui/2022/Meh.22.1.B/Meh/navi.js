@@ -53,7 +53,7 @@ class Selector extends Tree
 {
 	constructor( srcValue, options )
 	{
-		super( srcValue, options );
+		super( { defaultNode: Index, ... options } );
 
 		this.current = new Leaf.Object
 		(
@@ -63,11 +63,6 @@ class Selector extends Tree
 
 		this.build( srcValue );
 	}
-
-	// type //
-
-	get defaultNode() { return Index; }
-
 
 	// URL , Location //
 

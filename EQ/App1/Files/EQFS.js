@@ -1,6 +1,7 @@
 let EQFS = new function()
 {
-	let rootpath = location.host.match( /localhost/ ) ? "/D/GitHub/EQ/" : "/EQ/";
+	let rootpath = location.host.match( /localhost/ ) ? "/GitHub/EQ/" : "/EQ/";
+	// let rootpath = location.host.match( /localhost/ ) ? "/D/GitHub/EQ/" : "/EQ/";
 	let wavespath = rootpath + "Waves/";
 
 	this.Init = function( oncomplete )

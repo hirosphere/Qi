@@ -119,7 +119,7 @@ class Parts
 	{
 		const { model, part } = def;
 
-			for( const item of model )
+		for( const item of model )
 		{
 			const key = item?.key ?? item;
 			this.createNode( part( item ), key );

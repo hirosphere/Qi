@@ -148,7 +148,17 @@ class AudioComponent
 
 	resume()
 	{
+		log( this.context.state );
+		this.context.resume();
+		starts.go();
+	}
+
+	resume_()
+	{
 		const state = this.context.state;
+		
+		log( state );
+
 		if( state == "suspended" || state == "interrupted" )
 		{
 			this.context.resume();

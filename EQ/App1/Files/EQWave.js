@@ -109,6 +109,8 @@ let EQDec = new function()
 		let samplingrate = rd.Uint16( "サンプリングレート" );
 		let ch_count = rd.Uint8( "成分数" );
 		let samplecount = sampletime * samplingrate / 10;
+
+		console.log( { samplecount, sampletime, samplingrate } );
 		
 		rd.Uint8( "移設フラグ" );
 
@@ -163,6 +165,8 @@ let EQDec = new function()
 		{
 			this.Initiate = function( channels, ch_count, index, samplecount, rd, mon )
 			{
+				console.log( channels, ch_count, index, samplecount, rd, mon );
+
 				this.Monitor = mon || [];
 				this.Samples = new Float32Array( samplecount );
 				this.index = index;
