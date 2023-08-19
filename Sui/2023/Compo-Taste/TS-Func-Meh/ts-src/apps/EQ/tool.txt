@@ -1,0 +1,7 @@
+観測点リストをJSONに
+
+const lines = input.split( "\n" );
+const line = lines[ Math.floor( Math.random() * lines.length ) ].split( "," );
+const [ code, name, name_r, lat, long, depth, x1, pref, pref_r, lat_j, long_j, x2, x3, x4, x5 ] = line;
+
+JSON.stringify( { code, name, name_r, lat, long, depth, x1, pref, pref_r, lat_j, long_j, x2, x3, x4, x5 }, null, "\t" );

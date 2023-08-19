@@ -1,0 +1,5 @@
+// RU : runtime unique
+export class RU {
+    __ru = Symbol();
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiUlUuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi90cy1zcmMvbWVoL21vZGVsL1JVLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUNBLHNCQUFzQjtBQUV0QixNQUFNLE9BQU8sRUFBRTtJQUVFLElBQUksR0FBRyxNQUFNLEVBQUUsQ0FBQztDQUNoQyJ9
